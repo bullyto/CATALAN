@@ -1,105 +1,113 @@
-/* ===== sw.js : AUTO UPDATE + HTML NETWORK-FIRST + ASSETS CACHE-FIRST ===== */
+/* sw.js — L'apéro catalan
+   Objectif :
+   - Pré-cache des fichiers essentiels (offline)
+   - Mise à jour propre : SKIP_WAITING + reload auto
+   - HTML en Network First (pour chopper les modifs vite)
+*/
 
-const CACHE_VERSION = "catalan-v2"; // incrémente si besoin (v2, v3...)
-const CACHE_NAME = `pwa-${CACHE_VERSION}`;
+const VERSION = "v7"; // ⬅️ incrémente à chaque grosse modif (v8, v9, etc.)
+const CACHE_NAME = `catalan-${VERSION}`;
 
-const PRECACHE = [
+// ✅ Mets ici EXACTEMENT les fichiers qui existent dans ton repo
+const PRECACHE_URLS = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
+
+  // Icônes / favicons (Android + iPhone)
   "./icon-192.png",
   "./icon-512.png",
-  "./icon-192-maskable.png",
-  "./icon-512-maskable.png",
   "./apple-touch-icon.png",
   "./favicon-32.png"
 ];
 
-// ✅ reçoit l'ordre de passer direct en actif
-self.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "SKIP_WAITING") {
-    self.skipWaiting();
-  }
-});
-
-// ✅ install : precache
+// -------- INSTALL: pré-cache + skip waiting --------
 self.addEventListener("install", (event) => {
-  event.waitUntil((async () => {
-    const cache = await caches.open(CACHE_NAME);
-
-    // cache "reload" = évite certains caches CDN/navigateurs
-    await cache.addAll(PRECACHE.map((u) => new Request(u, { cache: "reload" })));
-
-    self.skipWaiting();
-  })());
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(PRECACHE_URLS))
+      .then(() => self.skipWaiting())
+  );
 });
 
-// ✅ activate : nettoyage + claim
+// -------- ACTIVATE: purge anciens caches + claim --------
 self.addEventListener("activate", (event) => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.map((k) => (k !== CACHE_NAME ? caches.delete(k) : Promise.resolve())));
+    await Promise.all(
+      keys.map((k) => (k !== CACHE_NAME ? caches.delete(k) : Promise.resolve()))
+    );
     await self.clients.claim();
   })());
 });
 
-// Helpers
-function isHTMLRequest(req) {
-  const url = new URL(req.url);
-  const accept = req.headers.get("accept") || "";
-  return (
-    confirmingNavigate(req) ||
-    accept.includes("text/html") ||
-    url.pathname.endsWith(".html") ||
-    url.pathname === "/" ||
-    url.pathname.endsWith("/")
-  );
-}
+// -------- MESSAGE: SKIP_WAITING depuis la page --------
+self.addEventListener("message", (event) => {
+  if (!event.data) return;
+  if (event.data.type === "SKIP_WAITING") self.skipWaiting();
+});
 
-function confirmingNavigate(req) {
-  return req.mode === "navigate";
-}
-
-// ✅ fetch : HTML network-first, assets cache-first
+// -------- FETCH STRATEGY --------
+// - Navigations (HTML) : Network First (pour être à jour)
+// - Autres assets (png, css, js) : Cache First (rapide) + mise en cache
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
 
   const url = new URL(req.url);
+  const isSameOrigin = url.origin === self.location.origin;
 
-  // hors scope => laisser passer
-  if (url.origin !== self.location.origin) return;
+  // ✅ Toujours Network First pour les pages HTML (navigations)
+  const isNavigation = req.mode === "navigate" ||
+    (req.headers.get("accept") || "").includes("text/html");
 
-  // 1) HTML = NETWORK FIRST (toujours à jour)
-  if (isHTMLRequest(req)) {
-    event.respondWith((async () => {
-      try {
-        const fresh = await fetch(req, { cache: "no-store" });
-        const cache = await caches.open(CACHE_NAME);
-        cache.put(req, fresh.clone());
-        return fresh;
-      } catch (e) {
-        const cached = await caches.match(req);
-        return cached || caches.match("./index.html");
-      }
-    })());
+  if (isNavigation) {
+    event.respondWith(networkFirstHTML(req));
     return;
   }
 
-  // 2) Assets = CACHE FIRST
-  event.respondWith((async () => {
-    const cached = await caches.match(req);
-    if (cached) return cached;
+  // ✅ Pour le reste (icônes, images, css, js) : cache first (si même origin)
+  if (isSameOrigin) {
+    event.respondWith(cacheFirst(req));
+    return;
+  }
 
-    try {
-      const res = await fetch(req);
-      if (res && res.status === 200 && res.type === "basic") {
-        const cache = await caches.open(CACHE_NAME);
-        cache.put(req, res.clone());
-      }
-      return res;
-    } catch (e) {
-      return cached || Response.error();
-    }
-  })());
+  // sinon laisse passer
 });
+
+// ---------- Helpers ----------
+async function networkFirstHTML(req) {
+  try {
+    const fresh = await fetch(req, { cache: "no-store" });
+    const cache = await caches.open(CACHE_NAME);
+
+    // on met en cache uniquement si OK + same-origin (souvent basic)
+    if (fresh && fresh.status === 200) {
+      cache.put(req, fresh.clone());
+    }
+    return fresh;
+  } catch (e) {
+    // fallback cache
+    const cached = await caches.match(req);
+    return cached || caches.match("./index.html");
+  }
+}
+
+async function cacheFirst(req) {
+  const cached = await caches.match(req);
+  if (cached) return cached;
+
+  try {
+    const fresh = await fetch(req);
+    // Cache uniquement réponses ok et même origin
+    const url = new URL(req.url);
+    if (fresh && fresh.status === 200 && fresh.type === "basic" && url.origin === self.location.origin) {
+      const cache = await caches.open(CACHE_NAME);
+      cache.put(req, fresh.clone());
+    }
+    return fresh;
+  } catch (e) {
+    // fallback icône si jamais
+    return caches.match("./icon-192.png");
+  }
+}
