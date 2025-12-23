@@ -7,10 +7,10 @@
   <title>L'apéro catalan</title>
 
   <!-- PWA / UI -->
-  <meta name="theme-color" content="#C61910">
-  <meta name="background-color" content="#ffffff">
+  <meta name="theme-color" content="#8a0b0b">
+  <meta name="background-color" content="#2a0a0c">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Apéro Catalan">
 
   <!-- ✅ Cache-busting -->
@@ -62,11 +62,277 @@
     .modal.active { opacity: 1; pointer-events: auto; }
     .tab-active { background:#C61910 !important; color:#fff !important; }
     .tab-idle { background:#f3f4f6 !important; color:#111827 !important; }
+  
+    /* ===== PWA FAUX CHARGEMENT (uniquement PWA installée) ===== */
+    #pwaLoading {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      display: none; /* activé uniquement en mode PWA */
+      opacity: 0;
+      transition: opacity .18s ease; /* fondu-in court */
+    }
+    #pwaLoading.ready { opacity: 1; }
+    #pwaLoading .pl-body{
+      height:100%;
+      overflow:hidden;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;
+      background:
+        radial-gradient(900px 650px at 50% 18%, rgba(255,211,107,.18), transparent 58%),
+        radial-gradient(900px 650px at 20% 70%, rgba(177,15,21,.20), transparent 62%),
+        radial-gradient(900px 650px at 80% 70%, rgba(242,178,51,.12), transparent 62%),
+        linear-gradient(180deg, #5a1217, #2a0a0c 55%, #120406);
+    }
+    #pwaLoading .pl-stripes{
+      position:absolute; inset:-40%;
+      background: repeating-linear-gradient(90deg, rgba(177,15,21,.12) 0 42px, rgba(242,178,51,.10) 42px 84px);
+      transform: rotate(-12deg);
+      opacity:.35;
+      animation: pl-drift 8s ease-in-out infinite;
+      mix-blend-mode: overlay;
+      pointer-events:none;
+    }
+    @keyframes pl-drift{
+      0%,100%{transform: rotate(-12deg) translateX(-1.4%)}
+      50%{transform: rotate(-12deg) translateX(1.4%)}
+    }
+    #pwaLoading .pl-vignette{
+      position:absolute; inset:0;
+      background: radial-gradient(circle at 50% 38%, transparent 35%, rgba(0,0,0,.50) 92%);
+      pointer-events:none;
+    }
+    #pwaLoading .pl-screen{
+      position:relative;
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+    #pwaLoading .pl-brand{
+      position:absolute;
+      top:18px;
+      width:100%;
+      text-align:center;
+      font-weight:900;
+      letter-spacing:.18em;
+      color:rgba(255,244,223,.95);
+      font-size:19px;
+      text-shadow:0 6px 24px rgba(0,0,0,.45);
+      user-select:none;
+    }
+    #pwaLoading .pl-brand sup{
+      font-size:12px;
+      margin-left:3px;
+      vertical-align:text-top;
+      letter-spacing:0;
+    }
+    #pwaLoading .pl-stack{
+      width:min(420px, 100%);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:16px;
+      transform: translateY(-10px);
+    }
+    #pwaLoading .pl-iconWrap{
+      width:168px; height:168px;
+      display:grid;
+      place-items:center;
+      border-radius:36px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 24px 95px rgba(0,0,0,.55);
+      position:relative;
+      animation: pl-float 3.2s ease-in-out infinite;
+      backdrop-filter: blur(10px);
+      overflow:hidden;
+    }
+    #pwaLoading .pl-iconWrap::before{
+      content:"";
+      position:absolute; inset:-20px;
+      background: radial-gradient(circle at 50% 50%, rgba(255,211,107,.28), transparent 60%);
+      filter: blur(16px);
+      opacity:.9;
+      pointer-events:none;
+      z-index:0;
+    }
+    #pwaLoading .pl-iconWrap::after{
+      content:"";
+      position:absolute;
+      top:-40%;
+      left:-70%;
+      width:60%;
+      height:220%;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.18) 40%, rgba(255,255,255,.35) 50%, rgba(255,255,255,.18) 60%, transparent 100%);
+      transform: skewX(-18deg);
+      filter: blur(1px);
+      opacity:.75;
+      animation: pl-logoShine 3.6s ease-in-out infinite;
+      pointer-events:none;
+      z-index:2;
+      mix-blend-mode: screen;
+    }
+    @keyframes pl-logoShine{
+      0%   { left:-75%; opacity:0; }
+      18%  { opacity:.85; }
+      50%  { opacity:.75; }
+      82%  { opacity:.85; }
+      100% { left:125%; opacity:0; }
+    }
+    #pwaLoading .pl-icon{
+      width:132px; height:132px;
+      object-fit:contain;
+      border-radius:30px;
+      background:#fff;
+      filter: drop-shadow(0 10px 26px rgba(0,0,0,.35));
+      position:relative;
+      z-index:1;
+    }
+    @keyframes pl-float{
+      0%,100%{transform: translateY(0)}
+      50%{transform: translateY(-5px)}
+    }
+    #pwaLoading .pl-progressRow{
+      width:270px;
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:10px;
+    }
+    #pwaLoading .pl-percent{
+      font-size:13px;
+      color:rgba(255,255,255,.72);
+      letter-spacing:.2px;
+      user-select:none;
+    }
+    #pwaLoading .pl-track{
+      width:100%;
+      height:10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    #pwaLoading .pl-bar{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background: linear-gradient(90deg, #d98912, #f2b233, #ffd36b);
+      transition: width .25s linear;
+      box-shadow: 0 0 18px rgba(255,211,107,.18);
+      position:relative;
+    }
+    #pwaLoading .pl-bar:after{
+      content:"";
+      position:absolute;
+      top:-70%;
+      left:-55%;
+      width:46%;
+      height:240%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.24), transparent);
+      transform: skewX(-16deg);
+      animation: pl-sweep 1.6s linear infinite;
+      opacity:.65;
+    }
+    @keyframes pl-sweep{
+      0%{left:-55%}
+      100%{left:130%}
+    }
+    @media (prefers-reduced-motion: reduce){
+      #pwaLoading .pl-stripes,
+      #pwaLoading .pl-iconWrap,
+      #pwaLoading .pl-iconWrap::after,
+      #pwaLoading .pl-bar:after { animation:none !important; }
+    }
+
   </style>
 </head>
 
 <body class="w-[375px] min-h-[762px] mx-auto relative"
   style="background-image:url('https://readdy.ai/api/search-image?query=blurred%20background%2C%20warm%20and%20festive%20atmosphere%2C%20people%20celebrating%2C%20soft%20lights%2C%20party%20mood%2C%20warm%20colors%2C%20subtle%20pattern%2C%20low%20opacity%20for%20text%20readability%2C%20no%20distinct%20objects&width=375&height=762&seq=10&orientation=portrait'); background-size:cover; background-position:center;">
+<!-- ✅ PWA : Faux chargement (uniquement si l'app est installée) -->
+<div id="pwaLoading" aria-hidden="true">
+  <div class="pl-body">
+    <div class="pl-stripes"></div>
+    <div class="pl-vignette"></div>
+
+    <div class="pl-screen">
+      <div class="pl-brand">APERO CATALAN<sup>®</sup></div>
+
+      <div class="pl-stack">
+        <div class="pl-iconWrap">
+          <!-- priorité icône locale (offline), fallback URL -->
+          <img class="pl-icon"
+               src="./icône-512.png?v=20251223"
+               onerror="this.onerror=null; this.src='https://image.noelshack.com/fichiers/2025/52/2/1766528997-icon-512-1.png';"
+               alt="Apéro Catalan">
+        </div>
+
+        <div class="pl-progressRow">
+          <div class="pl-percent" id="plPct">0%</div>
+          <div class="pl-track"><div class="pl-bar" id="plBar"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== Afficher le faux chargement UNIQUEMENT en PWA installée ===== */
+(function(){
+  const isStandalone =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.matchMedia('(display-mode: fullscreen)').matches ||
+    window.matchMedia('(display-mode: minimal-ui)').matches ||
+    window.navigator.standalone === true;
+
+  const overlay = document.getElementById('pwaLoading');
+  if (!overlay) return;
+
+  if (!isStandalone) {
+    overlay.remove(); // Site navigateur => jamais de faux chargement
+    return;
+  }
+
+  // Active l'overlay + petit fondu-in (feinte avec le splash natif)
+  overlay.style.display = 'block';
+  requestAnimationFrame(() => overlay.classList.add('ready'));
+
+  // Progression réaliste (un peu lente)
+  const bar = document.getElementById('plBar');
+  const pct = document.getElementById('plPct');
+  let p = 0;
+
+  function setP(v){
+    p = Math.max(0, Math.min(100, v));
+    if (bar) bar.style.width = p + '%';
+    if (pct) pct.textContent = Math.round(p) + '%';
+  }
+
+  const t = setInterval(() => {
+    if (p < 40) setP(p + 1.2);
+    else if (p < 70) setP(p + 0.85);
+    else if (p < 88) setP(p + 0.42);
+    else if (p < 96) setP(p + 0.16);
+    else setP(p + 0.05);
+    if (p >= 99) setP(99);
+  }, 130);
+
+  // Quand la page est prête, on finit et on retire proprement
+  window.addEventListener('load', () => {
+    clearInterval(t);
+    // petite pause "réaliste"
+    setTimeout(() => {
+      setP(100);
+      overlay.style.transition = 'opacity .25s ease';
+      overlay.style.opacity = '0';
+      setTimeout(() => overlay.remove(), 260);
+    }, 480);
+  });
+})();
+</script>
+
 
 <header class="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
   <div class="w-[375px] mx-auto py-4 flex items-center justify-center">
