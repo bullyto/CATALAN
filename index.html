@@ -1,61 +1,80 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>L'apéro catalan</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="https://cdn.tailwindcss.com/3.4.16"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+  <title>L'apéro catalan</title>
 
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      colors: { primary: '#C61910', secondary: '#FFB81C' },
-      borderRadius: {
-        'none': '0px','sm': '4px',DEFAULT: '8px','md': '12px','lg': '16px','xl': '20px',
-        '2xl': '24px','3xl': '32px','full': '9999px','button': '8px'
+  <!-- PWA / UI -->
+  <meta name="theme-color" content="#C61910">
+  <meta name="background-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Apéro Catalan">
+
+  <!-- ✅ Cache-busting -->
+  <link rel="manifest" href="manifest.webmanifest?v=20251223">
+
+  <!-- ✅ Icônes locales -->
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png?v=20251223">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icône-192.png?v=20251223">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icône-512.png?v=20251223">
+  <link rel="apple-touch-icon" href="./icône-touch-apple.png?v=20251223">
+
+  <!-- ✅ Partage / preview -->
+  <meta property="og:title" content="L'apéro catalan">
+  <meta property="og:description" content="Épicerie de nuit catalan • Livraison 7j/7 de 19h à 6h • Appel direct">
+  <meta property="og:image" content="./icône-512.png?v=20251223">
+  <meta property="og:type" content="website">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="L'apéro catalan">
+  <meta name="twitter:description" content="Épicerie de nuit catalan • Livraison 7j/7 de 19h à 6h • Appel direct">
+  <meta name="twitter:image" content="./icône-512.png?v=20251223">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+
+  <script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: { primary: '#C61910', secondary: '#FFB81C' },
+        borderRadius: {
+          'none': '0px','sm': '4px',DEFAULT: '8px','md': '12px','lg': '16px','xl': '20px',
+          '2xl': '24px','3xl': '32px','full': '9999px','button': '8px'
+        }
       }
     }
   }
-}
-</script>
+  </script>
 
-<style>
-:where([class^="ri-"])::before { content: "\f3c2"; }
-.modal { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
-.modal.active { opacity: 1; pointer-events: auto; }
-
-/* Mini polish boutique */
-.tab-active { background:#C61910 !important; color:#fff !important; }
-.tab-idle { background:#f3f4f6 !important; color:#111827 !important; }
-</style>
-
-<link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#C61910">
-
-<meta property="og:title" content="L'apéro catalan">
-<meta property="og:description" content="Épicerie de nuit catalan • Livraison 7j/7 de 19h à 6h • Appel direct">
-<meta property="og:image" content="https://i.postimg.cc/MHrNcvMr/file-000000002c906243b1fb58ce1bd6d82d-1.png">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
-
-<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
-<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+  <style>
+    :where([class^="ri-"])::before { content: "\f3c2"; }
+    .modal { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+    .modal.active { opacity: 1; pointer-events: auto; }
+    .tab-active { background:#C61910 !important; color:#fff !important; }
+    .tab-idle { background:#f3f4f6 !important; color:#111827 !important; }
+  </style>
 </head>
 
 <body class="w-[375px] min-h-[762px] mx-auto relative"
-style="background-image: url('https://readdy.ai/api/search-image?query=blurred%20background%2C%20warm%20and%20festive%20atmosphere%2C%20people%20celebrating%2C%20soft%20lights%2C%20party%20mood%2C%20warm%20colors%2C%20subtle%20pattern%2C%20low%20opacity%20for%20text%20readability%2C%20no%20distinct%20objects&width=375&height=762&seq=10&orientation=portrait'); background-size: cover; background-position: center;">
+  style="background-image:url('https://readdy.ai/api/search-image?query=blurred%20background%2C%20warm%20and%20festive%20atmosphere%2C%20people%20celebrating%2C%20soft%20lights%2C%20party%20mood%2C%20warm%20colors%2C%20subtle%20pattern%2C%20low%20opacity%20for%20text%20readability%2C%20no%20distinct%20objects&width=375&height=762&seq=10&orientation=portrait'); background-size:cover; background-position:center;">
 
 <header class="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
   <div class="w-[375px] mx-auto py-4 flex items-center justify-center">
     <div class="text-center">
       <div class="w-[150px] h-[150px] mx-auto mb-2 rounded-full overflow-hidden">
-        <img id="logo-entreprise" src="https://i.postimg.cc/MHrNcvMr/file-000000002c906243b1fb58ce1bd6d82d-1.png" alt="Logo" class="w-full h-full object-cover">
+        <img id="logo-entreprise"
+             src="https://i.postimg.cc/MHrNcvMr/file-000000002c906243b1fb58ce1bd6d82d-1.png"
+             alt="Logo" class="w-full h-full object-cover">
       </div>
       <h1 class="font-['Pacifico'] text-2xl text-primary">L'apéro catalan</h1>
     </div>
@@ -63,27 +82,33 @@ style="background-image: url('https://readdy.ai/api/search-image?query=blurred%2
 </header>
 
 <main class="pt-[220px] pb-[80px] px-4 flex flex-col gap-6">
-  <a href="tel:0652336461" class="w-full py-4 bg-primary text-white font-semibold !rounded-button flex items-center justify-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+  <a href="tel:0652336461"
+     class="w-full py-4 bg-primary text-white font-semibold !rounded-button flex items-center justify-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
     <div class="w-6 h-6 flex items-center justify-center">
       <i class="ri-phone-fill text-xl"></i>
     </div>
     <span>APPELER</span>
   </a>
 
-  <button id="installBtn" class="w-full bg-[#FFC107] text-white py-4 !rounded-button font-semibold flex items-center justify-center gap-2 shadow-lg hover:opacity-95 transition hidden">
+  <button id="installBtn"
+          class="w-full bg-[#FFC107] text-white py-4 !rounded-button font-semibold flex items-center justify-center gap-2 shadow-lg hover:opacity-95 transition hidden">
     <i class="ri-download-cloud-2-line text-xl"></i>
     AJOUTER À L'ÉCRAN D'ACCUEIL
   </button>
-  <p id="installHint" class="text-xs text-white/90 text-center hidden">Sur iPhone : appuie sur <b>Partager</b> puis <b>Sur l’écran d’accueil</b>.</p>
+  <p id="installHint" class="text-xs text-white/90 text-center hidden">
+    Sur iPhone : appuie sur <b>Partager</b> puis <b>Sur l’écran d’accueil</b>.
+  </p>
 
-  <button id="zoneBtn" class="w-full py-4 bg-secondary text-white font-semibold !rounded-button flex items-center justify-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+  <button id="zoneBtn"
+          class="w-full py-4 bg-secondary text-white font-semibold !rounded-button flex items-center justify-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
     <div class="w-6 h-6 flex items-center justify-center">
       <i class="ri-map-pin-2-fill text-xl"></i>
     </div>
     <span>ZONE DE LIVRAISON</span>
   </button>
 
-  <button id="articlesBtn" class="w-full py-4 bg-primary text-white font-semibold !rounded-button flex items-center justify-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+  <button id="articlesBtn"
+          class="w-full py-4 bg-primary text-white font-semibold !rounded-button flex items-center justify-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
     <div class="w-6 h-6 flex items-center justify-center">
       <i class="ri-shopping-bag-fill text-xl"></i>
     </div>
@@ -119,7 +144,8 @@ style="background-image: url('https://readdy.ai/api/search-image?query=blurred%2
 <!-- ===== MODALS ===== -->
 <div id="zoneModal" class="modal fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
   <div class="w-[340px] bg-white !rounded-button p-4 relative">
-    <button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary" onclick="closeModal('zoneModal')">
+    <button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary"
+            onclick="closeModal('zoneModal')">
       <i class="ri-close-line text-xl"></i>
     </button>
     <h2 class="text-xl font-semibold mb-4">Zone de livraison</h2>
@@ -131,8 +157,8 @@ style="background-image: url('https://readdy.ai/api/search-image?query=blurred%2
 
 <div id="articlesModal" class="modal fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
   <div class="w-[340px] bg-white !rounded-button p-4 relative max-h-[90vh] overflow-y-auto">
-
-    <button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary" onclick="closeModal('articlesModal')">
+    <button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary"
+            onclick="closeModal('articlesModal')">
       <i class="ri-close-line text-xl"></i>
     </button>
 
@@ -141,17 +167,18 @@ style="background-image: url('https://readdy.ai/api/search-image?query=blurred%2
       <p class="text-xs text-gray-500 mb-3">Recherche + tri pour trouver vite. Appelle pour commander.</p>
     </div>
 
-    <!-- Search + Sort -->
     <div class="grid grid-cols-1 gap-2 mb-4">
       <div class="relative">
         <div class="w-6 h-6 absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center text-gray-400">
           <i class="ri-search-line"></i>
         </div>
-        <input type="text" id="searchInput" placeholder="Rechercher un produit..." class="w-full pl-10 pr-4 py-2 !rounded-button border border-gray-200 text-sm focus:outline-none focus:border-primary">
+        <input type="text" id="searchInput" placeholder="Rechercher un produit..."
+               class="w-full pl-10 pr-4 py-2 !rounded-button border border-gray-200 text-sm focus:outline-none focus:border-primary">
       </div>
 
       <div class="flex gap-2">
-        <select id="sortSelect" class="w-full py-2 px-3 !rounded-button border border-gray-200 text-sm focus:outline-none focus:border-primary">
+        <select id="sortSelect"
+                class="w-full py-2 px-3 !rounded-button border border-gray-200 text-sm focus:outline-none focus:border-primary">
           <option value="popular">Tri : Recommandés</option>
           <option value="az">Tri : A → Z</option>
           <option value="priceAsc">Tri : Prix ↑</option>
@@ -160,7 +187,6 @@ style="background-image: url('https://readdy.ai/api/search-image?query=blurred%2
       </div>
     </div>
 
-    <!-- Category tabs (bière supprimée) -->
     <div class="overflow-x-auto -mx-4 px-4 mb-3">
       <div class="flex gap-2 whitespace-nowrap pb-2" id="categoryTabs">
         <button class="px-3 py-1 text-sm !rounded-full tab-active" data-category="all">Tout</button>
@@ -178,7 +204,6 @@ style="background-image: url('https://readdy.ai/api/search-image?query=blurred%2
       </div>
     </div>
 
-    <!-- Quick stats -->
     <div class="flex items-center justify-between text-xs text-gray-500 mb-3">
       <div id="resultInfo">—</div>
       <div class="text-gray-400">Commande : <span class="text-primary font-semibold">téléphone</span></div>
@@ -194,25 +219,22 @@ style="background-image: url('https://readdy.ai/api/search-image?query=blurred%2
 
 <div id="cgvModal" class="modal fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
   <div class="w-[340px] bg-white !rounded-button p-4 relative max-h-[90vh] overflow-y-auto">
-    <button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary" onclick="closeModal('cgvModal')">
+    <button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary"
+            onclick="closeModal('cgvModal')">
       <i class="ri-close-line text-xl"></i>
     </button>
-    <h2 class="text-xl font-semibold mb-4 bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Conditions Générales de Vente</h2>
+    <h2 class="text-xl font-semibold mb-4 bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">
+      Conditions Générales de Vente
+    </h2>
     <div class="prose text-sm space-y-4">
       <h3 class="font-medium">1. Service de livraison</h3>
       <p>L'Apéro Catalan propose un service de livraison d'alcool à domicile, disponible de 19h à 6h, 7 jours sur 7, dans un rayon de 30km autour de Perpignan.</p>
       <h3 class="font-medium">2. Commande et livraison</h3>
-      <p>- Commande par téléphone uniquement<br>
-        - Délai de livraison estimé communiqué lors de la commande<br>
-        - Zone de livraison limitée à 30km de Perpignan</p>
+      <p>- Commande par téléphone uniquement<br>- Délai de livraison estimé communiqué lors de la commande<br>- Zone de livraison limitée à 30km de Perpignan</p>
       <h3 class="font-medium">3. Conditions de vente</h3>
-      <p>- Vente d'alcool interdite aux mineurs (une pièce d'identité sera demandée)<br>
-        - Paiement à la livraison (espèces ou CB)<br>
-        - Droit de refus en cas de client en état d'ébriété manifeste</p>
+      <p>- Vente d'alcool interdite aux mineurs (une pièce d'identité sera demandée)<br>- Paiement à la livraison (espèces ou CB)<br>- Droit de refus en cas de client en état d'ébriété manifeste</p>
       <h3 class="font-medium">4. Prix et paiement</h3>
-      <p>- Les prix sont indiqués TTC<br>
-        - Frais de livraison calculés selon la distance<br>
-        - Paiement sécurisé à la livraison</p>
+      <p>- Les prix sont indiqués TTC<br>- Frais de livraison calculés selon la distance<br>- Paiement sécurisé à la livraison</p>
       <h3 class="font-medium">5. Responsabilité</h3>
       <p>L'Apéro Catalan se réserve le droit de refuser une livraison si les conditions de sécurité ne sont pas réunies ou en cas de non-respect des présentes conditions.</p>
       <h3 class="font-medium">RGPD :</h3>
@@ -223,10 +245,13 @@ style="background-image: url('https://readdy.ai/api/search-image?query=blurred%2
 
 <div id="mentionsModal" class="modal fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
   <div class="w-[340px] bg-white !rounded-button p-4 relative max-h-[90vh] overflow-y-auto">
-    <button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary" onclick="closeModal('mentionsModal')">
+    <button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary"
+            onclick="closeModal('mentionsModal')">
       <i class="ri-close-line text-xl"></i>
     </button>
-    <h2 class="text-xl font-semibold mb-4 bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Mentions Légales</h2>
+    <h2 class="text-xl font-semibold mb-4 bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">
+      Mentions Légales
+    </h2>
     <div class="prose text-sm space-y-4">
       <h3 class="font-medium text-base">Éditeur du site</h3>
       <p>Le présent site internet « L'Apéro Catalan » est exploité par la société Apéro de Nuit 66, entreprise immatriculée au Registre du Commerce et des Sociétés sous le numéro 879 976 099, dont le siège social est situé a villelongue de la sallanque.</p>
@@ -256,7 +281,8 @@ document.addEventListener('DOMContentLoaded', function() {
     mentionsBtn: document.getElementById('mentionsBtn')
   };
 
-  // ✅ BIÈRES SUPPRIMÉES ICI
+  // ✅ BIÈRES RETIRÉES
+  // ✅ VIN : DOMAINE DU VIEUX GENEVRIER remplacé par XV Catalan
   const products = {
     "vodka": [
       {"name":"Poliakov","price":29.0,"image":""},
@@ -289,12 +315,8 @@ document.addEventListener('DOMContentLoaded', function() {
       {"name":"Gibson's","price":34.0,"image":""},
       {"name":"Liqueur de cassis","price":8.5,"image":""}
     ],
-    "gin": [
-      {"name":"Gordon's","price":34.0,"image":""}
-    ],
-    "tequila": [
-      {"name":"Tequila","price":28.0,"image":""}
-    ],
+    "gin": [{"name":"Gordon's","price":34.0,"image":""}],
+    "tequila": [{"name":"Tequila","price":28.0,"image":""}],
     "softs": [
       {"name":"Oasis (tropical)","price":3.5,"image":""},
       {"name":"Fanta citron","price":3.5,"image":""},
@@ -318,17 +340,15 @@ document.addEventListener('DOMContentLoaded', function() {
       {"name":"Veuve Pelletier","price":60.0,"image":""}
     ],
     "vin": [
-      {"name":"DOMAINE DU VIEUX GENEVRIER (Muscat)","price":25.0,"image":""},
-      {"name":"DOMAINE DU VIEUX GENEVRIER (Vin rouge)","price":19.0,"image":""},
-      {"name":"DOMAINE DU VIEUX GENEVRIER (Vin rosé)","price":19.0,"image":""},
-      {"name":"DOMAINE DU VIEUX GENEVRIER (Vin blanc)","price":19.0,"image":""},
+      {"name":"XV Catalan (Muscat)","price":25.0,"image":""},
+      {"name":"XV Catalan (Vin rouge)","price":19.0,"image":""},
+      {"name":"XV Catalan (Vin rosé)","price":19.0,"image":""},
+      {"name":"XV Catalan (Vin blanc)","price":19.0,"image":""},
       {"name":"LAFAGE (Vin blanc)","price":19.0,"image":""},
       {"name":"LAFAGE (Vin rouge)","price":19.0,"image":""},
       {"name":"LAFAGE (Vin rosé)","price":19.0,"image":""}
     ],
-    "accessoires": [
-      {"name":"Verre à whisky-soda incassable 35 cl","price":0.5,"image":""}
-    ]
+    "accessoires": [{"name":"Verre à whisky-soda incassable 35 cl","price":0.5,"image":""}]
   };
 
   Object.entries(buttons).forEach(([key, btn]) => {
@@ -336,21 +356,14 @@ document.addEventListener('DOMContentLoaded', function() {
     btn.addEventListener('click', () => openModal(modalId));
   });
 
-  window.closeModal = function(modalId) {
-    modals[modalId].classList.remove('active');
-  };
-
+  window.closeModal = function(modalId) { modals[modalId].classList.remove('active'); };
   window.openModal = function(modalId) {
     modals[modalId].classList.add('active');
-    if(modalId === 'articlesModal') {
-      displayProducts(getActiveCategory(), searchInput.value, sortSelect.value);
-    }
+    if(modalId === 'articlesModal') displayProducts(getActiveCategory(), searchInput.value, sortSelect.value);
   };
 
   Object.values(modals).forEach(modal => {
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) modal.classList.remove('active');
-    });
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
   });
 
   const searchInput = document.getElementById('searchInput');
@@ -359,81 +372,48 @@ document.addEventListener('DOMContentLoaded', function() {
   const sortSelect = document.getElementById('sortSelect');
   const resultInfo = document.getElementById('resultInfo');
 
-  // Ordre recommandé (tu peux changer)
   const featuredOrder = [
-    "Jack Daniel's",
-    "Ballantine's",
-    "Captain Morgan",
-    "Havana Club 3 ans",
-    "Absolut Vodka",
-    "CIROC Classic",
-    "MOËT & CHANDON \"Impérial\" (1,5 L)",
-    "Ricard",
-    "GET 27",
-    "Red Bull"
+    "Jack Daniel's","Ballantine's","Captain Morgan","Havana Club 3 ans","Absolut Vodka",
+    "CIROC Classic","MOËT & CHANDON \"Impérial\" (1,5 L)","Ricard","GET 27","Red Bull",
+    "XV Catalan (Vin rouge)","XV Catalan (Vin blanc)","XV Catalan (Muscat)"
   ];
 
   function getActiveCategory() {
     const active = categoryTabs.querySelector('.tab-active');
     return active ? active.dataset.category : 'all';
   }
-
+  function catLabel(cat){
+    const map = {vodka:"Vodka",whisky:"Whisky",rhum:"Rhum",liqueurs:"Liqueurs",gin:"Gin",tequila:"Tequila",softs:"Softs",pastis:"Pastis",champagne:"Champagne",vin:"Vin",accessoires:"Accessoires"};
+    return map[cat] || cat;
+  }
   function flattenProducts() {
     const out = [];
-    Object.entries(products).forEach(([cat, list]) => {
-      list.forEach(p => out.push({ ...p, category: cat }));
-    });
+    Object.entries(products).forEach(([cat, list]) => list.forEach(p => out.push({ ...p, category: cat })));
     return out;
   }
-
   function getProductsForCategory(category) {
     if (category === 'all') return flattenProducts();
     return (products[category] || []).map(p => ({ ...p, category }));
   }
-
   function applySearch(list, term) {
     const t = (term || "").trim().toLowerCase();
     if (!t) return list;
     return list.filter(p => p.name.toLowerCase().includes(t));
   }
-
   function applySort(list, mode) {
     const arr = [...list];
-    if (mode === "az") {
-      arr.sort((a,b) => a.name.localeCompare(b.name, 'fr'));
-    } else if (mode === "priceAsc") {
-      arr.sort((a,b) => a.price - b.price);
-    } else if (mode === "priceDesc") {
-      arr.sort((a,b) => b.price - a.price);
-    } else {
-      // "popular"
+    if (mode === "az") arr.sort((a,b) => a.name.localeCompare(b.name, 'fr'));
+    else if (mode === "priceAsc") arr.sort((a,b) => a.price - b.price);
+    else if (mode === "priceDesc") arr.sort((a,b) => b.price - a.price);
+    else {
       arr.sort((a,b) => {
-        const ia = featuredOrder.indexOf(a.name);
-        const ib = featuredOrder.indexOf(b.name);
-        const aRank = ia === -1 ? 9999 : ia;
-        const bRank = ib === -1 ? 9999 : ib;
-        if (aRank !== bRank) return aRank - bRank;
+        const ia = featuredOrder.indexOf(a.name), ib = featuredOrder.indexOf(b.name);
+        const ra = ia === -1 ? 9999 : ia, rb = ib === -1 ? 9999 : ib;
+        if (ra !== rb) return ra - rb;
         return a.name.localeCompare(b.name, 'fr');
       });
     }
     return arr;
-  }
-
-  function catLabel(cat){
-    const map = {
-      vodka:"Vodka",
-      whisky:"Whisky",
-      rhum:"Rhum",
-      liqueurs:"Liqueurs",
-      gin:"Gin",
-      tequila:"Tequila",
-      softs:"Softs",
-      pastis:"Pastis",
-      champagne:"Champagne",
-      vin:"Vin",
-      accessoires:"Accessoires"
-    };
-    return map[cat] || cat;
   }
 
   function displayProducts(category, searchTerm = '', sortMode = 'popular') {
@@ -442,13 +422,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const sorted = applySort(searched, sortMode);
 
     productGrid.innerHTML = '';
-
     resultInfo.textContent = `${sorted.length} article${sorted.length>1?'s':''} • ${category==='all'?'Tout':catLabel(category)}`;
 
     sorted.forEach(product => {
       const card = document.createElement("div");
       card.className = "bg-white shadow-sm !rounded-button overflow-hidden flex flex-col border border-gray-100";
-
       card.innerHTML = `
         <div class="p-3 flex-1">
           <div class="text-[10px] inline-flex items-center px-2 py-[2px] rounded-full bg-gray-100 text-gray-600 mb-2">
@@ -467,37 +445,23 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Tabs click
   categoryTabs.addEventListener('click', (e) => {
     if (e.target.tagName === 'BUTTON') {
-      categoryTabs.querySelectorAll('button').forEach(btn => {
-        btn.classList.remove('tab-active');
-        btn.classList.add('tab-idle');
-      });
+      categoryTabs.querySelectorAll('button').forEach(btn => { btn.classList.remove('tab-active'); btn.classList.add('tab-idle'); });
       e.target.classList.remove('tab-idle');
       e.target.classList.add('tab-active');
-
       displayProducts(e.target.dataset.category, searchInput.value, sortSelect.value);
     }
   });
 
-  // Search
-  searchInput.addEventListener('input', () => {
-    displayProducts(getActiveCategory(), searchInput.value, sortSelect.value);
-  });
+  searchInput.addEventListener('input', () => displayProducts(getActiveCategory(), searchInput.value, sortSelect.value));
+  sortSelect.addEventListener('change', () => displayProducts(getActiveCategory(), searchInput.value, sortSelect.value));
 
-  // Sort
-  sortSelect.addEventListener('change', () => {
-    displayProducts(getActiveCategory(), searchInput.value, sortSelect.value);
-  });
-
-  // Init
   displayProducts('all', '', 'popular');
 });
 </script>
 
-<!-- Worker plus tard, comme demandé -->
-
+<!-- ✅ Installation PWA (sans worker pour l’instant) -->
 <script>
 let deferredPrompt = null;
 const installBtn = document.getElementById('installBtn');
@@ -527,7 +491,6 @@ window.addEventListener('appinstalled', () => {
   installBtn?.classList.add('hidden');
 });
 
-// iOS hint
 window.addEventListener('load', () => {
   if (isIOS() && !isInStandalone()) {
     setTimeout(() => {
@@ -542,3 +505,4 @@ window.addEventListener('load', () => {
 
 </body>
 </html>
+```0
