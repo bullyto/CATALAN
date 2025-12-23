@@ -5,7 +5,7 @@
    - HTML en Network First (pour chopper les modifs vite)
 */
 
-const VERSION = "v3.0"; // ⬅️ incrémente à chaque grosse modif (v8, v9, etc.)
+const VERSION = "v4.0"; // ⬅️ incrémente à chaque grosse modif (v8, v9, etc.)
 const CACHE_NAME = `catalan-${VERSION}`;
 
 // ✅ Mets ici EXACTEMENT les fichiers qui existent dans ton repo
