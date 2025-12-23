@@ -317,7 +317,7 @@
     else if (p < 96) setP(p + 0.16);
     else setP(p + 0.05);
     if (p >= 99) setP(99);
-  }, 130);
+  }, 80);
 
   // Quand la page est prête, on finit et on retire proprement
   window.addEventListener('load', () => {
@@ -328,7 +328,7 @@
       overlay.style.transition = 'opacity .25s ease';
       overlay.style.opacity = '0';
       setTimeout(() => overlay.remove(), 260);
-    }, 480);
+    }, 2100);
   });
 })();
 </script>
