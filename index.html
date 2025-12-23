@@ -1,611 +1,509 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=375px, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>L'apéro catalan</title>
+
 <script src="https://cdn.tailwindcss.com/3.4.16"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+
 <script>
 tailwind.config = {
-theme: {
-extend: {
-colors: {
-primary: '#C61910',
-secondary: '#FFB81C'
-},
-borderRadius: {
-'none': '0px',
-'sm': '4px',
-DEFAULT: '8px',
-'md': '12px',
-'lg': '16px',
-'xl': '20px',
-'2xl': '24px',
-'3xl': '32px',
-'full': '9999px',
-'button': '8px'
-}
-}
-}
+  theme: {
+    extend: {
+      colors: { primary: '#C61910', secondary: '#FFB81C' },
+      borderRadius: {
+        'none': '0px','sm': '4px',DEFAULT: '8px','md': '12px','lg': '16px','xl': '20px',
+        '2xl': '24px','3xl': '32px','full': '9999px','button': '8px'
+      }
+    }
+  }
 }
 </script>
+
 <style>
 :where([class^="ri-"])::before { content: "\f3c2"; }
-.modal {
-opacity: 0;
-pointer-events: none;
-transition: opacity 0.3s ease;
-}
-.modal.active {
-opacity: 1;
-pointer-events: auto;
-}
+.modal { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+.modal.active { opacity: 1; pointer-events: auto; }
+
+/* Mini polish boutique */
+.tab-active { background:#C61910 !important; color:#fff !important; }
+.tab-idle { background:#f3f4f6 !important; color:#111827 !important; }
 </style>
+
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#C61910">
+
 <meta property="og:title" content="L'apéro catalan">
 <meta property="og:description" content="Épicerie de nuit catalan • Livraison 7j/7 de 19h à 6h • Appel direct">
 <meta property="og:image" content="https://i.postimg.cc/MHrNcvMr/file-000000002c906243b1fb58ce1bd6d82d-1.png">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
+
 <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
 </head>
-<body class="w-[375px] min-h-[762px] mx-auto relative" style="background-image: url('https://readdy.ai/api/search-image?query=blurred%20background%2C%20warm%20and%20festive%20atmosphere%2C%20people%20celebrating%2C%20soft%20lights%2C%20party%20mood%2C%20warm%20colors%2C%20subtle%20pattern%2C%20low%20opacity%20for%20text%20readability%2C%20no%20distinct%20objects&width=375&height=762&seq=10&orientation=portrait'); background-size: cover; background-position: center;">
-<header class="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
-<div class="w-[375px] mx-auto py-4 flex items-center justify-center">
-<div class="text-center">
-<div class="w-[150px] h-[150px] mx-auto mb-2 rounded-full overflow-hidden">
-<img id="logo-entreprise" src="https://i.postimg.cc/MHrNcvMr/file-000000002c906243b1fb58ce1bd6d82d-1.png" alt="Logo" class="w-full h-full object-cover">
-</div>
-<h1 class="font-['Pacifico'] text-2xl text-primary">L'apéro catalan</h1>
-</div>
-</div>
-</header>
-<main class="pt-[220px] pb-[80px] px-4 flex flex-col gap-6">
-<a href="tel:0652336461" class="w-full py-4 bg-primary text-white font-semibold !rounded-button flex items-center justify-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
-<div class="w-6 h-6 flex items-center justify-center">
-<i class="ri-phone-fill text-xl"></i>
-</div>
-<span>APPELER</span>
-</a>
-<button id="installBtn" class="w-full bg-[#FFC107] text-white py-4 !rounded-button font-semibold flex items-center justify-center gap-2 shadow-lg hover:opacity-95 transition hidden">
-  <i class="ri-download-cloud-2-line text-xl"></i>
-  AJOUTER À L'ÉCRAN D'ACCUEIL
-</button>
-<p id="installHint" class="text-xs text-white/90 text-center hidden">Sur iPhone : appuie sur <b>Partager</b> puis <b>Sur l’écran d’accueil</b>.</p>
-<button id="zoneBtn" class="w-full py-4 bg-secondary text-white font-semibold !rounded-button flex items-center justify-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
-<div class="w-6 h-6 flex items-center justify-center">
-<i class="ri-map-pin-2-fill text-xl"></i>
-</div>
-<span>ZONE DE LIVRAISON</span>
-</button>
-<button id="articlesBtn" class="w-full py-4 bg-primary text-white font-semibold !rounded-button flex items-center justify-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
-<div class="w-6 h-6 flex items-center justify-center">
-<i class="ri-shopping-bag-fill text-xl"></i>
-</div>
-<span>NOS ARTICLES</span>
-</button>
-<div class="mt-6 p-4 bg-white/90 !rounded-button shadow-sm">
-<h3 class="text-lg font-semibold text-primary mb-3">Horaires & Zone de Livraison</h3>
-<ul class="space-y-2 text-sm">
-<li class="flex items-center gap-2">
-<i class="ri-time-line text-primary"></i>
-<span>Livraison 7j/7 de 19h à 6h</span>
-</li>
-<li class="flex items-center gap-2">
-<i class="ri-map-pin-range-line text-primary"></i>
-<span>Jusqu'à 30km de Perpignan</span>
-</li>
-<li class="flex items-center gap-2">
-<i class="ri-phone-line text-primary"></i>
-<span>Service rapide et professionnel</span>
-</li>
-</ul>
-</div>
-</main>
-<footer class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100">
-<div class="w-[375px] mx-auto py-4 px-4 flex items-center justify-center gap-6">
-<button id="cgvBtn" class="text-xs text-gray-500 hover:text-primary cursor-pointer">CGV</button>
-<button id="mentionsBtn" class="text-xs text-gray-500 hover:text-primary cursor-pointer">Mentions légales</button>
-</div>
-</footer>
-<div id="zoneModal" class="modal fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
-<div class="w-[340px] bg-white !rounded-button p-4 relative">
-<button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary" onclick="closeModal('zoneModal')">
-<i class="ri-close-line text-xl"></i>
-</button>
-<h2 class="text-xl font-semibold mb-4">Zone de livraison</h2>
-<div class="h-[400px] bg-gray-100 !rounded-button overflow-hidden">
-<iframe src="https://www.google.com/maps/d/embed?mid=1FFuBFNnWrOdpTJQwUCoJsepVkpoYzcU&ehbc=2E312F" width="640" height="480"></iframe>
-</div>
-</div>
-</div>
-<div id="articlesModal" class="modal fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
-<div class="w-[340px] bg-white !rounded-button p-4 relative max-h-[90vh] overflow-y-auto">
-<button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary" onclick="closeModal('articlesModal')">
-<i class="ri-close-line text-xl"></i>
-</button>
-<h2 class="text-xl font-semibold mb-4">Nos Articles</h2>
-<div class="mb-4 relative">
-<div class="w-6 h-6 absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center text-gray-400">
-<i class="ri-search-line"></i>
-</div>
-<input type="text" id="searchInput" placeholder="Rechercher un produit..." class="w-full pl-10 pr-4 py-2 !rounded-button border border-gray-200 text-sm focus:outline-none focus:border-primary">
-</div>
-<div class="overflow-x-auto -mx-4 px-4 mb-4">
-<div class="flex gap-2 whitespace-nowrap pb-2" id="categoryTabs">
-<button class="px-3 py-1 text-sm !rounded-full bg-primary text-white" data-category="all">Tout</button>
-<button class="px-3 py-1 text-sm !rounded-full bg-gray-100 hover:bg-gray-200" data-category="vodka">🍸 Vodka</button>
-<button class="px-3 py-1 text-sm !rounded-full bg-gray-100 hover:bg-gray-200" data-category="whisky">Whisky</button>
-<button class="px-3 py-1 text-sm !rounded-full bg-gray-100 hover:bg-gray-200" data-category="rhum">Rhum</button>
-<button class="px-3 py-1 text-sm !rounded-full bg-gray-100 hover:bg-gray-200" data-category="liqueurs">Liqueurs & Apéritifs</button>
-<button class="px-3 py-1 text-sm !rounded-full bg-gray-100 hover:bg-gray-200" data-category="gin">Gin</button>
-<button class="px-3 py-1 text-sm !rounded-full bg-gray-100 hover:bg-gray-200" data-category="tequila">Tequila</button>
-<button class="px-3 py-1 text-sm !rounded-full bg-gray-100 hover:bg-gray-200" data-category="biere">Bière</button>
-<button class="px-3 py-1 text-sm !rounded-full bg-gray-100 hover:bg-gray-200" data-category="softs">Softs & Jus</button>
-<button class="px-3 py-1 text-sm !rounded-full bg-gray-100 hover:bg-gray-200" data-category="pastis">Pastis</button>
-<button class="px-3 py-1 text-sm !rounded-full bg-gray-100 hover:bg-gray-200" data-category="champagne">Champagne</button>
-<button class="px-3 py-1 text-sm !rounded-full bg-gray-100 hover:bg-gray-200" data-category="vin">Vin</button>
-<button class="px-3 py-1 text-sm !rounded-full bg-gray-100 hover:bg-gray-200" data-category="accessoires">Accessoires</button>
-</div>
-</div>
-<div id="productGrid" class="grid grid-cols-2 gap-4">
-</div>
-</div>
-</div>
-<div id="cgvModal" class="modal fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
-<div class="w-[340px] bg-white !rounded-button p-4 relative max-h-[90vh] overflow-y-auto">
-<button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary" onclick="closeModal('cgvModal')">
-<i class="ri-close-line text-xl"></i>
-</button>
-<h2 class="text-xl font-semibold mb-4 bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Conditions Générales de Vente</h2>
-<div class="prose text-sm space-y-4">
-<h3 class="font-medium">1. Service de livraison</h3>
-<p>L'Apéro Catalan propose un service de livraison d'alcool à domicile, disponible de 19h à 6h, 7 jours sur 7, dans un rayon de 30km autour de Perpignan.</p>
-<h3 class="font-medium">2. Commande et livraison</h3>
-<p>- Commande par téléphone uniquement<br>
-- Délai de livraison estimé communiqué lors de la commande<br>
-- Zone de livraison limitée à 30km de Perpignan</p>
-<h3 class="font-medium">3. Conditions de vente</h3>
-<p>- Vente d'alcool interdite aux mineurs (une pièce d'identité sera demandée)<br>
-- Paiement à la livraison (espèces ou CB)<br>
-- Droit de refus en cas de client en état d'ébriété manifeste</p>
-<h3 class="font-medium">4. Prix et paiement</h3>
-<p>- Les prix sont indiqués TTC<br>
-- Frais de livraison calculés selon la distance<br>
-- Paiement sécurisé à la livraison</p>
-<h3 class="font-medium">5. Responsabilité</h3>
-<p>L'Apéro Catalan se réserve le droit de refuser une livraison si les conditions de sécurité ne sont pas réunies ou en cas de non-respect des présentes conditions.</p>
-<h3 class="font-medium">  RGPD : </h3>
-<p>Nous collectons uniquement votre adresse et votre numéro de téléphone dans le but d’assurer la livraison de vos commandes et de vous envoyer des communications marketing par SMS. Ces données sont conservées pendant une durée maximale de 3 ans et ne sont pas utilisées à d'autres fins. Aucun cookie n'est utilisé sur notre site.
 
-</p>
+<body class="w-[375px] min-h-[762px] mx-auto relative"
+style="background-image: url('https://readdy.ai/api/search-image?query=blurred%20background%2C%20warm%20and%20festive%20atmosphere%2C%20people%20celebrating%2C%20soft%20lights%2C%20party%20mood%2C%20warm%20colors%2C%20subtle%20pattern%2C%20low%20opacity%20for%20text%20readability%2C%20no%20distinct%20objects&width=375&height=762&seq=10&orientation=portrait'); background-size: cover; background-position: center;">
+
+<header class="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
+  <div class="w-[375px] mx-auto py-4 flex items-center justify-center">
+    <div class="text-center">
+      <div class="w-[150px] h-[150px] mx-auto mb-2 rounded-full overflow-hidden">
+        <img id="logo-entreprise" src="https://i.postimg.cc/MHrNcvMr/file-000000002c906243b1fb58ce1bd6d82d-1.png" alt="Logo" class="w-full h-full object-cover">
+      </div>
+      <h1 class="font-['Pacifico'] text-2xl text-primary">L'apéro catalan</h1>
+    </div>
+  </div>
+</header>
+
+<main class="pt-[220px] pb-[80px] px-4 flex flex-col gap-6">
+  <a href="tel:0652336461" class="w-full py-4 bg-primary text-white font-semibold !rounded-button flex items-center justify-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+    <div class="w-6 h-6 flex items-center justify-center">
+      <i class="ri-phone-fill text-xl"></i>
+    </div>
+    <span>APPELER</span>
+  </a>
+
+  <button id="installBtn" class="w-full bg-[#FFC107] text-white py-4 !rounded-button font-semibold flex items-center justify-center gap-2 shadow-lg hover:opacity-95 transition hidden">
+    <i class="ri-download-cloud-2-line text-xl"></i>
+    AJOUTER À L'ÉCRAN D'ACCUEIL
+  </button>
+  <p id="installHint" class="text-xs text-white/90 text-center hidden">Sur iPhone : appuie sur <b>Partager</b> puis <b>Sur l’écran d’accueil</b>.</p>
+
+  <button id="zoneBtn" class="w-full py-4 bg-secondary text-white font-semibold !rounded-button flex items-center justify-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+    <div class="w-6 h-6 flex items-center justify-center">
+      <i class="ri-map-pin-2-fill text-xl"></i>
+    </div>
+    <span>ZONE DE LIVRAISON</span>
+  </button>
+
+  <button id="articlesBtn" class="w-full py-4 bg-primary text-white font-semibold !rounded-button flex items-center justify-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+    <div class="w-6 h-6 flex items-center justify-center">
+      <i class="ri-shopping-bag-fill text-xl"></i>
+    </div>
+    <span>NOS ARTICLES</span>
+  </button>
+
+  <div class="mt-6 p-4 bg-white/90 !rounded-button shadow-sm">
+    <h3 class="text-lg font-semibold text-primary mb-3">Horaires & Zone de Livraison</h3>
+    <ul class="space-y-2 text-sm">
+      <li class="flex items-center gap-2">
+        <i class="ri-time-line text-primary"></i>
+        <span>Livraison 7j/7 de 19h à 6h</span>
+      </li>
+      <li class="flex items-center gap-2">
+        <i class="ri-map-pin-range-line text-primary"></i>
+        <span>Jusqu'à 30km de Perpignan</span>
+      </li>
+      <li class="flex items-center gap-2">
+        <i class="ri-phone-line text-primary"></i>
+        <span>Service rapide et professionnel</span>
+      </li>
+    </ul>
+  </div>
+</main>
+
+<footer class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100">
+  <div class="w-[375px] mx-auto py-4 px-4 flex items-center justify-center gap-6">
+    <button id="cgvBtn" class="text-xs text-gray-500 hover:text-primary cursor-pointer">CGV</button>
+    <button id="mentionsBtn" class="text-xs text-gray-500 hover:text-primary cursor-pointer">Mentions légales</button>
+  </div>
+</footer>
+
+<!-- ===== MODALS ===== -->
+<div id="zoneModal" class="modal fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
+  <div class="w-[340px] bg-white !rounded-button p-4 relative">
+    <button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary" onclick="closeModal('zoneModal')">
+      <i class="ri-close-line text-xl"></i>
+    </button>
+    <h2 class="text-xl font-semibold mb-4">Zone de livraison</h2>
+    <div class="h-[400px] bg-gray-100 !rounded-button overflow-hidden">
+      <iframe src="https://www.google.com/maps/d/embed?mid=1FFuBFNnWrOdpTJQwUCoJsepVkpoYzcU&ehbc=2E312F" width="640" height="480"></iframe>
+    </div>
+  </div>
 </div>
+
+<div id="articlesModal" class="modal fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
+  <div class="w-[340px] bg-white !rounded-button p-4 relative max-h-[90vh] overflow-y-auto">
+
+    <button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary" onclick="closeModal('articlesModal')">
+      <i class="ri-close-line text-xl"></i>
+    </button>
+
+    <div class="pr-8">
+      <h2 class="text-xl font-semibold mb-1">Nos Articles</h2>
+      <p class="text-xs text-gray-500 mb-3">Recherche + tri pour trouver vite. Appelle pour commander.</p>
+    </div>
+
+    <!-- Search + Sort -->
+    <div class="grid grid-cols-1 gap-2 mb-4">
+      <div class="relative">
+        <div class="w-6 h-6 absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center text-gray-400">
+          <i class="ri-search-line"></i>
+        </div>
+        <input type="text" id="searchInput" placeholder="Rechercher un produit..." class="w-full pl-10 pr-4 py-2 !rounded-button border border-gray-200 text-sm focus:outline-none focus:border-primary">
+      </div>
+
+      <div class="flex gap-2">
+        <select id="sortSelect" class="w-full py-2 px-3 !rounded-button border border-gray-200 text-sm focus:outline-none focus:border-primary">
+          <option value="popular">Tri : Recommandés</option>
+          <option value="az">Tri : A → Z</option>
+          <option value="priceAsc">Tri : Prix ↑</option>
+          <option value="priceDesc">Tri : Prix ↓</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Category tabs (bière supprimée) -->
+    <div class="overflow-x-auto -mx-4 px-4 mb-3">
+      <div class="flex gap-2 whitespace-nowrap pb-2" id="categoryTabs">
+        <button class="px-3 py-1 text-sm !rounded-full tab-active" data-category="all">Tout</button>
+        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="vodka">🍸 Vodka</button>
+        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="whisky">🥃 Whisky</button>
+        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="rhum">🏴‍☠️ Rhum</button>
+        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="liqueurs">🍹 Liqueurs</button>
+        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="gin">🌿 Gin</button>
+        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="tequila">🌵 Tequila</button>
+        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="softs">🥤 Softs</button>
+        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="pastis">🟡 Pastis</button>
+        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="champagne">🍾 Champagne</button>
+        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="vin">🍷 Vin</button>
+        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="accessoires">🧊 Accessoires</button>
+      </div>
+    </div>
+
+    <!-- Quick stats -->
+    <div class="flex items-center justify-between text-xs text-gray-500 mb-3">
+      <div id="resultInfo">—</div>
+      <div class="text-gray-400">Commande : <span class="text-primary font-semibold">téléphone</span></div>
+    </div>
+
+    <div id="productGrid" class="grid grid-cols-2 gap-3"></div>
+
+    <div class="mt-4 text-[11px] text-gray-500 leading-snug">
+      Prix indicatifs • Le stock peut varier selon la nuit • Appelle pour confirmation et commande.
+    </div>
+  </div>
 </div>
+
+<div id="cgvModal" class="modal fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
+  <div class="w-[340px] bg-white !rounded-button p-4 relative max-h-[90vh] overflow-y-auto">
+    <button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary" onclick="closeModal('cgvModal')">
+      <i class="ri-close-line text-xl"></i>
+    </button>
+    <h2 class="text-xl font-semibold mb-4 bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Conditions Générales de Vente</h2>
+    <div class="prose text-sm space-y-4">
+      <h3 class="font-medium">1. Service de livraison</h3>
+      <p>L'Apéro Catalan propose un service de livraison d'alcool à domicile, disponible de 19h à 6h, 7 jours sur 7, dans un rayon de 30km autour de Perpignan.</p>
+      <h3 class="font-medium">2. Commande et livraison</h3>
+      <p>- Commande par téléphone uniquement<br>
+        - Délai de livraison estimé communiqué lors de la commande<br>
+        - Zone de livraison limitée à 30km de Perpignan</p>
+      <h3 class="font-medium">3. Conditions de vente</h3>
+      <p>- Vente d'alcool interdite aux mineurs (une pièce d'identité sera demandée)<br>
+        - Paiement à la livraison (espèces ou CB)<br>
+        - Droit de refus en cas de client en état d'ébriété manifeste</p>
+      <h3 class="font-medium">4. Prix et paiement</h3>
+      <p>- Les prix sont indiqués TTC<br>
+        - Frais de livraison calculés selon la distance<br>
+        - Paiement sécurisé à la livraison</p>
+      <h3 class="font-medium">5. Responsabilité</h3>
+      <p>L'Apéro Catalan se réserve le droit de refuser une livraison si les conditions de sécurité ne sont pas réunies ou en cas de non-respect des présentes conditions.</p>
+      <h3 class="font-medium">RGPD :</h3>
+      <p>Nous collectons uniquement votre adresse et votre numéro de téléphone dans le but d’assurer la livraison de vos commandes et de vous envoyer des communications marketing par SMS. Ces données sont conservées pendant une durée maximale de 3 ans et ne sont pas utilisées à d'autres fins. Aucun cookie n'est utilisé sur notre site.</p>
+    </div>
+  </div>
 </div>
+
 <div id="mentionsModal" class="modal fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
-<div class="w-[340px] bg-white !rounded-button p-4 relative max-h-[90vh] overflow-y-auto">
-<button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary" onclick="closeModal('mentionsModal')">
-<i class="ri-close-line text-xl"></i>
-</button>
-<h2 class="text-xl font-semibold mb-4 bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Mentions Légales</h2>
-<div class="prose text-sm space-y-4">
-<h3 class="font-medium text-base">Éditeur du site</h3>
-<p>Le présent site internet « L'Apéro Catalan » est exploité par la société Apéro de Nuit 66, entreprise immatriculée au Registre du Commerce et des Sociétés sous le numéro 879 976 099, dont le siège social est situé a villelongue de la sallanque.</p>
-<h3 class="font-medium text-base">Responsable de publication</h3>
-<p>Monsieur Hauviller Steven, en qualité de représentant légal de l'entreprise Apéro de Nuit 66.<h3 class="font-medium text-base">Données personnelles & RGPD</h3>
-<p>Nous ne collectons pas de données personnelles via ce mini-site (pas de compte, pas de formulaire, pas de suivi).</p>
-<p>Si vous choisissez d’activer les notifications push, l’abonnement est géré par votre navigateur/appareil. Vous pouvez vous désabonner à tout moment depuis les réglages de votre navigateur.</p>
-<h3 class="font-medium text-base">Propriété</h3>
-<p>« L'Apéro Catalan » est une marque / vitrine commerciale exploitée par <b>Apéro de Nuit 66</b>.</p>
-</p>
+  <div class="w-[340px] bg-white !rounded-button p-4 relative max-h-[90vh] overflow-y-auto">
+    <button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary" onclick="closeModal('mentionsModal')">
+      <i class="ri-close-line text-xl"></i>
+    </button>
+    <h2 class="text-xl font-semibold mb-4 bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">Mentions Légales</h2>
+    <div class="prose text-sm space-y-4">
+      <h3 class="font-medium text-base">Éditeur du site</h3>
+      <p>Le présent site internet « L'Apéro Catalan » est exploité par la société Apéro de Nuit 66, entreprise immatriculée au Registre du Commerce et des Sociétés sous le numéro 879 976 099, dont le siège social est situé a villelongue de la sallanque.</p>
+      <h3 class="font-medium text-base">Responsable de publication</h3>
+      <p>Monsieur Hauviller Steven, en qualité de représentant légal de l'entreprise Apéro de Nuit 66.</p>
+      <h3 class="font-medium text-base">Données personnelles & RGPD</h3>
+      <p>Nous ne collectons pas de données personnelles via ce mini-site (pas de compte, pas de formulaire, pas de suivi).</p>
+      <p>Si vous choisissez d’activer les notifications push, l’abonnement est géré par votre navigateur/appareil. Vous pouvez vous désabonner à tout moment depuis les réglages de votre navigateur.</p>
+      <h3 class="font-medium text-base">Propriété</h3>
+      <p>« L'Apéro Catalan » est une marque / vitrine commerciale exploitée par <b>Apéro de Nuit 66</b>.</p>
+    </div>
+  </div>
 </div>
-</div>
-</div>
-<script id="modal-handler">
-document.addEventListener('DOMContentLoaded', function() {
-const modals = {
-zoneModal: document.getElementById('zoneModal'),
-articlesModal: document.getElementById('articlesModal'),
-cgvModal: document.getElementById('cgvModal'),
-mentionsModal: document.getElementById('mentionsModal')
-};
-const buttons = {
-zoneBtn: document.getElementById('zoneBtn'),
-articlesBtn: document.getElementById('articlesBtn'),
-cgvBtn: document.getElementById('cgvBtn'),
-mentionsBtn: document.getElementById('mentionsBtn')
-};
-const products = {
-  "vodka": [
-    {
-      "name": "Poliakov",
-      "price": 29.0,
-      "image": ""
-    },
-    {
-      "name": "Absolut Vodka",
-      "price": 34.0,
-      "image": ""
-    },
-    {
-      "name": "CIROC Classic",
-      "price": 49.0,
-      "image": ""
-    },
-    {
-      "name": "CIROC Red Berry",
-      "price": 49.0,
-      "image": ""
-    },
-    {
-      "name": "CIROC Pomme",
-      "price": 49.0,
-      "image": ""
-    }
-  ],
-  "whisky": [
-    {
-      "name": "William Peel",
-      "price": 29.0,
-      "image": ""
-    },
-    {
-      "name": "LABEL 5",
-      "price": 32.0,
-      "image": ""
-    },
-    {
-      "name": "Clan Campbell",
-      "price": 35.0,
-      "image": ""
-    },
-    {
-      "name": "Ballantine's",
-      "price": 36.0,
-      "image": ""
-    },
-    {
-      "name": "Jack Daniel's",
-      "price": 40.0,
-      "image": ""
-    },
-    {
-      "name": "Jack Daniel's Honey",
-      "price": 42.0,
-      "image": ""
-    }
-  ],
-  "rhum": [
-    {
-      "name": "Old Nick",
-      "price": 29.0,
-      "image": ""
-    },
-    {
-      "name": "Old Nick (blanc)",
-      "price": 27.0,
-      "image": ""
-    },
-    {
-      "name": "Captain Morgan",
-      "price": 34.0,
-      "image": ""
-    },
-    {
-      "name": "Havana Club 3 ans",
-      "price": 37.0,
-      "image": ""
-    },
-    {
-      "name": "Havana Club",
-      "price": 38.0,
-      "image": ""
-    },
-    {
-      "name": "Saint James Rhum blanc",
-      "price": 32.0,
-      "image": ""
-    },
-    {
-      "name": "Trois Rivières",
-      "price": 33.0,
-      "image": ""
-    }
-  ],
-  "liqueurs": [
-    {
-      "name": "GET 27",
-      "price": 32.0,
-      "image": ""
-    },
-    {
-      "name": "Jägermeister",
-      "price": 35.0,
-      "image": ""
-    },
-    {
-      "name": "COINTREAU",
-      "price": 28.0,
-      "image": ""
-    },
-    {
-      "name": "Gibson's",
-      "price": 34.0,
-      "image": ""
-    },
-    {
-      "name": "Liqueur de cassis",
-      "price": 8.5,
-      "image": ""
-    }
-  ],
-  "gin": [
-    {
-      "name": "Gordon's",
-      "price": 34.0,
-      "image": ""
-    }
-  ],
-  "tequila": [
-    {
-      "name": "Tequila",
-      "price": 28.0,
-      "image": ""
-    }
-  ],
-  "biere": [
-    {
-      "name": "Desperados (6×25 cl)",
-      "price": 25.0,
-      "image": ""
-    },
-    {
-      "name": "Desperados (12×33 cl)",
-      "price": 38.0,
-      "image": ""
-    },
-    {
-      "name": "Heineken (12×33 cl)",
-      "price": 28.0,
-      "image": ""
-    },
-    {
-      "name": "Pelforth (6×25 cl)",
-      "price": 19.0,
-      "image": ""
-    },
-    {
-      "name": "Kronenbourg (10×25 cl)",
-      "price": 25.0,
-      "image": ""
-    },
-    {
-      "name": "1664 (5,5% vol.)",
-      "price": 25.0,
-      "image": ""
-    }
-  ],
-  "softs": [
-    {
-      "name": "Oasis (tropical)",
-      "price": 3.5,
-      "image": ""
-    },
-    {
-      "name": "Fanta citron",
-      "price": 3.5,
-      "image": ""
-    },
-    {
-      "name": "Schweppes tonic",
-      "price": 3.5,
-      "image": ""
-    },
-    {
-      "name": "Perrier citron",
-      "price": 2.5,
-      "image": ""
-    },
-    {
-      "name": "Crazy Tiger",
-      "price": 5.0,
-      "image": ""
-    },
-    {
-      "name": "Red Bull",
-      "price": 3.5,
-      "image": ""
-    },
-    {
-      "name": "Monster",
-      "price": 2.4,
-      "image": ""
-    },
-    {
-      "name": "Lait de coco",
-      "price": 5.0,
-      "image": ""
-    },
-    {
-      "name": "Jus de pommes",
-      "price": 4.5,
-      "image": ""
-    },
-    {
-      "name": "Jus de pamplemousse",
-      "price": 4.5,
-      "image": ""
-    },
-    {
-      "name": "Jus d'oranges",
-      "price": 4.5,
-      "image": ""
-    },
-    {
-      "name": "Jus d'ananas",
-      "price": 4.5,
-      "image": ""
-    }
-  ],
-  "pastis": [
-    {
-      "name": "Pastis de Marseille",
-      "price": 35.0,
-      "image": ""
-    },
-    {
-      "name": "Ricard",
-      "price": 35.0,
-      "image": ""
-    }
-  ],
-  "champagne": [
-    {
-      "name": "MOËT & CHANDON \"Impérial\" (1,5 L)",
-      "price": 89.0,
-      "image": ""
-    },
-    {
-      "name": "Veuve Pelletier",
-      "price": 60.0,
-      "image": ""
-    }
-  ],
-  "vin": [
-    {
-      "name": "DOMAINE DU VIEUX GENEVRIER (Muscat)",
-      "price": 25.0,
-      "image": ""
-    },
-    {
-      "name": "DOMAINE DU VIEUX GENEVRIER (Vin rouge)",
-      "price": 19.0,
-      "image": ""
-    },
-    {
-      "name": "DOMAINE DU VIEUX GENEVRIER (Vin rosé)",
-      "price": 19.0,
-      "image": ""
-    },
-    {
-      "name": "DOMAINE DU VIEUX GENEVRIER (Vin blanc)",
-      "price": 19.0,
-      "image": ""
-    },
-    {
-      "name": "LAFAGE (Vin blanc)",
-      "price": 19.0,
-      "image": ""
-    },
-    {
-      "name": "LAFAGE (Vin rouge)",
-      "price": 19.0,
-      "image": ""
-    },
-    {
-      "name": "LAFAGE (Vin rosé)",
-      "price": 19.0,
-      "image": ""
-    }
-  ],
-  "accessoires": [
-    {
-      "name": "Verre à whisky-soda incassable 35 cl",
-      "price": 0.5,
-      "image": ""
-    }
-  ]
-};
-Object.entries(buttons).forEach(([key, btn]) => {
-const modalId = key.replace('Btn', 'Modal');
-btn.addEventListener('click', () => openModal(modalId));
-});
-window.closeModal = function(modalId) {
-modals[modalId].classList.remove('active');
-};
-window.openModal = function(modalId) {
-modals[modalId].classList.add('active');
-if(modalId === 'articlesModal') {
-displayProducts('all');
-}
-};
-Object.values(modals).forEach(modal => {
-modal.addEventListener('click', (e) => {
-if (e.target === modal) {
-modal.classList.remove('active');
-}
-});
-});
-const searchInput = document.getElementById('searchInput');
-const categoryTabs = document.getElementById('categoryTabs');
-const productGrid = document.getElementById('productGrid');
-function displayProducts(category, searchTerm = '') {
-productGrid.innerHTML = '';
-let productsToShow = [];
-if (category === 'all') {
-Object.values(products).forEach(categoryProducts => {
-productsToShow = [...productsToShow, ...categoryProducts];
-});
-} else {
-productsToShow = products[category] || [];
-}
-if (searchTerm) {
-productsToShow = productsToShow.filter(product =>
-product.name.toLowerCase().includes(searchTerm.toLowerCase())
-);
-}
-productsToShow.forEach(product => {
-const productCard = `
-<div class="bg-white shadow-sm !rounded-button overflow-hidden flex flex-col" id="${product.name.toLowerCase().replace(/\s+/g, '-')}">
-<div class="p-3">
-<h3 class="font-medium text-sm mb-1">${product.name}</h3>
-<p class="text-primary font-semibold">${product.price.toFixed(2)} €</p>
-</div>
-</div>
-`;
-productGrid.innerHTML += productCard;
-});
-}
-categoryTabs.addEventListener('click', (e) => {
-if (e.target.tagName === 'BUTTON') {
-categoryTabs.querySelectorAll('button').forEach(btn => {
-btn.classList.remove('bg-primary', 'text-white');
-btn.classList.add('bg-gray-100');
-});
-e.target.classList.remove('bg-gray-100');
-e.target.classList.add('bg-primary', 'text-white');
-displayProducts(e.target.dataset.category, searchInput.value);
-}
-});
-searchInput.addEventListener('input', (e) => {
-const activeCategory = categoryTabs.querySelector('.bg-primary').dataset.category;
-displayProducts(activeCategory, e.target.value);
-});
-displayProducts('all');
-});
-</script>
+
 <script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
+document.addEventListener('DOMContentLoaded', function() {
+  const modals = {
+    zoneModal: document.getElementById('zoneModal'),
+    articlesModal: document.getElementById('articlesModal'),
+    cgvModal: document.getElementById('cgvModal'),
+    mentionsModal: document.getElementById('mentionsModal')
+  };
+  const buttons = {
+    zoneBtn: document.getElementById('zoneBtn'),
+    articlesBtn: document.getElementById('articlesBtn'),
+    cgvBtn: document.getElementById('cgvBtn'),
+    mentionsBtn: document.getElementById('mentionsBtn')
+  };
+
+  // ✅ BIÈRES SUPPRIMÉES ICI
+  const products = {
+    "vodka": [
+      {"name":"Poliakov","price":29.0,"image":""},
+      {"name":"Absolut Vodka","price":34.0,"image":""},
+      {"name":"CIROC Classic","price":49.0,"image":""},
+      {"name":"CIROC Red Berry","price":49.0,"image":""},
+      {"name":"CIROC Pomme","price":49.0,"image":""}
+    ],
+    "whisky": [
+      {"name":"William Peel","price":29.0,"image":""},
+      {"name":"LABEL 5","price":32.0,"image":""},
+      {"name":"Clan Campbell","price":35.0,"image":""},
+      {"name":"Ballantine's","price":36.0,"image":""},
+      {"name":"Jack Daniel's","price":40.0,"image":""},
+      {"name":"Jack Daniel's Honey","price":42.0,"image":""}
+    ],
+    "rhum": [
+      {"name":"Old Nick","price":29.0,"image":""},
+      {"name":"Old Nick (blanc)","price":27.0,"image":""},
+      {"name":"Captain Morgan","price":34.0,"image":""},
+      {"name":"Havana Club 3 ans","price":37.0,"image":""},
+      {"name":"Havana Club","price":38.0,"image":""},
+      {"name":"Saint James Rhum blanc","price":32.0,"image":""},
+      {"name":"Trois Rivières","price":33.0,"image":""}
+    ],
+    "liqueurs": [
+      {"name":"GET 27","price":32.0,"image":""},
+      {"name":"Jägermeister","price":35.0,"image":""},
+      {"name":"COINTREAU","price":28.0,"image":""},
+      {"name":"Gibson's","price":34.0,"image":""},
+      {"name":"Liqueur de cassis","price":8.5,"image":""}
+    ],
+    "gin": [
+      {"name":"Gordon's","price":34.0,"image":""}
+    ],
+    "tequila": [
+      {"name":"Tequila","price":28.0,"image":""}
+    ],
+    "softs": [
+      {"name":"Oasis (tropical)","price":3.5,"image":""},
+      {"name":"Fanta citron","price":3.5,"image":""},
+      {"name":"Schweppes tonic","price":3.5,"image":""},
+      {"name":"Perrier citron","price":2.5,"image":""},
+      {"name":"Crazy Tiger","price":5.0,"image":""},
+      {"name":"Red Bull","price":3.5,"image":""},
+      {"name":"Monster","price":2.4,"image":""},
+      {"name":"Lait de coco","price":5.0,"image":""},
+      {"name":"Jus de pommes","price":4.5,"image":""},
+      {"name":"Jus de pamplemousse","price":4.5,"image":""},
+      {"name":"Jus d'oranges","price":4.5,"image":""},
+      {"name":"Jus d'ananas","price":4.5,"image":""}
+    ],
+    "pastis": [
+      {"name":"Pastis de Marseille","price":35.0,"image":""},
+      {"name":"Ricard","price":35.0,"image":""}
+    ],
+    "champagne": [
+      {"name":"MOËT & CHANDON \"Impérial\" (1,5 L)","price":89.0,"image":""},
+      {"name":"Veuve Pelletier","price":60.0,"image":""}
+    ],
+    "vin": [
+      {"name":"DOMAINE DU VIEUX GENEVRIER (Muscat)","price":25.0,"image":""},
+      {"name":"DOMAINE DU VIEUX GENEVRIER (Vin rouge)","price":19.0,"image":""},
+      {"name":"DOMAINE DU VIEUX GENEVRIER (Vin rosé)","price":19.0,"image":""},
+      {"name":"DOMAINE DU VIEUX GENEVRIER (Vin blanc)","price":19.0,"image":""},
+      {"name":"LAFAGE (Vin blanc)","price":19.0,"image":""},
+      {"name":"LAFAGE (Vin rouge)","price":19.0,"image":""},
+      {"name":"LAFAGE (Vin rosé)","price":19.0,"image":""}
+    ],
+    "accessoires": [
+      {"name":"Verre à whisky-soda incassable 35 cl","price":0.5,"image":""}
+    ]
+  };
+
+  Object.entries(buttons).forEach(([key, btn]) => {
+    const modalId = key.replace('Btn', 'Modal');
+    btn.addEventListener('click', () => openModal(modalId));
   });
-}
+
+  window.closeModal = function(modalId) {
+    modals[modalId].classList.remove('active');
+  };
+
+  window.openModal = function(modalId) {
+    modals[modalId].classList.add('active');
+    if(modalId === 'articlesModal') {
+      displayProducts(getActiveCategory(), searchInput.value, sortSelect.value);
+    }
+  };
+
+  Object.values(modals).forEach(modal => {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('active');
+    });
+  });
+
+  const searchInput = document.getElementById('searchInput');
+  const categoryTabs = document.getElementById('categoryTabs');
+  const productGrid = document.getElementById('productGrid');
+  const sortSelect = document.getElementById('sortSelect');
+  const resultInfo = document.getElementById('resultInfo');
+
+  // Ordre recommandé (tu peux changer)
+  const featuredOrder = [
+    "Jack Daniel's",
+    "Ballantine's",
+    "Captain Morgan",
+    "Havana Club 3 ans",
+    "Absolut Vodka",
+    "CIROC Classic",
+    "MOËT & CHANDON \"Impérial\" (1,5 L)",
+    "Ricard",
+    "GET 27",
+    "Red Bull"
+  ];
+
+  function getActiveCategory() {
+    const active = categoryTabs.querySelector('.tab-active');
+    return active ? active.dataset.category : 'all';
+  }
+
+  function flattenProducts() {
+    const out = [];
+    Object.entries(products).forEach(([cat, list]) => {
+      list.forEach(p => out.push({ ...p, category: cat }));
+    });
+    return out;
+  }
+
+  function getProductsForCategory(category) {
+    if (category === 'all') return flattenProducts();
+    return (products[category] || []).map(p => ({ ...p, category }));
+  }
+
+  function applySearch(list, term) {
+    const t = (term || "").trim().toLowerCase();
+    if (!t) return list;
+    return list.filter(p => p.name.toLowerCase().includes(t));
+  }
+
+  function applySort(list, mode) {
+    const arr = [...list];
+    if (mode === "az") {
+      arr.sort((a,b) => a.name.localeCompare(b.name, 'fr'));
+    } else if (mode === "priceAsc") {
+      arr.sort((a,b) => a.price - b.price);
+    } else if (mode === "priceDesc") {
+      arr.sort((a,b) => b.price - a.price);
+    } else {
+      // "popular"
+      arr.sort((a,b) => {
+        const ia = featuredOrder.indexOf(a.name);
+        const ib = featuredOrder.indexOf(b.name);
+        const aRank = ia === -1 ? 9999 : ia;
+        const bRank = ib === -1 ? 9999 : ib;
+        if (aRank !== bRank) return aRank - bRank;
+        return a.name.localeCompare(b.name, 'fr');
+      });
+    }
+    return arr;
+  }
+
+  function catLabel(cat){
+    const map = {
+      vodka:"Vodka",
+      whisky:"Whisky",
+      rhum:"Rhum",
+      liqueurs:"Liqueurs",
+      gin:"Gin",
+      tequila:"Tequila",
+      softs:"Softs",
+      pastis:"Pastis",
+      champagne:"Champagne",
+      vin:"Vin",
+      accessoires:"Accessoires"
+    };
+    return map[cat] || cat;
+  }
+
+  function displayProducts(category, searchTerm = '', sortMode = 'popular') {
+    const base = getProductsForCategory(category);
+    const searched = applySearch(base, searchTerm);
+    const sorted = applySort(searched, sortMode);
+
+    productGrid.innerHTML = '';
+
+    resultInfo.textContent = `${sorted.length} article${sorted.length>1?'s':''} • ${category==='all'?'Tout':catLabel(category)}`;
+
+    sorted.forEach(product => {
+      const card = document.createElement("div");
+      card.className = "bg-white shadow-sm !rounded-button overflow-hidden flex flex-col border border-gray-100";
+
+      card.innerHTML = `
+        <div class="p-3 flex-1">
+          <div class="text-[10px] inline-flex items-center px-2 py-[2px] rounded-full bg-gray-100 text-gray-600 mb-2">
+            ${catLabel(product.category)}
+          </div>
+          <h3 class="font-semibold text-sm leading-snug mb-1 text-gray-900">${product.name}</h3>
+          <p class="text-primary font-extrabold text-base">${product.price.toFixed(2)} €</p>
+        </div>
+        <div class="px-3 pb-3">
+          <a href="tel:0652336461" class="w-full inline-flex items-center justify-center gap-2 py-2 bg-primary text-white text-xs font-semibold !rounded-button hover:opacity-95 transition">
+            <i class="ri-phone-fill"></i> Commander
+          </a>
+        </div>
+      `;
+      productGrid.appendChild(card);
+    });
+  }
+
+  // Tabs click
+  categoryTabs.addEventListener('click', (e) => {
+    if (e.target.tagName === 'BUTTON') {
+      categoryTabs.querySelectorAll('button').forEach(btn => {
+        btn.classList.remove('tab-active');
+        btn.classList.add('tab-idle');
+      });
+      e.target.classList.remove('tab-idle');
+      e.target.classList.add('tab-active');
+
+      displayProducts(e.target.dataset.category, searchInput.value, sortSelect.value);
+    }
+  });
+
+  // Search
+  searchInput.addEventListener('input', () => {
+    displayProducts(getActiveCategory(), searchInput.value, sortSelect.value);
+  });
+
+  // Sort
+  sortSelect.addEventListener('change', () => {
+    displayProducts(getActiveCategory(), searchInput.value, sortSelect.value);
+  });
+
+  // Init
+  displayProducts('all', '', 'popular');
+});
 </script>
+
+<!-- Worker plus tard, comme demandé -->
+
 <script>
 let deferredPrompt = null;
 const installBtn = document.getElementById('installBtn');
 const installHint = document.getElementById('installHint');
 
-function isIOS() {
-  return /iphone|ipad|ipod/i.test(navigator.userAgent);
-}
+function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent); }
 function isInStandalone() {
   return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 }
@@ -613,9 +511,7 @@ function isInStandalone() {
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  if (!isInStandalone()) {
-    installBtn.classList.remove('hidden');
-  }
+  if (!isInStandalone()) installBtn.classList.remove('hidden');
 });
 
 installBtn?.addEventListener('click', async () => {
@@ -631,13 +527,11 @@ window.addEventListener('appinstalled', () => {
   installBtn?.classList.add('hidden');
 });
 
-// iOS: show hint (cannot trigger prompt)
+// iOS hint
 window.addEventListener('load', () => {
   if (isIOS() && !isInStandalone()) {
-    // show after a short delay so it doesn't feel aggressive
     setTimeout(() => {
       installBtn.classList.remove('hidden');
-      // Replace click behavior on iOS with hint
       installBtn.addEventListener('click', () => {
         installHint.classList.remove('hidden');
       }, { once: true });
@@ -645,5 +539,6 @@ window.addEventListener('load', () => {
   }
 });
 </script>
+
 </body>
 </html>
