@@ -62,7 +62,7 @@
     .modal.active { opacity: 1; pointer-events: auto; }
     .tab-active { background:#C61910 !important; color:#fff !important; }
     .tab-idle { background:#f3f4f6 !important; color:#111827 !important; }
-  
+
     /* ===== PWA FAUX CHARGEMENT (uniquement PWA installée) ===== */
     #pwaLoading {
       position: fixed;
@@ -246,11 +246,132 @@
       #pwaLoading .pl-bar:after { animation:none !important; }
     }
 
+    /* =========================
+       🔞 AGE GATE (harmonisé Apéro Catalan)
+       - Même méthode que ton autre page (localStorage + until + action pending)
+       ========================= */
+    .ageOverlay{
+      position: fixed;
+      inset: 0;
+      z-index: 999998; /* sous faux chargement, au-dessus du reste */
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0,0,0,.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .ageOverlay.show{ display:flex; }
+
+    .ageCard{
+      width: min(560px, 94vw);
+      border-radius: 24px;
+      overflow: hidden;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 30px 90px rgba(0,0,0,.55);
+      background:
+        radial-gradient(900px 650px at 50% 18%, rgba(255,211,107,.18), transparent 58%),
+        radial-gradient(900px 650px at 20% 70%, rgba(198,25,16,.22), transparent 62%),
+        radial-gradient(900px 650px at 80% 70%, rgba(255,184,28,.14), transparent 62%),
+        linear-gradient(180deg, #5a1217, #2a0a0c 55%, #120406);
+    }
+    .ageTop{
+      padding: 14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+    }
+    .ageBrand{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .ageBadge{
+      width: 36px;
+      height: 36px;
+      border-radius: 14px;
+      display:grid;
+      place-items:center;
+      font-weight: 950;
+      letter-spacing: .06em;
+      background: rgba(198,25,16,.20);
+      border: 1px solid rgba(198,25,16,.38);
+      color: #fff;
+      flex: 0 0 auto;
+    }
+    .ageBrand b{
+      letter-spacing:.10em;
+      text-transform: uppercase;
+      font-size: 13px;
+      color: rgba(255,244,223,.95);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ageBody{ padding: 18px; }
+    .ageTitle{ margin: 6px 0 10px; font-size: 28px; line-height:1.1; font-weight: 950; }
+    .ageLead{ margin: 0 0 14px; color: rgba(255,255,255,.78); line-height: 1.45; font-size: 15px; }
+    .ageNotice{
+      margin: 14px 0 16px;
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      color: rgba(255,255,255,.92);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+    .ageBtns{ display:grid; gap: 10px; margin-top: 10px; }
+    .ageBtn{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: #fff;
+      padding: 14px 14px;
+      border-radius: 16px;
+      cursor: pointer;
+      font-weight: 950;
+      font-size: 15px;
+    }
+    .ageBtnPrimary{
+      background: linear-gradient(180deg, rgba(198,25,16,1), rgba(138,11,11,1));
+      border-color: rgba(255,255,255,.10);
+      box-shadow: 0 16px 48px rgba(198,25,16,.28);
+    }
+    .ageBtnSecondary{
+      background: linear-gradient(180deg, rgba(255,184,28,1), rgba(217,137,18,1));
+      color: #1b0b0b;
+      border-color: rgba(255,255,255,.12);
+      box-shadow: 0 16px 48px rgba(255,184,28,.22);
+    }
+    .ageTimer{
+      margin-top: 12px;
+      font-weight: 950;
+      color: rgba(255,211,107,.95);
+      text-align: center;
+      font-size: 14px;
+      letter-spacing: .2px;
+    }
+    .ageFine{
+      margin: 12px 0 0;
+      color: rgba(255,255,255,.62);
+      font-size: 12.5px;
+      line-height: 1.35;
+      text-align: center;
+    }
+    .ageFine a{ color:#ffd36b; text-decoration:none; font-weight: 900; }
+    .ageFine a:hover{ text-decoration: underline; }
   </style>
 </head>
 
 <body class="w-[375px] min-h-[762px] mx-auto relative"
   style="background-image:url('https://readdy.ai/api/search-image?query=blurred%20background%2C%20warm%20and%20festive%20atmosphere%2C%20people%20celebrating%2C%20soft%20lights%2C%20party%20mood%2C%20warm%20colors%2C%20subtle%20pattern%2C%20low%20opacity%20for%20text%20readability%2C%20no%20distinct%20objects&width=375&height=762&seq=10&orientation=portrait'); background-size:cover; background-position:center;">
+
 <!-- ✅ PWA : Faux chargement (uniquement si l'app est installée) -->
 <div id="pwaLoading" aria-hidden="true">
   <div class="pl-body">
@@ -262,7 +383,6 @@
 
       <div class="pl-stack">
         <div class="pl-iconWrap">
-          <!-- priorité icon locale (offline), fallback URL -->
           <img class="pl-icon"
                src="./icon-512.png?v=20251223"
                onerror="this.onerror=null; this.src='https://image.noelshack.com/fichiers/2025/52/2/1766528997-icon-512-1.png';"
@@ -295,11 +415,9 @@
     return;
   }
 
-  // Active l'overlay + petit fondu-in (feinte avec le splash natif)
   overlay.style.display = 'block';
   requestAnimationFrame(() => overlay.classList.add('ready'));
 
-  // Progression réaliste (un peu lente)
   const bar = document.getElementById('plBar');
   const pct = document.getElementById('plPct');
   let p = 0;
@@ -319,10 +437,8 @@
     if (p >= 99) setP(99);
   }, 5);
 
-  // Quand la page est prête, on finit et on retire proprement
   window.addEventListener('load', () => {
     clearInterval(t);
-    // petite pause "réaliste"
     setTimeout(() => {
       setP(100);
       overlay.style.transition = 'opacity .25s ease';
@@ -332,7 +448,6 @@
   });
 })();
 </script>
-
 
 <header class="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
   <div class="w-[375px] mx-auto py-4 flex items-center justify-center">
@@ -348,7 +463,9 @@
 </header>
 
 <main class="pt-[220px] pb-[80px] px-4 flex flex-col gap-6">
+  <!-- ✅ 1/4 bouton principal (APPELER) => déclenche l'age gate -->
   <a href="tel:0652336461"
+     id="callBtn"
      class="w-full py-4 bg-primary text-white font-semibold !rounded-button flex items-center justify-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
     <div class="w-6 h-6 flex items-center justify-center">
       <i class="ri-phone-fill text-xl"></i>
@@ -356,6 +473,7 @@
     <span>APPELER</span>
   </a>
 
+  <!-- ✅ 2/4 bouton principal (INSTALL) => déclenche l'age gate -->
   <button id="installBtn"
           class="w-full bg-[#FFC107] text-white py-4 !rounded-button font-semibold flex items-center justify-center gap-2 shadow-lg hover:opacity-95 transition hidden">
     <i class="ri-download-cloud-2-line text-xl"></i>
@@ -365,6 +483,7 @@
     Sur iPhone : appuie sur <b>Partager</b> puis <b>Sur l’écran d’accueil</b>.
   </p>
 
+  <!-- ✅ 3/4 bouton principal (ZONE) => déclenche l'age gate -->
   <button id="zoneBtn"
           class="w-full py-4 bg-secondary text-white font-semibold !rounded-button flex items-center justify-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
     <div class="w-6 h-6 flex items-center justify-center">
@@ -373,6 +492,7 @@
     <span>ZONE DE LIVRAISON</span>
   </button>
 
+  <!-- ✅ 4/4 bouton principal (ARTICLES) => déclenche l'age gate -->
   <button id="articlesBtn"
           class="w-full py-4 bg-primary text-white font-semibold !rounded-button flex items-center justify-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
     <div class="w-6 h-6 flex items-center justify-center">
@@ -532,6 +652,73 @@
   </div>
 </div>
 
+<!-- 🔞 AGE GATE OVERLAYS -->
+<div class="ageOverlay" id="ageQuestion" role="dialog" aria-modal="true">
+  <div class="ageCard">
+    <div class="ageTop">
+      <div class="ageBrand">
+        <div class="ageBadge">18+</div>
+        <b>L'APÉRO CATALAN®</b>
+      </div>
+    </div>
+
+    <div class="ageBody">
+      <div class="ageTitle">Bienvenue ✨</div>
+      <p class="ageLead">
+        Ce site présente des boissons alcoolisées. Pour continuer, confirme que tu as l’âge légal.
+      </p>
+
+      <div class="ageNotice">
+        <b>La vente d’alcool est interdite aux mineurs.</b><br>
+        L’abus d’alcool est dangereux pour la santé, à consommer avec modération.
+      </div>
+
+      <div class="ageBtns">
+        <button class="ageBtn ageBtnPrimary" id="ageYes">✅ Je suis majeur</button>
+        <button class="ageBtn ageBtnSecondary" id="ageNo">ℹ️ Je ne suis pas majeur</button>
+      </div>
+
+      <div class="ageFine">🔒 Choix mémorisé sur cet appareil.</div>
+    </div>
+  </div>
+</div>
+
+<div class="ageOverlay" id="ageBlocked" role="dialog" aria-modal="true">
+  <div class="ageCard">
+    <div class="ageTop">
+      <div class="ageBrand">
+        <div class="ageBadge">NO</div>
+        <b>ACCÈS RÉSERVÉ</b>
+      </div>
+    </div>
+
+    <div class="ageBody">
+      <div class="ageTitle">Accès réservé 🔞</div>
+      <p class="ageLead">
+        Ce contenu est strictement réservé aux personnes majeures.<br>
+        La vente d’alcool est interdite aux mineurs.
+      </p>
+
+      <div class="ageNotice">
+        Pour accéder au contenu, une vérification d’âge est obligatoire.
+      </div>
+
+      <!-- ✅ (fix) compteur présent -->
+      <div class="ageTimer">
+        Nouvelle tentative dans <span id="ageCount">48:00:00</span>
+      </div>
+
+      <div class="ageFine">
+        Si tu penses être bloqué par erreur, contacte Apéro de Nuit® (06.52.33.64.61)
+        ou <a href="mailto:apero.nuit.du.66@gmail.com">contact@aperodenuit.com</a>.
+      </div>
+      <div class="ageFine" style="margin-top:10px;">
+        L’abus d’alcool est dangereux pour la santé.
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const modals = {
@@ -617,6 +804,118 @@ document.addEventListener('DOMContentLoaded', function() {
     "accessoires": [{"name":"Verre à whisky-soda incassable 35 cl","price":0.5,"image":""}]
   };
 
+  // =========================
+  // 🔞 AGE GATE (même méthode)
+  // Déclenché par les 4 boutons principaux
+  // =========================
+  const AGE = {
+    KEY_UNTIL: "ad_major_until",
+    KEY_LAST: "ad_last_choice",
+    WEEK_MS: 20 * 24 * 60 * 60 * 1000,   // 20 jours (même méthode que ton autre page)
+    BLOCK_S: 48 * 60 * 60,              // 48h
+  };
+
+  const ageQuestion = document.getElementById("ageQuestion");
+  const ageBlocked  = document.getElementById("ageBlocked");
+  const ageYes      = document.getElementById("ageYes");
+  const ageNo       = document.getElementById("ageNo");
+  const ageCount    = document.getElementById("ageCount");
+
+  let ageInterval = null;
+  let agePendingAction = null;
+
+  function ageNow(){ return Date.now(); }
+  function ageGetUntil(){
+    const v = localStorage.getItem(AGE.KEY_UNTIL);
+    const n = v ? parseInt(v, 10) : 0;
+    return Number.isFinite(n) ? n : 0;
+  }
+  function ageIsMajorValid(){ return ageGetUntil() > ageNow(); }
+
+  function ageShow(el){
+    el.classList.add("show");
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+  }
+  function ageHide(el){
+    el.classList.remove("show");
+    if(!ageQuestion.classList.contains("show") && !ageBlocked.classList.contains("show")){
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
+    }
+  }
+  function ageShowQuestion(){
+    ageHide(ageBlocked);
+    ageShow(ageQuestion);
+  }
+  function fmtHMS(totalSeconds){
+    const s = Math.max(0, Math.floor(totalSeconds));
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const ss = s % 60;
+    const pad = (x)=> String(x).padStart(2,"0");
+    return `${pad(h)}:${pad(m)}:${pad(ss)}`;
+  }
+  function ageShowBlocked(){
+    ageHide(ageQuestion);
+    ageShow(ageBlocked);
+
+    let t = AGE.BLOCK_S;
+    if (ageCount) ageCount.textContent = fmtHMS(t);
+
+    if(ageInterval) clearInterval(ageInterval);
+    ageInterval = setInterval(() => {
+      t--;
+      if (ageCount) ageCount.textContent = fmtHMS(t);
+      if(t <= 0){
+        clearInterval(ageInterval);
+        ageInterval = null;
+        ageShowQuestion();
+      }
+    }, 1000);
+  }
+  function ageSetMajorWeek(){
+    localStorage.setItem(AGE.KEY_LAST, "major");
+    localStorage.setItem(AGE.KEY_UNTIL, String(ageNow() + AGE.WEEK_MS));
+  }
+  function ageSetMinor(){
+    localStorage.setItem(AGE.KEY_LAST, "minor");
+  }
+
+  // Empêche “Escape” de fermer (même logique que ta version)
+  document.addEventListener("keydown", (e)=>{
+    if((ageQuestion.classList.contains("show") || ageBlocked.classList.contains("show")) && e.key === "Escape"){
+      e.preventDefault();
+    }
+  });
+
+  function requireMajorThen(actionFn){
+    if(ageIsMajorValid()){
+      actionFn();
+      return;
+    }
+    agePendingAction = actionFn;
+    ageShowQuestion();
+  }
+
+  ageYes?.addEventListener("click", ()=>{
+    ageSetMajorWeek();
+    ageHide(ageQuestion);
+    if(typeof agePendingAction === "function"){
+      const fn = agePendingAction;
+      agePendingAction = null;
+      fn();
+    }
+  });
+
+  ageNo?.addEventListener("click", ()=>{
+    ageSetMinor();
+    ageShowBlocked();
+  });
+
+  // =========================
+  // MODALS (inchangé)
+  // =========================
   Object.entries(buttons).forEach(([key, btn]) => {
     const modalId = key.replace('Btn', 'Modal');
     btn.addEventListener('click', () => openModal(modalId));
@@ -724,6 +1023,46 @@ document.addEventListener('DOMContentLoaded', function() {
   sortSelect.addEventListener('change', () => displayProducts(getActiveCategory(), searchInput.value, sortSelect.value));
 
   displayProducts('all', '', 'popular');
+
+  // =========================
+  // ✅ Déclenche l'age gate sur les 4 boutons principaux
+  // =========================
+  const callBtn = document.getElementById('callBtn');
+  const installBtnEl = document.getElementById('installBtn');
+  const zoneBtnEl = document.getElementById('zoneBtn');
+  const articlesBtnEl = document.getElementById('articlesBtn');
+
+  callBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    requireMajorThen(() => {
+      window.location.href = callBtn.getAttribute('href') || 'tel:0652336461';
+    });
+  });
+
+  // Zone + Articles : on empêche l'ouverture directe, et on ouvre après validation
+  zoneBtnEl?.addEventListener('click', (e) => {
+    e.preventDefault();
+    requireMajorThen(() => openModal('zoneModal'));
+  });
+
+  articlesBtnEl?.addEventListener('click', (e) => {
+    e.preventDefault();
+    requireMajorThen(() => openModal('articlesModal'));
+  });
+
+  // Install : on laisse ensuite le code PWA gérer (on simule un clic après validation)
+  installBtnEl?.addEventListener('click', (e) => {
+    // IMPORTANT : on ne veut pas doubler le handler PWA plus bas.
+    // Donc: on intercepte seulement si pas majeur.
+    if (!ageIsMajorValid()) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      requireMajorThen(() => {
+        // relance le clic une fois validé
+        setTimeout(() => installBtnEl.click(), 0);
+      });
+    }
+  }, true);
 });
 </script>
 
@@ -771,4 +1110,3 @@ window.addEventListener('load', () => {
 
 </body>
 </html>
-```0
