@@ -1108,5 +1108,107 @@ window.addEventListener('load', () => {
 });
 </script>
 
+
+<!-- ===== GLOBAL STATUS POPUP (commun aux 2 sites) ===== -->
+<div id="globalStatusOverlay" class="fixed inset-0 z-[999997] hidden items-center justify-center p-4 bg-black/70 backdrop-blur-md">
+  <div class="w-[min(560px,94vw)] overflow-hidden rounded-3xl border border-white/10 shadow-2xl"
+       style="background: radial-gradient(900px 650px at 50% 18%, rgba(255,211,107,.18), transparent 58%),
+              radial-gradient(900px 650px at 20% 70%, rgba(198,25,16,.22), transparent 62%),
+              radial-gradient(900px 650px at 80% 70%, rgba(255,184,28,.14), transparent 62%),
+              linear-gradient(180deg, #5a1217, #2a0a0c 55%, #120406);">
+    <div class="p-3 flex items-center justify-between gap-3 border-b border-white/10 bg-white/5">
+      <div class="flex items-center gap-2 min-w-0">
+        <div class="w-9 h-9 rounded-2xl grid place-items-center font-black tracking-wider text-white border border-white/10"
+             style="background: rgba(198,25,16,.20);">!</div>
+        <div class="min-w-0">
+          <div class="text-[12px] tracking-[.18em] font-black text-white/90 whitespace-nowrap overflow-hidden text-ellipsis">INFORMATION SERVICE</div>
+          <div class="text-[12px] text-white/70 -mt-[2px]">Mise à jour officielle</div>
+        </div>
+      </div>
+      <button id="globalStatusCloseX" class="w-10 h-10 rounded-2xl grid place-items-center text-white/80 hover:text-white hover:bg-white/10 border border-white/10">
+        <i class="ri-close-line text-xl"></i>
+      </button>
+    </div>
+
+    <img id="globalStatusImg" alt="" class="w-full h-auto block bg-black/20">
+
+    <div class="p-5">
+      <h2 id="globalStatusTitle" class="text-white text-2xl font-black leading-tight mb-2">Service temporairement suspendu</h2>
+      <p id="globalStatusMsg" class="text-white/80 text-[15px] leading-relaxed">
+        Une information importante est en cours.
+      </p>
+
+      <div class="mt-4 grid gap-2">
+        <button id="globalStatusOk"
+                class="w-full py-4 !rounded-button font-black tracking-wide text-white bg-primary hover:opacity-95 transition">
+          OK, j'ai compris
+        </button>
+        <a href="tel:0652336461"
+           class="w-full py-3 !rounded-button font-semibold text-center text-white/90 border border-white/15 bg-white/5 hover:bg-white/10 transition">
+          Besoin d’infos ? Appeler
+        </a>
+      </div>
+
+      <div class="mt-3 text-[12px] text-white/60 text-center">
+        L’abus d’alcool est dangereux pour la santé, à consommer avec modération.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== Lecture du statut commun (status.json) ===== */
+(function() {
+  const STATUS_URL = 'https://bullyto.github.io/status/status.json';
+
+  const overlay = document.getElementById('globalStatusOverlay');
+  const imgEl   = document.getElementById('globalStatusImg');
+  const titleEl = document.getElementById('globalStatusTitle');
+  const msgEl   = document.getElementById('globalStatusMsg');
+  const btnOk   = document.getElementById('globalStatusOk');
+  const btnX    = document.getElementById('globalStatusCloseX');
+
+  if(!overlay || !imgEl || !titleEl || !msgEl || !btnOk) return;
+
+  function close() {
+    overlay.classList.add('hidden');
+    overlay.classList.remove('flex');
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+  }
+
+  function open() {
+    overlay.classList.remove('hidden');
+    overlay.classList.add('flex');
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+  }
+
+  btnOk.addEventListener('click', close);
+  if(btnX) btnX.addEventListener('click', close);
+  overlay.addEventListener('click', (e) => { if(e.target === overlay) close(); });
+  // Afficher tant que "active": true (les clients peuvent fermer, mais ça reviendra au prochain chargement)
+  fetch(STATUS_URL, { cache: "no-store" })
+    .then(r => r.json())
+    .then(data => {
+      if(!data || !data.active) return;
+      const mode = data.mode || "none";
+      const cfg = data.modes && data.modes[mode];
+      if(!cfg) return;
+
+      const base = STATUS_URL.replace(/\/status\.json$/,'/');
+      const imgUrl = (cfg.image || "").startsWith("http") ? cfg.image : (base + (cfg.image || ""));
+
+      imgEl.src = imgUrl;
+      titleEl.textContent = cfg.title || "Information";
+      msgEl.textContent = cfg.message || "";
+
+      open();
+    })
+    .catch(() => {});
+})();
+</script>
+
+
 </body>
 </html>
