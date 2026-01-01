@@ -1145,6 +1145,8 @@ window.addEventListener('load', () => {
         </button>
       
 
+            </div>
+
       <div class="mt-3 text-[12px] text-white/60 text-center">
         L’abus d’alcool est dangereux pour la santé, à consommer avec modération.
       </div>
@@ -1164,9 +1166,48 @@ window.addEventListener('load', () => {
   const btnOk   = document.getElementById('globalStatusOk');
   const btnX    = document.getElementById('globalStatusCloseX');
 
+  // (optionnel) zone message secondaire si warning
+  let secondary = document.getElementById('globalStatusSecondary');
+  if(!secondary){
+    const div = document.createElement('div');
+    div.id = 'globalStatusSecondary';
+    div.className = "mt-3 text-[13px] text-white/85 text-center font-semibold";
+    div.style.display = "none";
+    btnOk?.parentElement?.appendChild(div);
+    secondary = div;
+  }
+
   if(!overlay || !imgEl || !titleEl || !msgEl || !btnOk) return;
 
+  let canClose = true;
+  let currentMode = "none";
+  let warningClickMsg = "Ce n'est actuellement pas possible de commander.";
+
+  function setCloseEnabled(on){
+    canClose = !!on;
+
+    if(btnX){
+      btnX.disabled = !canClose;
+      btnX.style.opacity = canClose ? "" : "0.5";
+      btnX.style.cursor = canClose ? "" : "not-allowed";
+      btnX.classList.toggle("pointer-events-none", !canClose);
+    }
+
+    if(currentMode === "info"){
+      btnOk.disabled = !canClose;
+      btnOk.style.opacity = canClose ? "" : "0.7";
+      btnOk.style.cursor = canClose ? "" : "not-allowed";
+      btnOk.classList.toggle("pointer-events-none", !canClose);
+    } else {
+      btnOk.disabled = false;
+      btnOk.style.opacity = "";
+      btnOk.style.cursor = "pointer";
+      btnOk.classList.remove("pointer-events-none");
+    }
+  }
+
   function close() {
+    if(!canClose) return;
     overlay.classList.add('hidden');
     overlay.classList.remove('flex');
     document.documentElement.style.overflow = '';
@@ -1180,17 +1221,104 @@ window.addEventListener('load', () => {
     document.body.style.overflow = 'hidden';
   }
 
-  btnOk.addEventListener('click', close);
+  overlay.addEventListener('click', (e) => {
+    if(e.target === overlay) {
+      if(canClose) close();
+      else if(currentMode === "warning" && secondary){
+        secondary.style.display = "block";
+        secondary.textContent = warningClickMsg;
+      }
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if(overlay.classList.contains("flex") && e.key === "Escape"){
+      if(!canClose){
+        e.preventDefault();
+        e.stopPropagation();
+      } else {
+        close();
+      }
+    }
+  }, true);
+
+  btnOk.addEventListener('click', () => {
+    if(currentMode === "warning"){
+      if(secondary){
+        secondary.style.display = "block";
+        secondary.textContent = warningClickMsg;
+        secondary.style.opacity = "1";
+        setTimeout(()=> secondary.style.opacity = "0.85", 250);
+      }
+      return;
+    }
+    close();
+  });
+
   if(btnX) btnX.addEventListener('click', close);
-  overlay.addEventListener('click', (e) => { if(e.target === overlay) close(); });
-  // Afficher tant que "active": true (les clients peuvent fermer, mais ça reviendra au prochain chargement)
+
+  function withinSchedule(schedule, now = new Date()){
+    if(!schedule || !schedule.enabled) return true;
+
+    const days = Array.isArray(schedule.days) ? schedule.days : [];
+    const day = now.getDay();
+    if(days.length && !days.includes(day)) return false;
+
+    const [sh, sm] = String(schedule.start||"00:00").split(":").map(n=>parseInt(n,10));
+    const [eh, em] = String(schedule.end||"00:00").split(":").map(n=>parseInt(n,10));
+    if(!Number.isFinite(sh)||!Number.isFinite(sm)||!Number.isFinite(eh)||!Number.isFinite(em)) return true;
+
+    const startMin = sh*60+sm;
+    const endMin = eh*60+em;
+    const nowMin = now.getHours()*60+now.getMinutes();
+
+    if(startMin === endMin) return true;
+    if(startMin < endMin){
+      return nowMin >= startMin && nowMin < endMin;
+    } else {
+      return (nowMin >= startMin) || (nowMin < endMin);
+    }
+  }
+
+  function setOrderEnabled(enabled){
+    const callBtn = document.getElementById("callBtn");
+    const orderLinks = Array.from(document.querySelectorAll('a[href^="tel:"]'));
+    const all = new Set([callBtn, ...orderLinks].filter(Boolean));
+    all.forEach(el => {
+      if(enabled){
+        el.classList.remove("pointer-events-none","opacity-50");
+        el.removeAttribute("aria-disabled");
+        el.dataset.statusBlocked = "0";
+      } else {
+        el.classList.add("pointer-events-none","opacity-50");
+        el.setAttribute("aria-disabled","true");
+        el.dataset.statusBlocked = "1";
+      }
+    });
+  }
+
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest('a[href^="tel:"]');
+    if(!a) return;
+    if(a.dataset.statusBlocked === "1"){
+      e.preventDefault();
+      if(currentMode === "warning" && secondary){
+        secondary.style.display = "block";
+        secondary.textContent = warningClickMsg;
+      }
+    }
+  }, true);
+
   fetch(STATUS_URL, { cache: "no-store" })
     .then(r => r.json())
     .then(data => {
-      if(!data || !data.active) return;
+      if(!data || !data.active) { setOrderEnabled(true); return; }
+
       const mode = data.mode || "none";
       const cfg = data.modes && data.modes[mode];
-      if(!cfg) return;
+      if(!cfg) { setOrderEnabled(true); return; }
+
+      currentMode = mode;
 
       const base = STATUS_URL.replace(/\/status\.json$/,'/');
       const imgUrl = (cfg.image || "").startsWith("http") ? cfg.image : (base + (cfg.image || ""));
@@ -1199,9 +1327,48 @@ window.addEventListener('load', () => {
       titleEl.textContent = cfg.title || "Information";
       msgEl.textContent = cfg.message || "";
 
-      open();
+      if(mode === "info"){
+        const delay = Number.isFinite(cfg.ok_delay_seconds) ? cfg.ok_delay_seconds : 5;
+        if(btnOk) btnOk.textContent = `OK, j'ai compris (dans ${delay}s)`;
+        if(secondary) secondary.style.display = "none";
+
+        setCloseEnabled(false);
+        setOrderEnabled(true);
+        open();
+
+        let left = delay;
+        const t = setInterval(() => {
+          left -= 1;
+          if(left <= 0){
+            clearInterval(t);
+            if(btnOk) btnOk.textContent = "OK, j'ai compris";
+            setCloseEnabled(true);
+          } else {
+            if(btnOk) btnOk.textContent = `OK, j'ai compris (dans ${left}s)`;
+          }
+        }, 1000);
+        return;
+      }
+
+      if(mode === "warning"){
+        warningClickMsg = cfg.warning_click_message || warningClickMsg;
+        if(secondary){
+          secondary.style.display = "none";
+          secondary.textContent = warningClickMsg;
+        }
+        setCloseEnabled(false);
+
+        const schedule = cfg.block_schedule || { enabled:false };
+        const blockedNow = withinSchedule(schedule, new Date());
+        setOrderEnabled(!blockedNow);
+
+        open();
+        return;
+      }
+
+      setOrderEnabled(true);
     })
-    .catch(() => {});
+    .catch(() => { setOrderEnabled(true); });
 })();
 </script>
 
