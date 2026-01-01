@@ -1356,11 +1356,20 @@ window.addEventListener('load', () => {
           secondary.style.display = "none";
           secondary.textContent = warningClickMsg;
         }
-        setCloseEnabled(false);
 
         const schedule = cfg.block_schedule || { enabled:false };
         const blockedNow = withinSchedule(schedule, new Date());
-        setOrderEnabled(!blockedNow);
+
+        // ✅ WARNING ne bloque QUE pendant la plage horaire
+        if(!blockedNow){
+          setOrderEnabled(true);
+          close(); // ferme si jamais affichée
+          return;
+        }
+
+        // ✅ dans la plage => warning bloquant + commande bloquée
+        setCloseEnabled(false);
+        setOrderEnabled(false);
 
         open();
         return;
