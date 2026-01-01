@@ -703,9 +703,9 @@
         Pour accéder au contenu, une vérification d’âge est obligatoire.
       </div>
 
-      <!-- ✅ (fix) compteur présent -->
-      <div class="ageTimer">
-        Nouvelle tentative dans <span id="ageCount">48:00:00</span>
+      <!-- (compteur caché : on ne montre pas la durée de blocage) -->
+      <div class="ageTimer" style="display:none;">
+        <span id="ageCount">48:00:00</span>
       </div>
 
       <div class="ageFine">
@@ -809,10 +809,15 @@ document.addEventListener('DOMContentLoaded', function() {
   // Déclenché par les 4 boutons principaux
   // =========================
   const AGE = {
-    KEY_UNTIL: "ad_major_until",
+    // Majeur : on mémorise une "validité" (comme sur ton autre page)
+    KEY_MAJOR_UNTIL: "ad_major_until",
     KEY_LAST: "ad_last_choice",
-    WEEK_MS: 20 * 24 * 60 * 60 * 1000,   // 20 jours (même méthode que ton autre page)
-    BLOCK_S: 48 * 60 * 60,              // 48h
+
+    // Mineur : on mémorise un blocage silencieux 48h (persistant même après refresh)
+    KEY_MINOR_UNTIL: "ad_minor_until",
+
+    MAJOR_MS: 20 * 24 * 60 * 60 * 1000, // 20 jours
+    MINOR_MS: 48 * 60 * 60 * 1000       // 48h
   };
 
   const ageQuestion = document.getElementById("ageQuestion");
@@ -825,12 +830,20 @@ document.addEventListener('DOMContentLoaded', function() {
   let agePendingAction = null;
 
   function ageNow(){ return Date.now(); }
-  function ageGetUntil(){
-    const v = localStorage.getItem(AGE.KEY_UNTIL);
+
+  function ageGetMajorUntil(){
+    const v = localStorage.getItem(AGE.KEY_MAJOR_UNTIL);
     const n = v ? parseInt(v, 10) : 0;
     return Number.isFinite(n) ? n : 0;
   }
-  function ageIsMajorValid(){ return ageGetUntil() > ageNow(); }
+  function ageIsMajorValid(){ return ageGetMajorUntil() > ageNow(); }
+
+  function ageGetMinorUntil(){
+    const v = localStorage.getItem(AGE.KEY_MINOR_UNTIL);
+    const n = v ? parseInt(v, 10) : 0;
+    return Number.isFinite(n) ? n : 0;
+  }
+  function ageIsMinorBlocked(){ return ageGetMinorUntil() > ageNow(); }
 
   function ageShow(el){
     el.classList.add("show");
@@ -848,6 +861,8 @@ document.addEventListener('DOMContentLoaded', function() {
     ageHide(ageBlocked);
     ageShow(ageQuestion);
   }
+
+  // (Optionnel) compteur caché : on ne révèle pas les 48h à l'utilisateur
   function fmtHMS(totalSeconds){
     const s = Math.max(0, Math.floor(totalSeconds));
     const h = Math.floor(s / 3600);
@@ -856,30 +871,52 @@ document.addEventListener('DOMContentLoaded', function() {
     const pad = (x)=> String(x).padStart(2,"0");
     return `${pad(h)}:${pad(m)}:${pad(ss)}`;
   }
+
   function ageShowBlocked(){
     ageHide(ageQuestion);
     ageShow(ageBlocked);
 
-    let t = AGE.BLOCK_S;
-    if (ageCount) ageCount.textContent = fmtHMS(t);
+    // Timer silencieux basé sur la vraie date de fin stockée
+    const until = ageGetMinorUntil();
+    const leftMs = Math.max(0, until - ageNow());
+
+    // On garde le span (caché) à jour si jamais tu veux l'afficher plus tard
+    if (ageCount){
+      ageCount.textContent = fmtHMS(Math.ceil(leftMs / 1000));
+    }
 
     if(ageInterval) clearInterval(ageInterval);
-    ageInterval = setInterval(() => {
-      t--;
-      if (ageCount) ageCount.textContent = fmtHMS(t);
-      if(t <= 0){
-        clearInterval(ageInterval);
-        ageInterval = null;
-        ageShowQuestion();
-      }
-    }, 1000);
+    if(leftMs > 0){
+      ageInterval = setInterval(() => {
+        const l = Math.max(0, ageGetMinorUntil() - ageNow());
+        if (ageCount) ageCount.textContent = fmtHMS(Math.ceil(l / 1000));
+        if(l <= 0){
+          clearInterval(ageInterval);
+          ageInterval = null;
+          localStorage.removeItem(AGE.KEY_MINOR_UNTIL); // fin du blocage
+          ageShowQuestion(); // revient à la question majeur/mineur
+        }
+      }, 1000);
+    } else {
+      // blocage expiré (sécurité)
+      localStorage.removeItem(AGE.KEY_MINOR_UNTIL);
+      ageShowQuestion();
+    }
   }
+
   function ageSetMajorWeek(){
     localStorage.setItem(AGE.KEY_LAST, "major");
-    localStorage.setItem(AGE.KEY_UNTIL, String(ageNow() + AGE.WEEK_MS));
+    localStorage.setItem(AGE.KEY_MAJOR_UNTIL, String(ageNow() + AGE.MAJOR_MS));
+    localStorage.removeItem(AGE.KEY_MINOR_UNTIL); // si jamais il était bloqué avant
   }
-  function ageSetMinor(){
+  function ageSetMinorBlock(){
     localStorage.setItem(AGE.KEY_LAST, "minor");
+    localStorage.setItem(AGE.KEY_MINOR_UNTIL, String(ageNow() + AGE.MINOR_MS));
+  }
+
+  // Si l'utilisateur était déjà "mineur" => on le laisse sur la popup (persistant même après refresh)
+  if(ageIsMinorBlocked()){
+    ageShowBlocked();
   }
 
   // Empêche “Escape” de fermer (même logique que ta version)
@@ -890,10 +927,20 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   function requireMajorThen(actionFn){
+    // Si mineur encore bloqué => on reste sur la popup "accès réservé"
+    if(ageIsMinorBlocked()){
+      agePendingAction = null;
+      ageShowBlocked();
+      return;
+    }
+
+    // Si majeur encore valide => on exécute directement
     if(ageIsMajorValid()){
       actionFn();
       return;
     }
+
+    // Sinon on (re)demande
     agePendingAction = actionFn;
     ageShowQuestion();
   }
@@ -909,7 +956,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   ageNo?.addEventListener("click", ()=>{
-    ageSetMinor();
+    ageSetMinorBlock();
     ageShowBlocked();
   });
 
@@ -1108,7 +1155,6 @@ window.addEventListener('load', () => {
 });
 </script>
 
-
 <!-- ===== GLOBAL STATUS POPUP (commun aux 2 sites) ===== -->
 <div id="globalStatusOverlay" class="fixed inset-0 z-[999997] hidden items-center justify-center p-4 bg-black/70 backdrop-blur-md">
   <div class="w-[min(560px,94vw)] overflow-hidden rounded-3xl border border-white/10 shadow-2xl"
@@ -1143,9 +1189,7 @@ window.addEventListener('load', () => {
                 class="w-full py-4 !rounded-button font-black tracking-wide text-white bg-primary hover:opacity-95 transition">
           OK, j'ai compris
         </button>
-      
-
-            </div>
+      </div>
 
       <div class="mt-3 text-[12px] text-white/60 text-center">
         L’abus d’alcool est dangereux pour la santé, à consommer avec modération.
@@ -1380,7 +1424,6 @@ window.addEventListener('load', () => {
     .catch(() => { setOrderEnabled(true); });
 })();
 </script>
-
 
 </body>
 </html>
