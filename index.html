@@ -58,6 +58,20 @@
 
   <style>
 
+/* PATCH V6: search input full width and readable */
+#searchInput{
+  width:100% !important;
+  max-width:100% !important;
+  font-size:14px !important;
+}
+
+
+
+/* PATCH V6: hide misleading count line */
+#countLine, .countLine, .articlesCount { display:none !important; }
+
+
+
 /* =========================
    CORE UI REWORK (V5)
 ========================= */
@@ -749,7 +763,7 @@
         <div class="w-6 h-6 absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center text-gray-400">
           <i class="ri-search-line"></i>
         </div>
-        <input type="text" id="searchInput" placeholder="Rechercher un produit..."
+        <input type="text" id="searchInput" placeholder="Rechercher un produitroduit..."
                class="w-full pl-10 pr-4 py-2 !rounded-button border border-gray-200 text-sm focus:outline-none focus:border-primary">
       </div>
 
@@ -1293,27 +1307,36 @@ const base = getProductsForCategory(category);
       const card = document.createElement("div");
       card.className = "bg-white shadow-sm !rounded-button overflow-hidden flex flex-col border border-gray-100";
       card.innerHTML = `
-        <div class="p-3 flex-1">
-          <div class="flex items-start gap-3">
-            <div class="w-24 h-24 shrink-0 rounded-xl bg-gray-50 border border-gray-100 overflow-hidden flex items-center justify-center">
+        
+<div class="p-3 flex-1">
+          <div class="flex flex-col items-center text-center">
+            <div class="w-32 h-40 rounded-2xl bg-gray-50 border border-gray-100 overflow-hidden flex items-center justify-center">
               <img src="${product.imageUrl}" alt="${product.name}" class="w-full h-full object-contain" loading="lazy"
                 onerror="this.style.display='none'; this.parentElement.classList.add('items-center');" />
             </div>
-            <div class="min-w-0 flex-1">
-              <div class="text-[10px] inline-flex items-center px-2 py-[2px] rounded-full bg-gray-100 text-gray-600 mb-2">
+
+            <div class="mt-3 w-full">
+              <div class="text-[10px] inline-flex items-center px-2 py-[2px] rounded-full bg-gray-100 text-gray-600 mb-2 mx-auto">
                 ${catLabel(product.category)}
               </div>
-              <h3 class="font-semibold text-sm leading-snug mb-1 text-gray-900">${product.name}</h3>
-              <div class="flex items-center justify-between gap-2">
-                <p class="text-primary font-extrabold text-base">${product.price.toFixed(2)} €</p>
-                ${product.isAlcohol ? `
-                  <span class="text-[11px] font-semibold inline-flex items-center gap-1 px-2 py-1 rounded-full ${product.available ? 'bg-green-100 text-green-800 border-green-300' : 'bg-red-100 text-red-800 border-red-300'}">
-                    <span class="w-2.5 h-2.5 rounded-full ${product.available ? 'bg-green-500' : 'bg-red-500'}"></span>
-                    ${product.available ? 'Disponible' : 'Rupture'}
-                  </span>` : ``}
-              </div>
+
+              <h3 class="font-extrabold text-[15px] leading-snug text-gray-900 px-2">
+                ${product.name}
+              </h3>
+
+              <p class="text-primary font-extrabold text-[18px] mt-2">
+                ${product.price.toFixed(2)} <span class="text-[14px] font-black">€</span>
+              </p>
+
+              ${product.isAlcohol ? `
+                <div class="mt-2 inline-flex items-center justify-center px-3 py-1 rounded-full text-[12px] font-extrabold ${product.available ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}">
+                  ${product.available ? 'Disponible' : 'Rupture'}
+                </div>
+              ` : ``}
             </div>
           </div>
+        </div>
+
         </div>
         <div class="px-3 pb-3">
           <a href="tel:0652336461" class="w-full inline-flex items-center justify-center gap-2 py-2 bg-primary text-white text-xs font-semibold !rounded-button hover:opacity-95 transition">
