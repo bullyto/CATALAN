@@ -58,6 +58,104 @@
 
   <style>
 
+/* =========================
+   CORE UI REWORK (V5)
+========================= */
+.stockNote.premium{
+  display:flex; gap:10px; align-items:center;
+  margin:12px 0 14px; padding:12px 14px;
+  border-radius:14px;
+  background:linear-gradient(135deg, rgba(180,0,0,.08), rgba(0,0,0,.04));
+  border:1px solid rgba(180,0,0,.18);
+}
+.stockNote .icon{
+  width:10px;height:10px;border-radius:50%;
+  background:#b00000; flex:0 0 auto;
+}
+.stockNote .txt strong{display:block;font-size:14px}
+.stockNote .txt span{font-size:12px;opacity:.85}
+
+/* Grid locked mobile-first */
+.grid, .productsGrid{
+  display:grid !important;
+  grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+  gap:14px !important;
+}
+
+/* Product card */
+.productCard, .card{
+  display:flex; flex-direction:column;
+  align-items:center;
+  padding:14px 12px;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 6px 20px rgba(0,0,0,.06);
+  overflow:hidden;
+}
+
+/* Bottle image dominant */
+.productCard img, .card img{
+  width:84px; height:150px;
+  object-fit:contain;
+  margin-bottom:10px;
+}
+
+/* Title */
+.productCard h3, .card h3{
+  font-size:14px;
+  font-weight:700;
+  text-align:center;
+  line-height:1.2;
+  margin:4px 0 6px;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+/* Price line */
+.price, .productPrice{
+  display:flex; align-items:baseline; gap:6px;
+  font-size:18px; font-weight:800; color:#b00000;
+  margin:6px 0;
+}
+.price .euro{font-size:14px}
+
+/* Availability badge */
+.stockBadge{
+  margin:6px 0 10px;
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:12px; font-weight:800;
+}
+.stockBadge.ok{
+  background:rgba(0,150,80,.15);
+  color:#0a6a3a;
+}
+.stockBadge.no{
+  background:rgba(200,0,0,.15);
+  color:#a00000;
+}
+
+/* Button */
+.productCard .btn, .card button{
+  margin-top:auto;
+  width:100%;
+  border-radius:12px;
+  font-weight:700;
+}
+
+/* Search spacing */
+.searchBar{margin:10px 0 12px}
+
+/* Category tabs breathing */
+.tabs{margin:10px 0 14px}
+
+/* Safety */
+*{box-sizing:border-box}
+
+
+
 /* === PATCH V4: prevent overflow inside modal cards === */
 .stockNote{
   margin: 10px 0 12px;
@@ -628,12 +726,20 @@
 
     <div class="pr-8">
       <h2 class="text-xl font-semibold mb-1">Nos Articles</h2>
-      <p class="text-xs text-gray-500 mb-3">Appelle pour commander.</p>
+
+<div class="stockNote premium">
+  <div class="icon">●</div>
+  <div class="txt">
+    <strong>Disponibilités en temps réel</strong>
+    <span>Stock des produits alcoolisés synchronisé avec le véhicule</span>
+  </div>
+</div>
+
+      <p class="text-xs text-gray-500 mb-3">Appelez pour commander.</p>
     </div>
 
 <div class="stockNote">
-  <strong>Disponibilités des produits alcoolisés</strong><br>
-  <span>Connectées en temps réel au stock du véhicule.</span>
+  <strong></span>
 </div>
 
 
