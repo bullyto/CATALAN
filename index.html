@@ -57,6 +57,84 @@
   </script>
 
   <style>
+
+/* === PATCH V4: prevent overflow inside modal cards === */
+.stockNote{
+  margin: 10px 0 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(0,0,0,.04);
+  border: 1px solid rgba(0,0,0,.08);
+  color: #222;
+  font-size: 13px;
+  line-height: 1.25;
+}
+.stockNote strong{font-size: 13px;}
+.stockNote span{opacity:.9}
+
+/* Cards / grid safety */
+.grid, .cardsGrid, .productsGrid, .productGrid{
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+.productCard, .product-card, .itemCard, .item-card, .cardProduct, .card{
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+.productCard * , .product-card * , .itemCard * , .item-card * , .cardProduct * , .card *{
+  min-width: 0 !important;
+}
+
+/* Bigger bottle images but constrained */
+.productCard img, .product-card img, .itemCard img, .item-card img, .cardProduct img, img.productImg{
+  width: 64px !important;
+  height: 108px !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+  display:block !important;
+  margin: 0 auto !important;
+}
+
+/* Title clamp to avoid overflow */
+.productCard .name, .product-card .name, .itemCard .name, .item-card .name,
+.productCard h3, .product-card h3, .itemCard h3, .item-card h3,
+.productCard .title, .product-card .title, .itemCard .title, .item-card .title{
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  word-break: break-word !important;
+}
+
+/* Price + € same line */
+.price, .productPrice, .priceLine, .prix, .product-prix{
+  display: inline-flex !important;
+  align-items: baseline !important;
+  gap: 6px !important;
+  white-space: nowrap !important;
+}
+.euro{display:inline !important}
+
+/* Availability badge visibility */
+.avail, .availability, .stockBadge, .stockPill, .etatStock{
+  display:inline-flex !important;
+  align-items:center !important;
+  padding: 6px 10px !important;
+  border-radius: 999px !important;
+  font-weight: 900 !important;
+  font-size: 12px !important;
+  line-height: 1 !important;
+}
+.avail.ok, .availability.ok, .stockBadge.ok, .etatStock.ok{ background: rgba(0,160,80,.14) !important; color:#0b6b3a !important; border:1px solid rgba(0,160,80,.25) !important; }
+.avail.no, .availability.no, .stockBadge.no, .etatStock.no{ background: rgba(220,0,0,.14) !important; color:#a30000 !important; border:1px solid rgba(220,0,0,.25) !important; }
+
+/* Modal padding to keep inside */
+.modal, .sheet, .dialog, .popup{
+  box-sizing: border-box !important;
+}
+
+
     :where([class^="ri-"])::before { content: "\f3c2"; }
     .modal { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
     .modal.active { opacity: 1; pointer-events: auto; }
@@ -550,8 +628,15 @@
 
     <div class="pr-8">
       <h2 class="text-xl font-semibold mb-1">Nos Articles</h2>
-      <p class="text-xs text-gray-500 mb-3">Recherche + tri pour trouver vite. Disponibilités des produits alcoolisés en temps réel, connectées au véhicule. Appelle pour commander.</p>
+      <p class="text-xs text-gray-500 mb-3">Appelle pour commander.</p>
     </div>
+
+<div class="stockNote">
+  <strong>Disponibilités des produits alcoolisés</strong><br>
+  <span>Connectées en temps réel au stock du véhicule.</span>
+</div>
+
+
 
     <div class="grid grid-cols-1 gap-2 mb-4">
       <div class="relative">
