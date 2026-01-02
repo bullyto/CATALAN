@@ -57,47 +57,6 @@
   </script>
 
   <style>
-
-/* --- PATCH: availability pill clearly visible --- */
-.avail, .availability, .stockBadge, .stockPill, .etatStock{
-  display:inline-flex !important;
-  align-items:center !important;
-  padding: 6px 10px !important;
-  border-radius: 999px !important;
-  font-weight: 800 !important;
-  font-size: 12px !important;
-  line-height: 1 !important;
-  border: 1px solid rgba(0,0,0,.12) !important;
-}
-.avail.ok, .availability.ok, .stockBadge.ok, .etatStock.ok{ background: rgba(0,160,80,.12) !important; color:#0b6b3a !important; }
-.avail.no, .availability.no, .stockBadge.no, .etatStock.no{ background: rgba(220,0,0,.12) !important; color:#a30000 !important; }
-
-
-
-/* --- PATCH: price + euro on same line --- */
-.price, .productPrice, .priceLine, .prix, .product-prix { display:inline-flex !important; align-items:baseline; gap:6px; white-space:nowrap; }
-.price .euro, .productPrice .euro, .priceLine .euro, .prix .euro { display:inline !important; }
-
-
-
-/* --- PATCH: bigger bottle images --- */
-.productCard img, .product-card img, .itemCard img, .item-card img, .cardProduct img, .card img.productImg, img.productImg{
-  width: 72px !important;
-  height: 120px !important;
-  object-fit: contain !important;
-}
-/* If images are constrained by a container */
-.productCard .imgWrap, .product-card .imgWrap, .productCard .imgBox, .product-card .imgBox{
-  width: 78px !important;
-  height: 126px !important;
-}
-
-
-
-/* --- PATCH: hide sort row ("Tri : Recommandés") --- */
-.sortRow, .triRow, #sortRow, #triRow, .sort, .tri, [data-role="sort"], [data-role="tri"]{ display:none !important; }
-
-
     :where([class^="ri-"])::before { content: "\f3c2"; }
     .modal { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
     .modal.active { opacity: 1; pointer-events: auto; }
@@ -591,7 +550,7 @@
 
     <div class="pr-8">
       <h2 class="text-xl font-semibold mb-1">Nos Articles</h2>
-      <p class="text-xs text-gray-500 mb-3">Recherche + tri pour trouver vite. Appelle pour commander.</p>
+      <p class="text-xs text-gray-500 mb-3">Recherche + tri pour trouver vite. Disponibilités des produits alcoolisés en temps réel, connectées au véhicule. Appelle pour commander.</p>
     </div>
 
     <div class="grid grid-cols-1 gap-2 mb-4">
@@ -604,7 +563,14 @@
       </div>
 
       <div class="flex gap-2">
-</div>
+        <select id="sortSelect" style="display:none"
+                class="w-full py-2 px-3 !rounded-button border border-gray-200 text-sm focus:outline-none focus:border-primary">
+          <option value="popular">Tri : Recommandés</option>
+          <option value="az">Tri : A → Z</option>
+          <option value="priceAsc">Tri : Prix ↑</option>
+          <option value="priceDesc">Tri : Prix ↓</option>
+        </select>
+      </div>
     </div>
 
     <div class="overflow-x-auto -mx-4 px-4 mb-3">
@@ -618,8 +584,7 @@
         <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="tequila">🌵 Tequila</button>
         <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="softs">🥤 Softs</button>
         <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="pastis">🟡 Pastis</button>
-        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="champagne">🍾 Champagne</button>
-        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="vin">🍷 Vin</button>
+<button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="vin">🍷 Vin</button>
         <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="accessoires">🧊 Accessoires</button>
       </div>
     </div>
@@ -768,74 +733,72 @@ document.addEventListener('DOMContentLoaded', function() {
     mentionsBtn: document.getElementById('mentionsBtn')
   };
 
+    loadStockCache();
+
   // ✅ BIÈRES RETIRÉES
   // ✅ VIN : DOMAINE DU VIEUX GENEVRIER remplacé par XV Catalan
   const products = {
     "vodka": [
-      {"name":"Poliakov","price":29.0,"image":""},
-      {"name":"Absolut Vodka","price":34.0,"image":""},
-      {"name":"CIROC Classic","price":49.0,"image":""},
-      {"name":"CIROC Red Berry","price":49.0,"image":""},
-      {"name":"CIROC Pomme","price":49.0,"image":""}
+      {"id":"poliakov","name":"Poliakov","price":29.0},
+      {"id":"absolut","name":"Absolut Vodka","price":34.0},
+      {"id":"ciroc_classic","name":"Cîroc Classic","price":49.0},
+      {"id":"ciroc_redberry","name":"Cîroc Red Berry","price":49.0},
+      {"id":"ciroc_pomme","name":"Cîroc Pomme","price":49.0}
     ],
     "whisky": [
-      {"name":"William Peel","price":29.0,"image":""},
-      {"name":"LABEL 5","price":32.0,"image":""},
-      {"name":"Clan Campbell","price":35.0,"image":""},
-      {"name":"Ballantine's","price":36.0,"image":""},
-      {"name":"Jack Daniel's","price":40.0,"image":""},
-      {"name":"Jack Daniel's Honey","price":42.0,"image":""}
+      {"id":"william_peel","name":"William Peel","price":29.0},
+      {"id":"label_5","name":"Label 5","price":32.0},
+      {"id":"ballantines","name":"Ballantine's","price":36.0},
+      {"id":"jack_old7","name":"Jack Daniel's","price":40.0},
+      {"id":"jack_honey","name":"Jack Daniel's Honey","price":42.0}
     ],
     "rhum": [
-      {"name":"Old Nick","price":29.0,"image":""},
-      {"name":"Old Nick (blanc)","price":27.0,"image":""},
-      {"name":"Captain Morgan","price":34.0,"image":""},
-      {"name":"Havana Club 3 ans","price":37.0,"image":""},
-      {"name":"Havana Club","price":38.0,"image":""},
-      {"name":"Saint James Rhum blanc","price":32.0,"image":""},
-      {"name":"Trois Rivières","price":33.0,"image":""}
+      {"id":"old_nick_darkwood","name":"Old Nick Dark Wood","price":29.0},
+      {"id":"captain_morgan","name":"Captain Morgan","price":34.0},
+      {"id":"havana_especial","name":"Havana Club Especial","price":38.0},
+      {"id":"old_nick_blanc","name":"Old Nick Rhum Blanc","price":27.0},
+      {"id":"saint_james_blanc","name":"Saint James Rhum blanc","price":32.0},
+      {"id":"trois_rivieres","name":"Trois Rivières","price":33.0},
+      {"id":"havana_3ans","name":"Havana Club 3 ans","price":37.0}
     ],
     "liqueurs": [
-      {"name":"GET 27","price":32.0,"image":""},
-      {"name":"Jägermeister","price":35.0,"image":""},
-      {"name":"COINTREAU","price":28.0,"image":""},
-      {"name":"Gibson's","price":34.0,"image":""},
-      {"name":"Liqueur de cassis","price":8.5,"image":""}
+      {"id":"get_27","name":"GET 27","price":32.0},
+      {"id":"jagermeister","name":"Jägermeister","price":35.0}
     ],
-    "gin": [{"name":"Gordon's","price":34.0,"image":""}],
-    "tequila": [{"name":"Tequila","price":28.0,"image":""}],
-    "softs": [
-      {"name":"Oasis (tropical)","price":3.5,"image":""},
-      {"name":"Fanta citron","price":3.5,"image":""},
-      {"name":"Schweppes tonic","price":3.5,"image":""},
-      {"name":"Perrier citron","price":2.5,"image":""},
-      {"name":"Crazy Tiger","price":5.0,"image":""},
-      {"name":"Red Bull","price":3.5,"image":""},
-      {"name":"Monster","price":2.4,"image":""},
-      {"name":"Lait de coco","price":5.0,"image":""},
-      {"name":"Jus de pommes","price":4.5,"image":""},
-      {"name":"Jus de pamplemousse","price":4.5,"image":""},
-      {"name":"Jus d'oranges","price":4.5,"image":""},
-      {"name":"Jus d'ananas","price":4.5,"image":""}
+    "gin": [
+      {"id":"gibsons_gin","name":"Gibson's Gin","price":34.0},
+      {"id":"gordons_gin","name":"Gordon's Gin","price":34.0}
+    ],
+    "tequila": [
+      {"id":"tequila_sanjose","name":"Tequila San José","price":28.0}
     ],
     "pastis": [
-      {"name":"Pastis de Marseille","price":35.0,"image":""},
-      {"name":"Ricard","price":35.0,"image":""}
-    ],
-    "champagne": [
-      {"name":"MOËT & CHANDON \"Impérial\" (1,5 L)","price":89.0,"image":""},
-      {"name":"Veuve Pelletier","price":60.0,"image":""}
+      {"id":"ricard","name":"Ricard","price":35.0},
+      {"id":"pastis_51","name":"Pastis 51","price":35.0}
     ],
     "vin": [
-      {"name":"XV Catalan (Muscat)","price":25.0,"image":""},
-      {"name":"XV Catalan (Vin rouge)","price":19.0,"image":""},
-      {"name":"XV Catalan (Vin rosé)","price":19.0,"image":""},
-      {"name":"XV Catalan (Vin blanc)","price":19.0,"image":""},
-      {"name":"LAFAGE (Vin blanc)","price":19.0,"image":""},
-      {"name":"LAFAGE (Vin rouge)","price":19.0,"image":""},
-      {"name":"LAFAGE (Vin rosé)","price":19.0,"image":""}
+      {"id":"vin_rose","name":"Vin rosé","price":19.0},
+      {"id":"vin_blanc","name":"Vin blanc","price":19.0},
+      {"id":"vin_rouge","name":"Vin rouge","price":19.0},
+      {"id":"muscat","name":"Muscat","price":25.0}
     ],
-    "accessoires": [{"name":"Verre à whisky-soda incassable 35 cl","price":0.5,"image":""}]
+    "softs": [
+      {"id":"oasis_tropical","name":"Oasis (tropical)","price":3.5},
+      {"id":"fanta_citron","name":"Fanta citron","price":3.5},
+      {"id":"schweppes_tonic","name":"Schweppes tonic","price":3.5},
+      {"id":"perrier_citron","name":"Perrier citron","price":2.5},
+      {"id":"crazy_tiger","name":"Crazy Tiger","price":5.0},
+      {"id":"red_bull","name":"Red Bull","price":3.5},
+      {"id":"monster","name":"Monster","price":2.4},
+      {"id":"lait_de_coco","name":"Lait de coco","price":5.0},
+      {"id":"jus_pommes","name":"Jus de pommes","price":4.5},
+      {"id":"jus_pamplemousse","name":"Jus de pamplemousse","price":4.5},
+      {"id":"jus_oranges","name":"Jus d'oranges","price":4.5},
+      {"id":"jus_ananas","name":"Jus d'ananas","price":4.5}
+    ],
+    "accessoires": [
+      {"id":"verre_whisky_soda_35cl","name":"Verre à whisky-soda incassable 35 cl","price":0.5}
+    ]
   };
 
   // =========================
@@ -1028,18 +991,79 @@ document.addEventListener('DOMContentLoaded', function() {
     const active = categoryTabs.querySelector('.tab-active');
     return active ? active.dataset.category : 'all';
   }
-  function catLabel(cat){
-    const map = {vodka:"Vodka",whisky:"Whisky",rhum:"Rhum",liqueurs:"Liqueurs",gin:"Gin",tequila:"Tequila",softs:"Softs",pastis:"Pastis",champagne:"Champagne",vin:"Vin",accessoires:"Accessoires"};
+  
+  // =========================
+  // 🚚 Stock véhicule (repo bullyto/stock)
+  // - On affiche seulement Disponible / Rupture (jamais la quantité)
+  // - Alcool = catégories : vodka/whisky/rhum/liqueurs/gin/tequila/pastis/vin
+  // =========================
+  const STOCK_REPO = { owner:"bullyto", repo:"stock", branch:"main" };
+  const STOCK_SNAPSHOT_PATH = "stock/_snapshot.json";
+  const STOCK_IMG_BASE = `https://raw.githubusercontent.com/${STOCK_REPO.owner}/${STOCK_REPO.repo}/${STOCK_REPO.branch}/img/`;
+
+  const ALCOHOL_CATS = new Set(["vodka","whisky","rhum","liqueurs","gin","tequila","pastis","vin"]);
+  let stockAvail = {}; // {id: true/false}
+  let stockUpdatedAt = 0;
+
+  async function fetchStockSnapshot(){
+    // cache-bust + no-store pour coller au "temps réel"
+    const url = `https://raw.githubusercontent.com/${STOCK_REPO.owner}/${STOCK_REPO.repo}/${STOCK_REPO.branch}/${STOCK_SNAPSHOT_PATH}?t=${Date.now()}`;
+    const res = await fetch(url, { cache:"no-store" });
+    if(!res.ok) throw new Error("snapshot_fetch_failed");
+    const snap = await res.json();
+    if(!snap || !Array.isArray(snap.items)) throw new Error("snapshot_bad");
+    const map = {};
+    snap.items.forEach(it => {
+      if(!it || !it.id) return;
+      const q = Number(it.qty);
+      map[String(it.id)] = Number.isFinite(q) ? (q > 0) : false;
+    });
+    stockAvail = map;
+    stockUpdatedAt = Date.now();
+    try{
+      localStorage.setItem("ac_stock_snapshot_cache_v1", JSON.stringify({ savedAt: stockUpdatedAt, avail: stockAvail }));
+    }catch{}
+  }
+
+  function loadStockCache(){
+    try{
+      const raw = localStorage.getItem("ac_stock_snapshot_cache_v1");
+      if(!raw) return;
+      const data = JSON.parse(raw);
+      if(data && typeof data.avail === "object"){
+        stockAvail = data.avail || {};
+        stockUpdatedAt = Number(data.savedAt || 0) || 0;
+      }
+    }catch{}
+  }
+
+  function imgUrlForId(id){
+    // Anticipe : images softs ajoutées plus tard dans le dépôt stock/img/
+    // Les images doivent s'appeler : <id>.png
+    return `${STOCK_IMG_BASE}${encodeURIComponent(id)}.png`;
+  }
+function catLabel(cat){
+    const map = {vodka:"Vodka",whisky:"Whisky",rhum:"Rhum",liqueurs:"Liqueurs",gin:"Gin",tequila:"Tequila",softs:"Softs",pastis:"Pastis",vin:"Vin",accessoires:"Accessoires"};
     return map[cat] || cat;
   }
   function flattenProducts() {
     const out = [];
-    Object.entries(products).forEach(([cat, list]) => list.forEach(p => out.push({ ...p, category: cat })));
+    Object.entries(products).forEach(([cat, list]) => list.forEach(p => {
+      const id = p.id || "";
+      const isAlcohol = ALCOHOL_CATS.has(cat);
+      const available = isAlcohol ? !!stockAvail[id] : null;
+      out.push({ ...p, id, category: cat, isAlcohol, available, imageUrl: id ? imgUrlForId(id) : "" });
+    }));
     return out;
   }
   function getProductsForCategory(category) {
     if (category === 'all') return flattenProducts();
-    return (products[category] || []).map(p => ({ ...p, category }));
+    return (products[category] || []).map(p => {
+      const id = p.id || "";
+      const isAlcohol = ALCOHOL_CATS.has(category);
+      const available = isAlcohol ? !!stockAvail[id] : null;
+      return ({ ...p, id, category, isAlcohol, available, imageUrl: id ? imgUrlForId(id) : "" });
+    });
   }
   function applySearch(list, term) {
     const t = (term || "").trim().toLowerCase();
@@ -1062,8 +1086,12 @@ document.addEventListener('DOMContentLoaded', function() {
     return arr;
   }
 
-  function displayProducts(category, searchTerm = '', sortMode = 'popular') {
-    const base = getProductsForCategory(category);
+  async function displayProducts(category, searchTerm = '', sortMode = 'popular'){
+    // Stock "temps réel" : refresh snapshot quand on est online
+    if (navigator.onLine) {
+      try { await fetchStockSnapshot(); } catch(e) { /* garde cache */ }
+    }
+const base = getProductsForCategory(category);
     const searched = applySearch(base, searchTerm);
     const sorted = applySort(searched, sortMode);
 
@@ -1075,11 +1103,26 @@ document.addEventListener('DOMContentLoaded', function() {
       card.className = "bg-white shadow-sm !rounded-button overflow-hidden flex flex-col border border-gray-100";
       card.innerHTML = `
         <div class="p-3 flex-1">
-          <div class="text-[10px] inline-flex items-center px-2 py-[2px] rounded-full bg-gray-100 text-gray-600 mb-2">
-            ${catLabel(product.category)}
+          <div class="flex items-start gap-3">
+            <div class="w-24 h-24 shrink-0 rounded-xl bg-gray-50 border border-gray-100 overflow-hidden flex items-center justify-center">
+              <img src="${product.imageUrl}" alt="${product.name}" class="w-full h-full object-contain" loading="lazy"
+                onerror="this.style.display='none'; this.parentElement.classList.add('items-center');" />
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-[10px] inline-flex items-center px-2 py-[2px] rounded-full bg-gray-100 text-gray-600 mb-2">
+                ${catLabel(product.category)}
+              </div>
+              <h3 class="font-semibold text-sm leading-snug mb-1 text-gray-900">${product.name}</h3>
+              <div class="flex items-center justify-between gap-2">
+                <p class="text-primary font-extrabold text-base">${product.price.toFixed(2)} €</p>
+                ${product.isAlcohol ? `
+                  <span class="text-[11px] font-semibold inline-flex items-center gap-1 px-2 py-1 rounded-full ${product.available ? 'bg-green-100 text-green-800 border-green-300' : 'bg-red-100 text-red-800 border-red-300'}">
+                    <span class="w-2.5 h-2.5 rounded-full ${product.available ? 'bg-green-500' : 'bg-red-500'}"></span>
+                    ${product.available ? 'Disponible' : 'Rupture'}
+                  </span>` : ``}
+              </div>
+            </div>
           </div>
-          <h3 class="font-semibold text-sm leading-snug mb-1 text-gray-900">${product.name}</h3>
-          <p class="text-primary font-extrabold text-base">${product.price.toFixed(2)} €</p>
         </div>
         <div class="px-3 pb-3">
           <a href="tel:0652336461" class="w-full inline-flex items-center justify-center gap-2 py-2 bg-primary text-white text-xs font-semibold !rounded-button hover:opacity-95 transition">
