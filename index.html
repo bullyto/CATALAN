@@ -781,6 +781,7 @@
     <div class="overflow-x-auto -mx-4 px-4 mb-3">
       <div class="flex gap-2 whitespace-nowrap pb-2" id="categoryTabs">
         <button class="px-3 py-1 text-sm !rounded-full tab-active" data-category="all">Tout</button>
+        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="snacks">🍪 Apéro & Bonbons</button>
         <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="vodka">🍸 Vodka</button>
         <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="whisky">🥃 Whisky</button>
         <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="rhum">🏴‍☠️ Rhum</button>
@@ -943,6 +944,15 @@ document.addEventListener('DOMContentLoaded', function() {
   // ✅ BIÈRES RETIRÉES
   // ✅ VIN : DOMAINE DU VIEUX GENEVRIER remplacé par XV Catalan
   const products = {
+"snacks": [
+  {"id":"cacahuette","name":"Cacahuète","price":2.5},
+  {"id":"bretzel","name":"Bretzel","price":2.5},
+  {"id":"curly","name":"Curly","price":2.5},
+  {"id":"chips","name":"Chips","price":2.5},
+  {"id":"monster_munch","name":"Monster Munch","price":2.5},
+  {"id":"dragibus","name":"Dragibus","price":2.5},
+  {"id":"fraise_tagada","name":"Fraise Tagada","price":2.5}
+],
     "vodka": [
       {"id":"poliakov","name":"Poliakov","price":29.0},
       {"id":"absolut","name":"Absolut Vodka","price":34.0},
@@ -982,9 +992,9 @@ document.addEventListener('DOMContentLoaded', function() {
       {"id":"pastis_51","name":"Pastis 51","price":35.0}
     ],
     "vin": [
-      {"id":"vin_rose","name":"Vin rosé","price":19.0},
-      {"id":"vin_blanc","name":"Vin blanc","price":19.0},
-      {"id":"vin_rouge","name":"Vin rouge","price":19.0},
+      {"id":"vin_rose","name":"XV catalan rosé","price":19.0},
+      {"id":"vin_blanc","name":"XV catalan blanc","price":19.0},
+      {"id":"vin_rouge","name":"XV catalan rouge","price":19.0},
       {"id":"muscat","name":"Muscat","price":25.0}
     ],
     "softs": [
@@ -993,11 +1003,7 @@ document.addEventListener('DOMContentLoaded', function() {
       {"id":"schweppes_tonic","name":"Schweppes tonic","price":3.5},
       {"id":"perrier_citron","name":"Perrier citron","price":2.5},
       {"id":"crazy_tiger","name":"Crazy Tiger","price":5.0},
-      {"id":"red_bull","name":"Red Bull","price":3.5},
-      {"id":"monster","name":"Monster","price":2.4},
-      {"id":"lait_de_coco","name":"Lait de coco","price":5.0},
       {"id":"jus_pommes","name":"Jus de pommes","price":4.5},
-      {"id":"jus_pamplemousse","name":"Jus de pamplemousse","price":4.5},
       {"id":"jus_oranges","name":"Jus d'oranges","price":4.5},
       {"id":"jus_ananas","name":"Jus d'ananas","price":4.5}
     ],
@@ -1187,9 +1193,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const resultInfo = document.getElementById('resultInfo');
 
   const featuredOrder = [
+  "Cacahuète","Bretzel","Curly","Chips","Monster Munch","Dragibus","Fraise Tagada",
     "Jack Daniel's","Ballantine's","Captain Morgan","Havana Club 3 ans","Absolut Vodka",
-    "CIROC Classic","MOËT & CHANDON \"Impérial\" (1,5 L)","Ricard","GET 27","Red Bull",
-    "XV Catalan (Vin rouge)","XV Catalan (Vin blanc)","XV Catalan (Muscat)"
+    "CIROC Classic","MOËT & CHANDON \"Impérial\" (1,5 L)","Ricard","GET 27",    "XV catalan rouge","XV catalan blanc","Muscat"
   ];
 
   function getActiveCategory() {
@@ -1248,7 +1254,7 @@ document.addEventListener('DOMContentLoaded', function() {
     return `${STOCK_IMG_BASE}${encodeURIComponent(id)}.png`;
   }
 function catLabel(cat){
-    const map = {vodka:"Vodka",whisky:"Whisky",rhum:"Rhum",liqueurs:"Liqueurs",gin:"Gin",tequila:"Tequila",softs:"Softs",pastis:"Pastis",vin:"Vin",accessoires:"Accessoires"};
+    const map = {vodka:"Vodka",whisky:"Whisky",rhum:"Rhum",liqueurs:"Liqueurs",gin:"Gin",tequila:"Tequila",softs:"Softs",pastis:"Pastis",vin:"Vin",accessoires:"Accessoires",snacks:"Apéro & Bonbons"};
     return map[cat] || cat;
   }
   function flattenProducts() {
