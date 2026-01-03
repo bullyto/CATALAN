@@ -559,7 +559,7 @@
   </style>
 </head>
 
-<body class="w-[375px] min-h-[762px] mx-auto relative"
+<body class="w-full max-w-[430px] min-h-[100svh] mx-auto relative"
   style="background-image:url('https://readdy.ai/api/search-image?query=blurred%20background%2C%20warm%20and%20festive%20atmosphere%2C%20people%20celebrating%2C%20soft%20lights%2C%20party%20mood%2C%20warm%20colors%2C%20subtle%20pattern%2C%20low%20opacity%20for%20text%20readability%2C%20no%20distinct%20objects&width=375&height=762&seq=10&orientation=portrait'); background-size:cover; background-position:center;">
 
 <!-- ✅ PWA : Faux chargement (uniquement si l'app est installée) -->
@@ -640,7 +640,7 @@
 </script>
 
 <header class="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
-  <div class="w-[375px] mx-auto py-4 flex items-center justify-center">
+  <div class="w-full max-w-[430px] mx-auto py-4 flex items-center justify-center">
     <div class="text-center">
       <div class="w-[150px] h-[150px] mx-auto mb-2 rounded-full overflow-hidden">
         <img id="logo-entreprise"
@@ -711,7 +711,7 @@
 </main>
 
 <footer class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100">
-  <div class="w-[375px] mx-auto py-4 px-4 flex items-center justify-center gap-6">
+  <div class="w-full max-w-[430px] mx-auto py-4 px-4 flex items-center justify-center gap-6">
     <button id="cgvBtn" class="text-xs text-gray-500 hover:text-primary cursor-pointer">CGV</button>
     <button id="mentionsBtn" class="text-xs text-gray-500 hover:text-primary cursor-pointer">Mentions légales</button>
   </div>
@@ -771,7 +771,7 @@
         <select id="sortSelect" style="display:none"
                 class="w-full py-2 px-3 !rounded-button border border-gray-200 text-sm focus:outline-none focus:border-primary">
           <option value="popular">Tri : Recommandés</option>
-          <option value="az">Tri : A → Z</option>
+          <option value="az">Tri : </option>
           <option value="priceAsc">Tri : Prix ↑</option>
           <option value="priceDesc">Tri : Prix ↓</option>
         </select>
@@ -1719,6 +1719,55 @@ window.addEventListener('load', () => {
       setOrderEnabled(true);
     })
     .catch(() => { setOrderEnabled(true); });
+})();
+</script>
+
+
+<script>
+(function(){
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  const overlay = document.getElementById('pwaLoading');
+  if(!isPWA && overlay){ overlay.remove(); return; }
+  if(isPWA && overlay){
+    setTimeout(()=>overlay.remove(),2700);
+  }
+})();
+</script>
+
+
+<script>
+// Service Worker (offline + cache)
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  // Avoid double-registration
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js', { scope: './' })
+      .then(reg => {
+        // If there's a waiting SW, activate it ASAP
+        if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        // When a new SW is found, prompt it to take over quickly
+        reg.addEventListener('updatefound', () => {
+          const sw = reg.installing;
+          if (!sw) return;
+          sw.addEventListener('statechange', () => {
+            if (sw.state === 'installed') {
+              // New version installed; ask it to activate
+              if (navigator.serviceWorker.controller) {
+                sw.postMessage({ type: 'SKIP_WAITING' });
+              }
+            }
+          });
+        });
+        // Reload once when controller changes (new SW takes over)
+        let reloaded = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (reloaded) return;
+          reloaded = true;
+          window.location.reload();
+        });
+      })
+      .catch(()=>{});
+  });
 })();
 </script>
 
