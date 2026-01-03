@@ -1,400 +1,978 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <meta name="theme-color" content="#b91c1c"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="Apéro Catalan®"/>
-  <title>Apéro Catalan®</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>L'apéro catalan®</title>
+
+  <!-- PWA / UI -->
+  <meta name="theme-color" content="#8a0b0b">
+  <meta name="background-color" content="#2a0a0c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Apéro Catalan®">
+
+  <!-- ✅ Cache-busting -->
+  <link rel="manifest" href="manifest.webmanifest?v=20251223">
+
+  <!-- ✅ icons locales -->
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png?v=20251223">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png?v=20251223">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png?v=20251223">
+  <link rel="apple-touch-icon" href="./icon-touch-apple.png?v=20251223">
+
+  <!-- ✅ Partage / preview -->
+  <meta property="og:title" content="L'apéro catalan®">
+  <meta property="og:description" content="Épicerie de nuit catalan • Livraison 7j/7 de 19h à 6h • Appel direct">
+  <meta property="og:image" content="./icon-512.png?v=20251223">
+  <meta property="og:type" content="website">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="L'apéro catalan®">
+  <meta name="twitter:description" content="Épicerie de nuit catalan • Livraison 7j/7 de 19h à 6h • Appel direct">
+  <meta name="twitter:image" content="./icon-512.png?v=20251223">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+
+  <script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: { primary: '#C61910', secondary: '#FFB81C' },
+        borderRadius: {
+          'none': '0px','sm': '4px',DEFAULT: '8px','md': '12px','lg': '16px','xl': '20px',
+          '2xl': '24px','3xl': '32px','full': '9999px','button': '8px'
+        }
+      }
+    }
+  }
+  </script>
 
   <style>
-    :root{
-      --red:#b91c1c;
-      --red2:#991b1b;
-      --bg:#0b0f14;
-      --card:#ffffff;
-      --muted:#6b7280;
-      --shadow: 0 10px 25px rgba(0,0,0,.25);
-      --radius: 18px;
-    }
-    *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: var(--bg);
-      color:#111827;
-    }
 
-    /* --- Modal --- */
-    .overlay{
-      position:fixed; inset:0;
-      display:none;
-      align-items:center; justify-content:center;
-      padding: 18px;
-      background: rgba(0,0,0,.55);
-      z-index: 9999;
-    }
-    .overlay.show{ display:flex; }
+/* PATCH V6: search input full width and readable */
+#searchInput{
+  width:100% !important;
+  max-width:100% !important;
+  font-size:14px !important;
+}
 
-    .modal{
-      width:min(980px, 100%);
-      max-height: min(88vh, 820px);
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+
+
+/* PATCH V6: hide misleading count line */
+#countLine, .countLine, .articlesCount { display:none !important; }
+
+
+
+/* =========================
+   CORE UI REWORK (V5)
+========================= */
+.stockNote.premium{
+  display:flex; gap:10px; align-items:center;
+  margin:12px 0 14px; padding:12px 14px;
+  border-radius:14px;
+  background:linear-gradient(135deg, rgba(180,0,0,.08), rgba(0,0,0,.04));
+  border:1px solid rgba(180,0,0,.18);
+}
+.stockNote .icon{
+  width:10px;height:10px;border-radius:50%;
+  background:#b00000; flex:0 0 auto;
+}
+.stockNote .txt strong{display:block;font-size:14px}
+.stockNote .txt span{font-size:12px;opacity:.85}
+
+/* Grid locked mobile-first */
+.grid, .productsGrid{
+  display:grid !important;
+  grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+  gap:14px !important;
+}
+
+/* Product card */
+.productCard, .card{
+  display:flex; flex-direction:column;
+  align-items:center;
+  padding:14px 12px;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 6px 20px rgba(0,0,0,.06);
+  overflow:hidden;
+}
+
+/* Bottle image dominant */
+.productCard img, .card img{
+  width:84px; height:150px;
+  object-fit:contain;
+  margin-bottom:10px;
+}
+
+/* Title */
+.productCard h3, .card h3{
+  font-size:14px;
+  font-weight:700;
+  text-align:center;
+  line-height:1.2;
+  margin:4px 0 6px;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+/* Price line */
+.price, .productPrice{
+  display:flex; align-items:baseline; gap:6px;
+  font-size:18px; font-weight:800; color:#b00000;
+  margin:6px 0;
+}
+.price .euro{font-size:14px}
+
+/* Availability badge */
+.stockBadge{
+  margin:6px 0 10px;
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:12px; font-weight:800;
+}
+.stockBadge.ok{
+  background:rgba(0,150,80,.15);
+  color:#0a6a3a;
+}
+.stockBadge.no{
+  background:rgba(200,0,0,.15);
+  color:#a00000;
+}
+
+/* Button */
+.productCard .btn, .card button{
+  margin-top:auto;
+  width:100%;
+  border-radius:12px;
+  font-weight:700;
+}
+
+/* Search spacing */
+.searchBar{margin:10px 0 12px}
+
+/* Category tabs breathing */
+.tabs{margin:10px 0 14px}
+
+/* Safety */
+*{box-sizing:border-box}
+
+
+
+/* === PATCH V4: prevent overflow inside modal cards === */
+.stockNote{
+  margin: 10px 0 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(0,0,0,.04);
+  border: 1px solid rgba(0,0,0,.08);
+  color: #222;
+  font-size: 13px;
+  line-height: 1.25;
+}
+.stockNote strong{font-size: 13px;}
+.stockNote span{opacity:.9}
+
+/* Cards / grid safety */
+.grid, .cardsGrid, .productsGrid, .productGrid{
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+.productCard, .product-card, .itemCard, .item-card, .cardProduct, .card{
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+.productCard * , .product-card * , .itemCard * , .item-card * , .cardProduct * , .card *{
+  min-width: 0 !important;
+}
+
+/* Bigger bottle images but constrained */
+.productCard img, .product-card img, .itemCard img, .item-card img, .cardProduct img, img.productImg{
+  width: 64px !important;
+  height: 108px !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+  display:block !important;
+  margin: 0 auto !important;
+}
+
+/* Title clamp to avoid overflow */
+.productCard .name, .product-card .name, .itemCard .name, .item-card .name,
+.productCard h3, .product-card h3, .itemCard h3, .item-card h3,
+.productCard .title, .product-card .title, .itemCard .title, .item-card .title{
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  word-break: break-word !important;
+}
+
+/* Price + € same line */
+.price, .productPrice, .priceLine, .prix, .product-prix{
+  display: inline-flex !important;
+  align-items: baseline !important;
+  gap: 6px !important;
+  white-space: nowrap !important;
+}
+.euro{display:inline !important}
+
+/* Availability badge visibility */
+.avail, .availability, .stockBadge, .stockPill, .etatStock{
+  display:inline-flex !important;
+  align-items:center !important;
+  padding: 6px 10px !important;
+  border-radius: 999px !important;
+  font-weight: 900 !important;
+  font-size: 12px !important;
+  line-height: 1 !important;
+}
+.avail.ok, .availability.ok, .stockBadge.ok, .etatStock.ok{ background: rgba(0,160,80,.14) !important; color:#0b6b3a !important; border:1px solid rgba(0,160,80,.25) !important; }
+.avail.no, .availability.no, .stockBadge.no, .etatStock.no{ background: rgba(220,0,0,.14) !important; color:#a30000 !important; border:1px solid rgba(220,0,0,.25) !important; }
+
+/* Modal padding to keep inside */
+.modal, .sheet, .dialog, .popup{
+  box-sizing: border-box !important;
+}
+
+
+    :where([class^="ri-"])::before { content: "\f3c2"; }
+    .modal { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+    .modal.active { opacity: 1; pointer-events: auto; }
+    .tab-active { background:#C61910 !important; color:#fff !important; }
+    .tab-idle { background:#f3f4f6 !important; color:#111827 !important; }
+
+    /* ===== PWA FAUX CHARGEMENT (uniquement PWA installée) ===== */
+    #pwaLoading {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      display: none; /* activé uniquement en mode PWA */
+      opacity: 0;
+      transition: opacity .18s ease; /* fondu-in court */
+    }
+    #pwaLoading.ready { opacity: 1; }
+    #pwaLoading .pl-body{
+      height:100%;
       overflow:hidden;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;
+      background:
+        radial-gradient(900px 650px at 50% 18%, rgba(255,211,107,.18), transparent 58%),
+        radial-gradient(900px 650px at 20% 70%, rgba(177,15,21,.20), transparent 62%),
+        radial-gradient(900px 650px at 80% 70%, rgba(242,178,51,.12), transparent 62%),
+        linear-gradient(180deg, #5a1217, #2a0a0c 55%, #120406);
+    }
+    #pwaLoading .pl-stripes{
+      position:absolute; inset:-40%;
+      background: repeating-linear-gradient(90deg, rgba(177,15,21,.12) 0 42px, rgba(242,178,51,.10) 42px 84px);
+      transform: rotate(-12deg);
+      opacity:.35;
+      animation: pl-drift 8s ease-in-out infinite;
+      mix-blend-mode: overlay;
+      pointer-events:none;
+    }
+    @keyframes pl-drift{
+      0%,100%{transform: rotate(-12deg) translateX(-1.4%)}
+      50%{transform: rotate(-12deg) translateX(1.4%)}
+    }
+    #pwaLoading .pl-vignette{
+      position:absolute; inset:0;
+      background: radial-gradient(circle at 50% 38%, transparent 35%, rgba(0,0,0,.50) 92%);
+      pointer-events:none;
+    }
+    #pwaLoading .pl-screen{
+      position:relative;
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+    #pwaLoading .pl-brand{
+      position:absolute;
+      top:18px;
+      width:100%;
+      text-align:center;
+      font-weight:900;
+      letter-spacing:.18em;
+      color:rgba(255,244,223,.95);
+      font-size:19px;
+      text-shadow:0 6px 24px rgba(0,0,0,.45);
+      user-select:none;
+    }
+    #pwaLoading .pl-brand sup{
+      font-size:12px;
+      margin-left:3px;
+      vertical-align:text-top;
+      letter-spacing:0;
+    }
+    #pwaLoading .pl-stack{
+      width:min(420px, 100%);
       display:flex;
       flex-direction:column;
+      align-items:center;
+      gap:16px;
+      transform: translateY(-10px);
+    }
+    #pwaLoading .pl-iconWrap{
+      width:168px; height:168px;
+      display:grid;
+      place-items:center;
+      border-radius:36px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 24px 95px rgba(0,0,0,.55);
+      position:relative;
+      animation: pl-float 3.2s ease-in-out infinite;
+      backdrop-filter: blur(10px);
+      overflow:hidden;
+    }
+    #pwaLoading .pl-iconWrap::before{
+      content:"";
+      position:absolute; inset:-20px;
+      background: radial-gradient(circle at 50% 50%, rgba(255,211,107,.28), transparent 60%);
+      filter: blur(16px);
+      opacity:.9;
+      pointer-events:none;
+      z-index:0;
+    }
+    #pwaLoading .pl-iconWrap::after{
+      content:"";
+      position:absolute;
+      top:-40%;
+      left:-70%;
+      width:60%;
+      height:220%;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.18) 40%, rgba(255,255,255,.35) 50%, rgba(255,255,255,.18) 60%, transparent 100%);
+      transform: skewX(-18deg);
+      filter: blur(1px);
+      opacity:.75;
+      animation: pl-logoShine 3.6s ease-in-out infinite;
+      pointer-events:none;
+      z-index:2;
+      mix-blend-mode: screen;
+    }
+    @keyframes pl-logoShine{
+      0%   { left:-75%; opacity:0; }
+      18%  { opacity:.85; }
+      50%  { opacity:.75; }
+      82%  { opacity:.85; }
+      100% { left:125%; opacity:0; }
+    }
+    #pwaLoading .pl-icon{
+      width:132px; height:132px;
+      object-fit:contain;
+      border-radius:30px;
+      background:#fff;
+      filter: drop-shadow(0 10px 26px rgba(0,0,0,.35));
+      position:relative;
+      z-index:1;
+    }
+    @keyframes pl-float{
+      0%,100%{transform: translateY(0)}
+      50%{transform: translateY(-5px)}
+    }
+    #pwaLoading .pl-progressRow{
+      width:270px;
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:10px;
+    }
+    #pwaLoading .pl-percent{
+      font-size:13px;
+      color:rgba(255,255,255,.72);
+      letter-spacing:.2px;
+      user-select:none;
+    }
+    #pwaLoading .pl-track{
+      width:100%;
+      height:10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    #pwaLoading .pl-bar{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background: linear-gradient(90deg, #d98912, #f2b233, #ffd36b);
+      transition: width .25s linear;
+      box-shadow: 0 0 18px rgba(255,211,107,.18);
+      position:relative;
+    }
+    #pwaLoading .pl-bar:after{
+      content:"";
+      position:absolute;
+      top:-70%;
+      left:-55%;
+      width:46%;
+      height:240%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.24), transparent);
+      transform: skewX(-16deg);
+      animation: pl-sweep 1.6s linear infinite;
+      opacity:.65;
+    }
+    @keyframes pl-sweep{
+      0%{left:-55%}
+      100%{left:130%}
+    }
+    @media (prefers-reduced-motion: reduce){
+      #pwaLoading .pl-stripes,
+      #pwaLoading .pl-iconWrap,
+      #pwaLoading .pl-iconWrap::after,
+      #pwaLoading .pl-bar:after { animation:none !important; }
     }
 
-    .modalHeader{
-      padding: 14px 16px 10px 16px;
-      border-bottom: 1px solid rgba(0,0,0,.06);
-      display:flex;
-      align-items:flex-start;
-      gap: 12px;
+    /* =========================
+       🔞 AGE GATE (harmonisé Apéro Catalan)
+       - Même méthode que ton autre page (localStorage + until + action pending)
+       ========================= */
+    .ageOverlay{
+      position: fixed;
+      inset: 0;
+      z-index: 999998; /* sous faux chargement, au-dessus du reste */
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0,0,0,.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
-    .modalHeader h2{
-      margin:0;
-      font-size: 22px;
-      line-height: 1.1;
-      font-weight: 800;
+    .ageOverlay.show{ display:flex; }
+
+    .ageCard{
+      width: min(560px, 94vw);
+      border-radius: 24px;
+      overflow: hidden;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 30px 90px rgba(0,0,0,.55);
+      background:
+        radial-gradient(900px 650px at 50% 18%, rgba(255,211,107,.18), transparent 58%),
+        radial-gradient(900px 650px at 20% 70%, rgba(198,25,16,.22), transparent 62%),
+        radial-gradient(900px 650px at 80% 70%, rgba(255,184,28,.14), transparent 62%),
+        linear-gradient(180deg, #5a1217, #2a0a0c 55%, #120406);
+    }
+    .ageTop{
+      padding: 14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+    }
+    .ageBrand{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .ageBadge{
+      width: 36px;
+      height: 36px;
+      border-radius: 14px;
+      display:grid;
+      place-items:center;
+      font-weight: 950;
+      letter-spacing: .06em;
+      background: rgba(198,25,16,.20);
+      border: 1px solid rgba(198,25,16,.38);
+      color: #fff;
+      flex: 0 0 auto;
+    }
+    .ageBrand b{
+      letter-spacing:.10em;
+      text-transform: uppercase;
+      font-size: 13px;
+      color: rgba(255,244,223,.95);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ageBody{ padding: 18px; }
+    .ageTitle{ margin: 6px 0 10px; font-size: 28px; line-height:1.1; font-weight: 950; }
+    .ageLead{ margin: 0 0 14px; color: rgba(255,255,255,.78); line-height: 1.45; font-size: 15px; }
+    .ageNotice{
+      margin: 14px 0 16px;
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      color: rgba(255,255,255,.92);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+    .ageBtns{ display:grid; gap: 10px; margin-top: 10px; }
+    .ageBtn{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: #fff;
+      padding: 14px 14px;
+      border-radius: 16px;
+      cursor: pointer;
+      font-weight: 950;
+      font-size: 15px;
+    }
+    .ageBtnPrimary{
+      background: linear-gradient(180deg, rgba(198,25,16,1), rgba(138,11,11,1));
+      border-color: rgba(255,255,255,.10);
+      box-shadow: 0 16px 48px rgba(198,25,16,.28);
+    }
+    .ageBtnSecondary{
+      background: linear-gradient(180deg, rgba(255,184,28,1), rgba(217,137,18,1));
+      color: #1b0b0b;
+      border-color: rgba(255,255,255,.12);
+      box-shadow: 0 16px 48px rgba(255,184,28,.22);
+    }
+    .ageTimer{
+      margin-top: 12px;
+      font-weight: 950;
+      color: rgba(255,211,107,.95);
+      text-align: center;
+      font-size: 14px;
       letter-spacing: .2px;
     }
-    .closeBtn{
-      margin-left:auto;
-      border:none;
-      background: transparent;
-      font-size: 24px;
-      cursor:pointer;
-      padding: 4px 8px;
-      opacity:.7;
+    .ageFine{
+      margin: 12px 0 0;
+      color: rgba(255,255,255,.62);
+      font-size: 12.5px;
+      line-height: 1.35;
+      text-align: center;
     }
-    .closeBtn:hover{ opacity:1; }
-
-    .subLine{
-      margin-top:4px;
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .infoBox{
-      margin: 10px 16px 0 16px;
-      border-radius: 14px;
-      background: #f8fafc;
-      border: 1px solid rgba(0,0,0,.06);
-      padding: 10px 12px;
-      font-size: 13px;
-      color:#111827;
-      line-height: 1.25;
-    }
-    .infoBox b{ display:block; margin-bottom: 2px; }
-
-    .toolsRow{
-      padding: 10px 16px 12px 16px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-    }
-
-    .search{
-      flex: 1 1 240px;
-      display:flex;
-      align-items:center;
-      gap:8px;
-      padding: 10px 12px;
-      border: 1px solid rgba(0,0,0,.1);
-      border-radius: 999px;
-      background:#fff;
-    }
-    .search input{
-      width:100%;
-      border:none; outline:none;
-      font-size: 14px;
-      background:transparent;
-    }
-
-    /* Tabs */
-    .tabsWrap{
-      padding: 0 16px 8px 16px;
-      overflow-x:auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    .tabs{
-      display:flex;
-      gap:8px;
-      white-space:nowrap;
-      padding-bottom: 2px;
-    }
-    .tabBtn{
-      border:none;
-      cursor:pointer;
-      padding: 7px 12px;
-      font-size: 13px;
-      border-radius: 999px;
-      background:#f3f4f6;
-      color:#111827;
-      transition: .15s ease;
-    }
-    .tabBtn:hover{ background:#e5e7eb; }
-    .tabBtn.active{
-      background: var(--red);
-      color:#fff;
-    }
-
-    .metaRow{
-      padding: 0 16px 10px 16px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      font-size: 12px;
-      color: var(--muted);
-      gap: 10px;
-    }
-    .metaRow .callLine{
-      color:#111827;
-    }
-    .metaRow .callLine b{
-      color: var(--red);
-    }
-
-    /* Grid */
-    .listArea{
-      padding: 0 12px 14px 12px;
-      overflow:auto;
-    }
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      padding: 0 4px 8px 4px;
-    }
-    @media (min-width: 720px){
-      .grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    }
-
-    .card{
-      border: 1px solid rgba(0,0,0,.08);
-      border-radius: 16px;
-      padding: 10px;
-      background:#fff;
-      display:flex;
-      flex-direction:column;
-      gap: 8px;
-      min-height: 228px;
-      overflow:hidden;
-    }
-
-    .topLine{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 8px;
-      font-size: 12px;
-      color: var(--muted);
-      min-height: 16px;
-    }
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      font-size: 12px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(0,0,0,.08);
-      background:#f8fafc;
-      color:#111827;
-      white-space:nowrap;
-    }
-    .dot{
-      width:8px; height:8px; border-radius:999px;
-      background:#9ca3af;
-    }
-    .dot.ok{ background:#16a34a; }
-    .dot.ko{ background:#dc2626; }
-    .badge.ok{ background:#ecfdf5; border-color: rgba(22,163,74,.25); }
-    .badge.ko{ background:#fef2f2; border-color: rgba(220,38,38,.25); }
-
-    .imgWrap{
-      width:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: 4px 2px;
-      min-height: 118px;
-    }
-    .imgWrap img{
-      max-width: 100%;
-      max-height: 130px;
-      object-fit: contain;
-      display:block;
-    }
-
-    .name{
-      font-weight: 800;
-      font-size: 16px;
-      line-height: 1.15;
-      color:#111827;
-      word-break: break-word;
-    }
-
-    .price{
-      font-weight: 900;
-      font-size: 18px;
-      color: var(--red);
-      display:flex;
-      align-items:baseline;
-      gap: 6px;
-    }
-    .price .eur{
-      font-weight: 800;
-      font-size: 14px;
-      color: var(--red2);
-    }
-
-    .btn{
-      margin-top:auto;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap: 10px;
-      padding: 10px 12px;
-      border:none;
-      border-radius: 12px;
-      background: var(--red);
-      color:#fff;
-      font-weight: 800;
-      cursor:pointer;
-      font-size: 14px;
-    }
-    .btn:hover{ background: var(--red2); }
-    .btn svg{ width: 16px; height: 16px; fill: currentColor; }
-
-    /* Small helper */
-    .hidden{ display:none !important; }
+    .ageFine a{ color:#ffd36b; text-decoration:none; font-weight: 900; }
+    .ageFine a:hover{ text-decoration: underline; }
   </style>
 </head>
 
-<body>
+<body class="w-[375px] min-h-[762px] mx-auto relative"
+  style="background-image:url('https://readdy.ai/api/search-image?query=blurred%20background%2C%20warm%20and%20festive%20atmosphere%2C%20people%20celebrating%2C%20soft%20lights%2C%20party%20mood%2C%20warm%20colors%2C%20subtle%20pattern%2C%20low%20opacity%20for%20text%20readability%2C%20no%20distinct%20objects&width=375&height=762&seq=10&orientation=portrait'); background-size:cover; background-position:center;">
 
-  <!-- Example page (ton site). Un bouton peut ouvrir cette modale -->
-  <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding: 28px;">
-    <button id="openModal" class="btn" style="max-width:320px;">Voir nos articles</button>
-  </div>
+<!-- ✅ PWA : Faux chargement (uniquement si l'app est installée) -->
+<div id="pwaLoading" aria-hidden="true">
+  <div class="pl-body">
+    <div class="pl-stripes"></div>
+    <div class="pl-vignette"></div>
 
-  <!-- Modal -->
-  <div class="overlay" id="overlay" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-label="Nos Articles">
-      <div class="modalHeader">
-        <div>
-          <h2>Nos Articles</h2>
-          <div class="subLine">Appelle pour commander.</div>
+    <div class="pl-screen">
+      <div class="pl-brand">APERO CATALAN<sup>®</sup></div>
+
+      <div class="pl-stack">
+        <div class="pl-iconWrap">
+          <img class="pl-icon"
+               src="./icon-512.png?v=20251223"
+               onerror="this.onerror=null; this.src='https://image.noelshack.com/fichiers/2025/52/2/1766528997-icon-512-1.png';"
+               alt="Apéro Catalan">
         </div>
-        <button class="closeBtn" id="closeModal" aria-label="Fermer">×</button>
-      </div>
 
-      <div class="infoBox">
-        <b>Disponibilités des produits alcoolisés</b>
-        Connectées en temps réel au stock du véhicule.
-      </div>
-
-      <div class="toolsRow">
-        <div class="search">
-          <span aria-hidden="true">🔎</span>
-          <input id="searchInput" type="search" placeholder="Rechercher un produit…"/>
-        </div>
-      </div>
-
-      <div class="tabsWrap">
-        <div class="tabs" id="categoryTabs">
-          <button class="tabBtn active" data-category="all">Tout</button>
-          <button class="tabBtn" data-category="snacks">🍿 Snacks</button>
-          <button class="tabBtn" data-category="vodka">🍸 Vodka</button>
-          <button class="tabBtn" data-category="whisky">🥃 Whisky</button>
-          <button class="tabBtn" data-category="rhum">🏴‍☠️ Rhum</button>
-          <button class="tabBtn" data-category="liqueurs">🍹 Liqueurs</button>
-          <button class="tabBtn" data-category="gin">🌿 Gin</button>
-          <button class="tabBtn" data-category="tequila">🌵 Tequila</button>
-          <button class="tabBtn" data-category="softs">🥤 Softs</button>
-          <button class="tabBtn" data-category="pastis">🟡 Pastis</button>
-          <button class="tabBtn" data-category="vin">🍷 Vin</button>
-          <button class="tabBtn" data-category="accessoires">🧊 Accessoires</button>
-        </div>
-      </div>
-
-      <div class="metaRow">
-        <div id="resultInfo">—</div>
-        <div class="callLine">Commande : <b>téléphone</b></div>
-      </div>
-
-      <div class="listArea">
-        <div class="grid" id="grid"></div>
-        <div style="padding: 0 6px 8px 6px; font-size: 12px; color: #6b7280;">
-          Prix indicatifs • Le stock peut varier selon la nuit • Appelle pour confirmation et commande.
+        <div class="pl-progressRow">
+          <div class="pl-percent" id="plPct">0%</div>
+          <div class="pl-track"><div class="pl-bar" id="plBar"></div></div>
         </div>
       </div>
     </div>
   </div>
+</div>
 
 <script>
-  // ====== CONFIG ======
-  // Base images: dépôt stock / img
-  // (si tu veux basculer sur jsDelivr, remplace la base par :
-  // https://cdn.jsdelivr.net/gh/bullyto/stock@main/img/
-  const STOCK_IMG_BASE = "https://raw.githubusercontent.com/bullyto/stock/main/img/";
+/* ===== Afficher le faux chargement UNIQUEMENT en PWA installée ===== */
+(function(){
+  const isStandalone =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.matchMedia('(display-mode: fullscreen)').matches ||
+    window.matchMedia('(display-mode: minimal-ui)').matches ||
+    window.navigator.standalone === true;
 
-  // Stock json (dépend de ton système déjà en place)
-  // Ici: on suppose que tu publies un snapshot accessible côté stock,
-  // si tu as déjà une URL différente, remplace-là.
-  const STOCK_SNAPSHOT_URL = "https://raw.githubusercontent.com/bullyto/stock/main/stock/_snapshot.json";
+  const overlay = document.getElementById('pwaLoading');
+  if (!overlay) return;
 
-  // Catégories considérées "alcool" => on affiche dispo/rupture
-  const ALCOHOL_CATS = new Set(["vodka","whisky","rhum","liqueurs","gin","tequila","pastis","vin"]);
+  if (!isStandalone) {
+    overlay.remove(); // Site navigateur => jamais de faux chargement
+    return;
+  }
 
-  // ====== PRODUITS ======
-  // IMPORTANT: image attendue = stock/img/<id>.png
+  overlay.style.display = 'block';
+  requestAnimationFrame(() => overlay.classList.add('ready'));
+
+  const bar = document.getElementById('plBar');
+  const pct = document.getElementById('plPct');
+  let p = 0;
+
+  function setP(v){
+    p = Math.max(0, Math.min(100, v));
+    if (bar) bar.style.width = p + '%';
+    if (pct) pct.textContent = Math.round(p) + '%';
+  }
+
+  const t = setInterval(() => {
+    if (p < 40) setP(p + 1.2);
+    else if (p < 70) setP(p + 0.85);
+    else if (p < 88) setP(p + 0.42);
+    else if (p < 96) setP(p + 0.16);
+    else setP(p + 0.05);
+    if (p >= 99) setP(99);
+  }, 5);
+
+  window.addEventListener('load', () => {
+    clearInterval(t);
+    setTimeout(() => {
+      setP(100);
+      overlay.style.transition = 'opacity .25s ease';
+      overlay.style.opacity = '0';
+      setTimeout(() => overlay.remove(), 260);
+    }, 2100);
+  });
+})();
+</script>
+
+<header class="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
+  <div class="w-[375px] mx-auto py-4 flex items-center justify-center">
+    <div class="text-center">
+      <div class="w-[150px] h-[150px] mx-auto mb-2 rounded-full overflow-hidden">
+        <img id="logo-entreprise"
+             src="https://i.postimg.cc/MHrNcvMr/file-000000002c906243b1fb58ce1bd6d82d-1.png"
+             alt="Logo" class="w-full h-full object-cover">
+      </div>
+      <h1 class="font-['Pacifico'] text-2xl text-primary">L'apéro catalan®</h1>
+    </div>
+  </div>
+</header>
+
+<main class="pt-[220px] pb-[80px] px-4 flex flex-col gap-6">
+  <!-- ✅ 1/4 bouton principal (APPELER) => déclenche l'age gate -->
+  <a href="tel:0652336461"
+     id="callBtn"
+     class="w-full py-4 bg-primary text-white font-semibold !rounded-button flex items-center justify-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+    <div class="w-6 h-6 flex items-center justify-center">
+      <i class="ri-phone-fill text-xl"></i>
+    </div>
+    <span>APPELER</span>
+  </a>
+
+  <!-- ✅ 2/4 bouton principal (INSTALL) => déclenche l'age gate -->
+  <button id="installBtn"
+          class="w-full bg-[#FFC107] text-white py-4 !rounded-button font-semibold flex items-center justify-center gap-2 shadow-lg hover:opacity-95 transition hidden">
+    <i class="ri-download-cloud-2-line text-xl"></i>
+    AJOUTER À L'ÉCRAN D'ACCUEIL
+  </button>
+  <p id="installHint" class="text-xs text-white/90 text-center hidden">
+    Sur iPhone : appuie sur <b>Partager</b> puis <b>Sur l’écran d’accueil</b>.
+  </p>
+
+  <!-- ✅ 3/4 bouton principal (ZONE) => déclenche l'age gate -->
+  <button id="zoneBtn"
+          class="w-full py-4 bg-secondary text-white font-semibold !rounded-button flex items-center justify-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+    <div class="w-6 h-6 flex items-center justify-center">
+      <i class="ri-map-pin-2-fill text-xl"></i>
+    </div>
+    <span>ZONE DE LIVRAISON</span>
+  </button>
+
+  <!-- ✅ 4/4 bouton principal (ARTICLES) => déclenche l'age gate -->
+  <button id="articlesBtn"
+          class="w-full py-4 bg-primary text-white font-semibold !rounded-button flex items-center justify-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+    <div class="w-6 h-6 flex items-center justify-center">
+      <i class="ri-shopping-bag-fill text-xl"></i>
+    </div>
+    <span>NOS ARTICLES</span>
+  </button>
+
+  <div class="mt-6 p-4 bg-white/90 !rounded-button shadow-sm">
+    <h3 class="text-lg font-semibold text-primary mb-3">Horaires & Zone de Livraison</h3>
+    <ul class="space-y-2 text-sm">
+      <li class="flex items-center gap-2">
+        <i class="ri-time-line text-primary"></i>
+        <span>Livraison 7j/7 de 19h à 6h</span>
+      </li>
+      <li class="flex items-center gap-2">
+        <i class="ri-map-pin-range-line text-primary"></i>
+        <span>Jusqu'à 30km de Perpignan</span>
+      </li>
+      <li class="flex items-center gap-2">
+        <i class="ri-phone-line text-primary"></i>
+        <span>Service rapide et professionnel</span>
+      </li>
+    </ul>
+  </div>
+</main>
+
+<footer class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100">
+  <div class="w-[375px] mx-auto py-4 px-4 flex items-center justify-center gap-6">
+    <button id="cgvBtn" class="text-xs text-gray-500 hover:text-primary cursor-pointer">CGV</button>
+    <button id="mentionsBtn" class="text-xs text-gray-500 hover:text-primary cursor-pointer">Mentions légales</button>
+  </div>
+</footer>
+
+<!-- ===== MODALS ===== -->
+<div id="zoneModal" class="modal fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
+  <div class="w-[340px] bg-white !rounded-button p-4 relative">
+    <button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary"
+            onclick="closeModal('zoneModal')">
+      <i class="ri-close-line text-xl"></i>
+    </button>
+    <h2 class="text-xl font-semibold mb-4">Zone de livraison</h2>
+    <div class="h-[400px] bg-gray-100 !rounded-button overflow-hidden">
+      <iframe src="https://www.google.com/maps/d/embed?mid=1FFuBFNnWrOdpTJQwUCoJsepVkpoYzcU&ehbc=2E312F" width="640" height="480"></iframe>
+    </div>
+  </div>
+</div>
+
+<div id="articlesModal" class="modal fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
+  <div class="w-[340px] bg-white !rounded-button p-4 relative max-h-[90vh] overflow-y-auto">
+    <button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary"
+            onclick="closeModal('articlesModal')">
+      <i class="ri-close-line text-xl"></i>
+    </button>
+
+    <div class="pr-8">
+      <h2 class="text-xl font-semibold mb-1">Nos Articles</h2>
+
+<div class="stockNote premium">
+  <div class="icon">●</div>
+  <div class="txt">
+    <strong>Disponibilités en temps réel</strong>
+    <span>Stock des produits alcoolisés synchronisé avec le véhicule</span>
+  </div>
+</div>
+
+      <p class="text-xs text-gray-500 mb-3">Appelez pour commander.</p>
+    </div>
+
+<div class="stockNote">
+  <strong></span>
+</div>
+
+
+
+    <div class="grid grid-cols-1 gap-2 mb-4">
+      <div class="relative">
+        <div class="w-6 h-6 absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center text-gray-400">
+          <i class="ri-search-line"></i>
+        </div>
+        <input type="text" id="searchInput" placeholder="Rechercher un produitroduit..."
+               class="w-full pl-10 pr-4 py-2 !rounded-button border border-gray-200 text-sm focus:outline-none focus:border-primary">
+      </div>
+
+      <div class="flex gap-2">
+        <select id="sortSelect" style="display:none"
+                class="w-full py-2 px-3 !rounded-button border border-gray-200 text-sm focus:outline-none focus:border-primary">
+          <option value="popular">Tri : Recommandés</option>
+          <option value="az">Tri : A → Z</option>
+          <option value="priceAsc">Tri : Prix ↑</option>
+          <option value="priceDesc">Tri : Prix ↓</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto -mx-4 px-4 mb-3">
+      <div class="flex gap-2 whitespace-nowrap pb-2" id="categoryTabs">
+        <button class="px-3 py-1 text-sm !rounded-full tab-active" data-category="all">Tout</button>
+        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="vodka">🍸 Vodka</button>
+        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="whisky">🥃 Whisky</button>
+        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="rhum">🏴‍☠️ Rhum</button>
+        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="liqueurs">🍹 Liqueurs</button>
+        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="gin">🌿 Gin</button>
+        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="tequila">🌵 Tequila</button>
+        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="softs">🥤 Softs</button>
+        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="pastis">🟡 Pastis</button>
+<button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="vin">🍷 Vin</button>
+        <button class="px-3 py-1 text-sm !rounded-full tab-idle hover:bg-gray-200" data-category="accessoires">🧊 Accessoires</button>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-xs text-gray-500 mb-3">
+      <div id="resultInfo">—</div>
+      <div class="text-gray-400">Commande : <span class="text-primary font-semibold">téléphone</span></div>
+    </div>
+
+    <div id="productGrid" class="grid grid-cols-2 gap-3"></div>
+
+    <div class="mt-4 text-[11px] text-gray-500 leading-snug">
+      Prix indicatifs • Le stock peut varier selon la nuit • Appelle pour confirmation et commande.
+    </div>
+  </div>
+</div>
+
+<div id="cgvModal" class="modal fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
+  <div class="w-[340px] bg-white !rounded-button p-4 relative max-h-[90vh] overflow-y-auto">
+    <button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary"
+            onclick="closeModal('cgvModal')">
+      <i class="ri-close-line text-xl"></i>
+    </button>
+    <h2 class="text-xl font-semibold mb-4 bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">
+      Conditions Générales de Vente
+    </h2>
+    <div class="prose text-sm space-y-4">
+      <h3 class="font-medium">1. Service de livraison</h3>
+      <p>L'Apéro Catalan® propose un service de livraison d'alcool à domicile, disponible de 19h à 6h, 7 jours sur 7, dans un rayon de 30km autour de Perpignan.</p>
+      <h3 class="font-medium">2. Commande et livraison</h3>
+      <p>- Commande par téléphone uniquement<br>- Délai de livraison estimé communiqué lors de la commande<br>- Zone de livraison limitée à 30km de Perpignan</p>
+      <h3 class="font-medium">3. Conditions de vente</h3>
+      <p>- Vente d'alcool interdite aux mineurs (une pièce d'identité sera demandée)<br>- Paiement à la livraison (espèces ou CB)<br>- Droit de refus en cas de client en état d'ébriété manifeste</p>
+      <h3 class="font-medium">4. Prix et paiement</h3>
+      <p>- Les prix sont indiqués TTC<br>- Frais de livraison calculés selon la distance<br>- Paiement sécurisé à la livraison</p>
+      <h3 class="font-medium">5. Responsabilité</h3>
+      <p>L'Apéro Catalan® se réserve le droit de refuser une livraison si les conditions de sécurité ne sont pas réunies ou en cas de non-respect des présentes conditions.</p>
+      <h3 class="font-medium">RGPD :</h3>
+      <p>Nous collectons uniquement votre adresse et votre numéro de téléphone dans le but d’assurer la livraison de vos commandes et de vous envoyer des communications marketing par SMS. Ces données sont conservées pendant une durée maximale de 3 ans et ne sont pas utilisées à d'autres fins. Aucun cookie n'est utilisé sur notre site.</p>
+    </div>
+  </div>
+</div>
+
+<div id="mentionsModal" class="modal fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
+  <div class="w-[340px] bg-white !rounded-button p-4 relative max-h-[90vh] overflow-y-auto">
+    <button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary"
+            onclick="closeModal('mentionsModal')">
+      <i class="ri-close-line text-xl"></i>
+    </button>
+    <h2 class="text-xl font-semibold mb-4 bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">
+      Mentions Légales
+    </h2>
+    <div class="prose text-sm space-y-4">
+      <h3 class="font-medium text-base">Éditeur du site</h3>
+      <p>Le présent site internet « L'Apéro Catalan® » est exploité par la société Apéro de Nuit 66®, entreprise immatriculée au Registre du Commerce et des Sociétés sous le numéro 879 976 099, dont le siège social est situé a villelongue de la sallanque.</p>
+      <h3 class="font-medium text-base">Responsable de publication</h3>
+      <p>Monsieur Hauviller Steven, en qualité de représentant légal de l'entreprise Apéro de Nuit 66®.</p>
+      <h3 class="font-medium text-base">Données personnelles & RGPD</h3>
+      <p>Nous ne collectons pas de données personnelles via ce mini-site (pas de compte, pas de formulaire, pas de suivi).</p>
+      <p>Si vous choisissez d’activer les notifications push, l’abonnement est géré par votre navigateur/appareil. Vous pouvez vous désabonner à tout moment depuis les réglages de votre navigateur.</p>
+      <h3 class="font-medium text-base">Propriété</h3>
+      <p>« L'Apéro Catalan® » est une marque / vitrine commerciale exploitée par <b>Apéro de Nuit 66®</b>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 🔞 AGE GATE OVERLAYS -->
+<div class="ageOverlay" id="ageQuestion" role="dialog" aria-modal="true">
+  <div class="ageCard">
+    <div class="ageTop">
+      <div class="ageBrand">
+        <div class="ageBadge">18+</div>
+        <b>L'APÉRO CATALAN®</b>
+      </div>
+    </div>
+
+    <div class="ageBody">
+      <div class="ageTitle">Bienvenue ✨</div>
+      <p class="ageLead">
+        Ce site présente des boissons alcoolisées. Pour continuer, confirme que tu as l’âge légal.
+      </p>
+
+      <div class="ageNotice">
+        <b>La vente d’alcool est interdite aux mineurs.</b><br>
+        L’abus d’alcool est dangereux pour la santé, à consommer avec modération.
+      </div>
+
+      <div class="ageBtns">
+        <button class="ageBtn ageBtnPrimary" id="ageYes">✅ Je suis majeur</button>
+        <button class="ageBtn ageBtnSecondary" id="ageNo">ℹ️ Je ne suis pas majeur</button>
+      </div>
+
+      <div class="ageFine">🔒 Choix mémorisé sur cet appareil.</div>
+    </div>
+  </div>
+</div>
+
+<div class="ageOverlay" id="ageBlocked" role="dialog" aria-modal="true">
+  <div class="ageCard">
+    <div class="ageTop">
+      <div class="ageBrand">
+        <div class="ageBadge">NO</div>
+        <b>ACCÈS RÉSERVÉ</b>
+      </div>
+    </div>
+
+    <div class="ageBody">
+      <div class="ageTitle">Accès réservé 🔞</div>
+      <p class="ageLead">
+        Ce contenu est strictement réservé aux personnes majeures.<br>
+        La vente d’alcool est interdite aux mineurs.
+      </p>
+
+      <div class="ageNotice">
+        Pour accéder au contenu, une vérification d’âge est obligatoire.
+      </div>
+
+      <!-- (compteur caché : on ne montre pas la durée de blocage) -->
+      <div class="ageTimer" style="display:none;">
+        <span id="ageCount">48:00:00</span>
+      </div>
+
+      <div class="ageFine">
+        Si tu penses être bloqué par erreur, contacte Apéro de Nuit® (06.52.33.64.61)
+        ou <a href="mailto:apero.nuit.du.66@gmail.com">contact@aperodenuit.com</a>.
+      </div>
+      <div class="ageFine" style="margin-top:10px;">
+        L’abus d’alcool est dangereux pour la santé.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const modals = {
+    zoneModal: document.getElementById('zoneModal'),
+    articlesModal: document.getElementById('articlesModal'),
+    cgvModal: document.getElementById('cgvModal'),
+    mentionsModal: document.getElementById('mentionsModal')
+  };
+  const buttons = {
+    zoneBtn: document.getElementById('zoneBtn'),
+    articlesBtn: document.getElementById('articlesBtn'),
+    cgvBtn: document.getElementById('cgvBtn'),
+    mentionsBtn: document.getElementById('mentionsBtn')
+  };
+
+    loadStockCache();
+
+  // ✅ BIÈRES RETIRÉES
+  // ✅ VIN : DOMAINE DU VIEUX GENEVRIER remplacé par XV Catalan
   const products = {
-    "snacks": [
-      {"id":"cacahuette","name":"Cacahuètes","price":0.0},
-      {"id":"bretzel","name":"Bretzel","price":0.0},
-      {"id":"curly","name":"Curly","price":0.0},
-      {"id":"chips","name":"Chips","price":0.0},
-      {"id":"monster_munch","name":"Monster Munch","price":0.0},
-      {"id":"dragibus","name":"Dragibus","price":0.0},
-      {"id":"fraise_tagada","name":"Fraise Tagada","price":0.0}
-    ],
     "vodka": [
       {"id":"poliakov","name":"Poliakov","price":29.0},
-      {"id":"absolut","name":"Absolut","price":34.0},
+      {"id":"absolut","name":"Absolut Vodka","price":34.0},
       {"id":"ciroc_classic","name":"Cîroc Classic","price":49.0},
-      {"id":"ciroc_pomme","name":"Cîroc Pomme","price":49.0},
-      {"id":"ciroc_redberry","name":"Cîroc Red Berry","price":49.0}
+      {"id":"ciroc_redberry","name":"Cîroc Red Berry","price":49.0},
+      {"id":"ciroc_pomme","name":"Cîroc Pomme","price":49.0}
     ],
     "whisky": [
       {"id":"william_peel","name":"William Peel","price":29.0},
-      {"id":"label_5","name":"Label 5 Classic Black","price":32.0},
-      {"id":"ballantines","name":"Ballantine’s Finest","price":36.0},
-      {"id":"jack_old7","name":"Jack Daniel’s Old No.7","price":40.0},
-      {"id":"jack_honey","name":"Jack Daniel’s Tennessee Honey","price":42.0}
+      {"id":"label_5","name":"Label 5","price":32.0},
+      {"id":"ballantines","name":"Ballantine's","price":36.0},
+      {"id":"jack_old7","name":"Jack Daniel's","price":40.0},
+      {"id":"jack_honey","name":"Jack Daniel's Honey","price":42.0}
     ],
     "rhum": [
       {"id":"old_nick_darkwood","name":"Old Nick Dark Wood","price":29.0},
-      {"id":"captain_morgan","name":"Captain Morgan Spiced Gold","price":34.0},
+      {"id":"captain_morgan","name":"Captain Morgan","price":34.0},
       {"id":"havana_especial","name":"Havana Club Especial","price":38.0},
       {"id":"old_nick_blanc","name":"Old Nick Rhum Blanc","price":27.0},
-      {"id":"saint_james_blanc","name":"Saint James Rhum Blanc","price":32.0},
-      {"id":"trois_rivieres","name":"Trois Rivières Rhum Blanc","price":33.0},
+      {"id":"saint_james_blanc","name":"Saint James Rhum blanc","price":32.0},
+      {"id":"trois_rivieres","name":"Trois Rivières","price":33.0},
       {"id":"havana_3ans","name":"Havana Club 3 ans","price":37.0}
     ],
     "liqueurs": [
-      {"id":"get_27","name":"GET 27","price":32.0}
+      {"id":"get_27","name":"GET 27","price":32.0},
+      {"id":"jagermeister","name":"Jägermeister","price":35.0}
     ],
     "gin": [
-      {"id":"gibson_gin","name":"Gibson’s Gin","price":34.0},
-      {"id":"gordons_gin","name":"Gordon’s Gin","price":34.0}
+      {"id":"gibsons_gin","name":"Gibson's Gin","price":34.0},
+      {"id":"gordons_gin","name":"Gordon's Gin","price":34.0}
     ],
     "tequila": [
       {"id":"tequila_sanjose","name":"Tequila San José","price":28.0}
@@ -404,9 +982,9 @@
       {"id":"pastis_51","name":"Pastis 51","price":35.0}
     ],
     "vin": [
-      {"id":"xv_catalan_rose","name":"XV Catalan Rosé","price":19.0},
-      {"id":"xv_catalan_blanc","name":"XV Catalan Blanc","price":19.0},
-      {"id":"xv_catalan_rouge","name":"XV Catalan Rouge","price":19.0},
+      {"id":"vin_rose","name":"Vin rosé","price":19.0},
+      {"id":"vin_blanc","name":"Vin blanc","price":19.0},
+      {"id":"vin_rouge","name":"Vin rouge","price":19.0},
       {"id":"muscat","name":"Muscat","price":25.0}
     ],
     "softs": [
@@ -415,56 +993,265 @@
       {"id":"schweppes_tonic","name":"Schweppes tonic","price":3.5},
       {"id":"perrier_citron","name":"Perrier citron","price":2.5},
       {"id":"crazy_tiger","name":"Crazy Tiger","price":5.0},
+      {"id":"red_bull","name":"Red Bull","price":3.5},
+      {"id":"monster","name":"Monster","price":2.4},
+      {"id":"lait_de_coco","name":"Lait de coco","price":5.0},
       {"id":"jus_pommes","name":"Jus de pommes","price":4.5},
+      {"id":"jus_pamplemousse","name":"Jus de pamplemousse","price":4.5},
       {"id":"jus_oranges","name":"Jus d'oranges","price":4.5},
       {"id":"jus_ananas","name":"Jus d'ananas","price":4.5}
     ],
     "accessoires": [
-      {"id":"verre_whisky","name":"Verre à whisky","price":0.5}
+      {"id":"verre_whisky_soda_35cl","name":"Verre à whisky-soda incassable 35 cl","price":0.5}
     ]
   };
 
-  // ====== STOCK AVAIL (alcool seulement) ======
-  let stockAvail = {}; // { id: true/false }
-  async function loadStockAvail(){
-    try{
-      const res = await fetch(STOCK_SNAPSHOT_URL, { cache:"no-store" });
-      if(!res.ok) throw new Error("HTTP "+res.status);
-      const snap = await res.json();
+  // =========================
+  // 🔞 AGE GATE (même méthode)
+  // Déclenché par les 4 boutons principaux
+  // =========================
+  const AGE = {
+    // Majeur : on mémorise une "validité" (comme sur ton autre page)
+    KEY_MAJOR_UNTIL: "ad_major_until",
+    KEY_LAST: "ad_last_choice",
 
-      // snap attendu : { items: { <id>: { qty:number } } } OU { <id>: number } etc.
-      // On rend ça robuste :
-      const out = {};
-      if(snap && typeof snap === "object"){
-        if(snap.items && typeof snap.items === "object"){
-          Object.entries(snap.items).forEach(([id, v])=>{
-            const qty = (v && typeof v==="object") ? Number(v.qty ?? v.qte ?? v.stock ?? 0) : Number(v);
-            out[id] = qty > 0;
-          });
-        } else {
-          Object.entries(snap).forEach(([id, v])=>{
-            const qty = (v && typeof v==="object") ? Number(v.qty ?? v.qte ?? v.stock ?? 0) : Number(v);
-            if(typeof id === "string") out[id] = qty > 0;
-          });
+    // Mineur : on mémorise un blocage silencieux 48h (persistant même après refresh)
+    KEY_MINOR_UNTIL: "ad_minor_until",
+
+    MAJOR_MS: 20 * 24 * 60 * 60 * 1000, // 20 jours
+    MINOR_MS: 48 * 60 * 60 * 1000       // 48h
+  };
+
+  const ageQuestion = document.getElementById("ageQuestion");
+  const ageBlocked  = document.getElementById("ageBlocked");
+  const ageYes      = document.getElementById("ageYes");
+  const ageNo       = document.getElementById("ageNo");
+  const ageCount    = document.getElementById("ageCount");
+
+  let ageInterval = null;
+  let agePendingAction = null;
+
+  function ageNow(){ return Date.now(); }
+
+  function ageGetMajorUntil(){
+    const v = localStorage.getItem(AGE.KEY_MAJOR_UNTIL);
+    const n = v ? parseInt(v, 10) : 0;
+    return Number.isFinite(n) ? n : 0;
+  }
+  function ageIsMajorValid(){ return ageGetMajorUntil() > ageNow(); }
+
+  function ageGetMinorUntil(){
+    const v = localStorage.getItem(AGE.KEY_MINOR_UNTIL);
+    const n = v ? parseInt(v, 10) : 0;
+    return Number.isFinite(n) ? n : 0;
+  }
+  function ageIsMinorBlocked(){ return ageGetMinorUntil() > ageNow(); }
+
+  function ageShow(el){
+    el.classList.add("show");
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+  }
+  function ageHide(el){
+    el.classList.remove("show");
+    if(!ageQuestion.classList.contains("show") && !ageBlocked.classList.contains("show")){
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
+    }
+  }
+  function ageShowQuestion(){
+    ageHide(ageBlocked);
+    ageShow(ageQuestion);
+  }
+
+  // (Optionnel) compteur caché : on ne révèle pas les 48h à l'utilisateur
+  function fmtHMS(totalSeconds){
+    const s = Math.max(0, Math.floor(totalSeconds));
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const ss = s % 60;
+    const pad = (x)=> String(x).padStart(2,"0");
+    return `${pad(h)}:${pad(m)}:${pad(ss)}`;
+  }
+
+  function ageShowBlocked(){
+    ageHide(ageQuestion);
+    ageShow(ageBlocked);
+
+    // Timer silencieux basé sur la vraie date de fin stockée
+    const until = ageGetMinorUntil();
+    const leftMs = Math.max(0, until - ageNow());
+
+    // On garde le span (caché) à jour si jamais tu veux l'afficher plus tard
+    if (ageCount){
+      ageCount.textContent = fmtHMS(Math.ceil(leftMs / 1000));
+    }
+
+    if(ageInterval) clearInterval(ageInterval);
+    if(leftMs > 0){
+      ageInterval = setInterval(() => {
+        const l = Math.max(0, ageGetMinorUntil() - ageNow());
+        if (ageCount) ageCount.textContent = fmtHMS(Math.ceil(l / 1000));
+        if(l <= 0){
+          clearInterval(ageInterval);
+          ageInterval = null;
+          localStorage.removeItem(AGE.KEY_MINOR_UNTIL); // fin du blocage
+          ageShowQuestion(); // revient à la question majeur/mineur
         }
-      }
-      stockAvail = out;
-    }catch(e){
-      // Si stock indispo: on n'affiche pas rupture/dipo pour alcool (reste neutre)
-      stockAvail = {};
+      }, 1000);
+    } else {
+      // blocage expiré (sécurité)
+      localStorage.removeItem(AGE.KEY_MINOR_UNTIL);
+      ageShowQuestion();
     }
   }
 
-  // ====== HELPERS ======
-  function imgUrlForId(id){
-    return `${STOCK_IMG_BASE}${encodeURIComponent(id)}.png`;
+  function ageSetMajorWeek(){
+    localStorage.setItem(AGE.KEY_LAST, "major");
+    localStorage.setItem(AGE.KEY_MAJOR_UNTIL, String(ageNow() + AGE.MAJOR_MS));
+    localStorage.removeItem(AGE.KEY_MINOR_UNTIL); // si jamais il était bloqué avant
   }
-  function catLabel(cat){
-    const map = {snacks:"Snacks",vodka:"Vodka",whisky:"Whisky",rhum:"Rhum",liqueurs:"Liqueurs",gin:"Gin",tequila:"Tequila",softs:"Softs",pastis:"Pastis",vin:"Vin",accessoires:"Accessoires"};
-    return map[cat] || cat;
+  function ageSetMinorBlock(){
+    localStorage.setItem(AGE.KEY_LAST, "minor");
+    localStorage.setItem(AGE.KEY_MINOR_UNTIL, String(ageNow() + AGE.MINOR_MS));
   }
 
-  function flattenProducts(){
+  // Si l'utilisateur était déjà "mineur" => on le laisse sur la popup (persistant même après refresh)
+  if(ageIsMinorBlocked()){
+    ageShowBlocked();
+  }
+
+  // Empêche “Escape” de fermer (même logique que ta version)
+  document.addEventListener("keydown", (e)=>{
+    if((ageQuestion.classList.contains("show") || ageBlocked.classList.contains("show")) && e.key === "Escape"){
+      e.preventDefault();
+    }
+  });
+
+  function requireMajorThen(actionFn){
+    // Si mineur encore bloqué => on reste sur la popup "accès réservé"
+    if(ageIsMinorBlocked()){
+      agePendingAction = null;
+      ageShowBlocked();
+      return;
+    }
+
+    // Si majeur encore valide => on exécute directement
+    if(ageIsMajorValid()){
+      actionFn();
+      return;
+    }
+
+    // Sinon on (re)demande
+    agePendingAction = actionFn;
+    ageShowQuestion();
+  }
+
+  ageYes?.addEventListener("click", ()=>{
+    ageSetMajorWeek();
+    ageHide(ageQuestion);
+    if(typeof agePendingAction === "function"){
+      const fn = agePendingAction;
+      agePendingAction = null;
+      fn();
+    }
+  });
+
+  ageNo?.addEventListener("click", ()=>{
+    ageSetMinorBlock();
+    ageShowBlocked();
+  });
+
+  // =========================
+  // MODALS (inchangé)
+  // =========================
+  Object.entries(buttons).forEach(([key, btn]) => {
+    const modalId = key.replace('Btn', 'Modal');
+    btn.addEventListener('click', () => openModal(modalId));
+  });
+
+  window.closeModal = function(modalId) { modals[modalId].classList.remove('active'); };
+  window.openModal = function(modalId) {
+    modals[modalId].classList.add('active');
+    if(modalId === 'articlesModal') displayProducts(getActiveCategory(), searchInput.value, sortSelect.value);
+  };
+
+  Object.values(modals).forEach(modal => {
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
+  });
+
+  const searchInput = document.getElementById('searchInput');
+  const categoryTabs = document.getElementById('categoryTabs');
+  const productGrid = document.getElementById('productGrid');
+  const sortSelect = document.getElementById('sortSelect');
+  const resultInfo = document.getElementById('resultInfo');
+
+  const featuredOrder = [
+    "Jack Daniel's","Ballantine's","Captain Morgan","Havana Club 3 ans","Absolut Vodka",
+    "CIROC Classic","MOËT & CHANDON \"Impérial\" (1,5 L)","Ricard","GET 27","Red Bull",
+    "XV Catalan (Vin rouge)","XV Catalan (Vin blanc)","XV Catalan (Muscat)"
+  ];
+
+  function getActiveCategory() {
+    const active = categoryTabs.querySelector('.tab-active');
+    return active ? active.dataset.category : 'all';
+  }
+  
+  // =========================
+  // 🚚 Stock véhicule (repo bullyto/stock)
+  // - On affiche seulement Disponible / Rupture (jamais la quantité)
+  // - Alcool = catégories : vodka/whisky/rhum/liqueurs/gin/tequila/pastis/vin
+  // =========================
+  const STOCK_REPO = { owner:"bullyto", repo:"stock", branch:"main" };
+  const STOCK_SNAPSHOT_PATH = "stock/_snapshot.json";
+  const STOCK_IMG_BASE = `https://raw.githubusercontent.com/${STOCK_REPO.owner}/${STOCK_REPO.repo}/${STOCK_REPO.branch}/img/`;
+
+  const ALCOHOL_CATS = new Set(["vodka","whisky","rhum","liqueurs","gin","tequila","pastis","vin"]);
+  let stockAvail = {}; // {id: true/false}
+  let stockUpdatedAt = 0;
+
+  async function fetchStockSnapshot(){
+    // cache-bust + no-store pour coller au "temps réel"
+    const url = `https://raw.githubusercontent.com/${STOCK_REPO.owner}/${STOCK_REPO.repo}/${STOCK_REPO.branch}/${STOCK_SNAPSHOT_PATH}?t=${Date.now()}`;
+    const res = await fetch(url, { cache:"no-store" });
+    if(!res.ok) throw new Error("snapshot_fetch_failed");
+    const snap = await res.json();
+    if(!snap || !Array.isArray(snap.items)) throw new Error("snapshot_bad");
+    const map = {};
+    snap.items.forEach(it => {
+      if(!it || !it.id) return;
+      const q = Number(it.qty);
+      map[String(it.id)] = Number.isFinite(q) ? (q > 0) : false;
+    });
+    stockAvail = map;
+    stockUpdatedAt = Date.now();
+    try{
+      localStorage.setItem("ac_stock_snapshot_cache_v1", JSON.stringify({ savedAt: stockUpdatedAt, avail: stockAvail }));
+    }catch{}
+  }
+
+  function loadStockCache(){
+    try{
+      const raw = localStorage.getItem("ac_stock_snapshot_cache_v1");
+      if(!raw) return;
+      const data = JSON.parse(raw);
+      if(data && typeof data.avail === "object"){
+        stockAvail = data.avail || {};
+        stockUpdatedAt = Number(data.savedAt || 0) || 0;
+      }
+    }catch{}
+  }
+
+  function imgUrlForId(id){
+    // Anticipe : images softs ajoutées plus tard dans le dépôt stock/img/
+    // Les images doivent s'appeler : <id>.png
+    return `${STOCK_IMG_BASE}${encodeURIComponent(id)}.png`;
+  }
+function catLabel(cat){
+    const map = {vodka:"Vodka",whisky:"Whisky",rhum:"Rhum",liqueurs:"Liqueurs",gin:"Gin",tequila:"Tequila",softs:"Softs",pastis:"Pastis",vin:"Vin",accessoires:"Accessoires"};
+    return map[cat] || cat;
+  }
+  function flattenProducts() {
     const out = [];
     Object.entries(products).forEach(([cat, list]) => list.forEach(p => {
       const id = p.id || "";
@@ -474,9 +1261,8 @@
     }));
     return out;
   }
-
-  function getProductsForCategory(category){
-    if(category === "all") return flattenProducts();
+  function getProductsForCategory(category) {
+    if (category === 'all') return flattenProducts();
     return (products[category] || []).map(p => {
       const id = p.id || "";
       const isAlcohol = ALCOHOL_CATS.has(category);
@@ -484,139 +1270,450 @@
       return ({ ...p, id, category, isAlcohol, available, imageUrl: id ? imgUrlForId(id) : "" });
     });
   }
-
-  function applySearch(list, term){
+  function applySearch(list, term) {
     const t = (term || "").trim().toLowerCase();
-    if(!t) return list;
-    return list.filter(p => (p.name || "").toLowerCase().includes(t));
+    if (!t) return list;
+    return list.filter(p => p.name.toLowerCase().includes(t));
+  }
+  function applySort(list, mode) {
+    const arr = [...list];
+    if (mode === "az") arr.sort((a,b) => a.name.localeCompare(b.name, 'fr'));
+    else if (mode === "priceAsc") arr.sort((a,b) => a.price - b.price);
+    else if (mode === "priceDesc") arr.sort((a,b) => b.price - a.price);
+    else {
+      arr.sort((a,b) => {
+        const ia = featuredOrder.indexOf(a.name), ib = featuredOrder.indexOf(b.name);
+        const ra = ia === -1 ? 9999 : ia, rb = ib === -1 ? 9999 : ib;
+        if (ra !== rb) return ra - rb;
+        return a.name.localeCompare(b.name, 'fr');
+      });
+    }
+    return arr;
   }
 
-  // ====== RENDER ======
-  const gridEl = document.getElementById("grid");
-  const resultInfoEl = document.getElementById("resultInfo");
-  const tabsEl = document.getElementById("categoryTabs");
-  const searchEl = document.getElementById("searchInput");
+  async function displayProducts(category, searchTerm = '', sortMode = 'popular'){
+    // Stock "temps réel" : refresh snapshot quand on est online
+    if (navigator.onLine) {
+      try { await fetchStockSnapshot(); } catch(e) { /* garde cache */ }
+    }
+const base = getProductsForCategory(category);
+    const searched = applySearch(base, searchTerm);
+    const sorted = applySort(searched, sortMode);
 
-  let currentCategory = "all";
-  let currentSearch = "";
+    productGrid.innerHTML = '';
+    resultInfo.textContent = `${sorted.length} article${sorted.length>1?'s':''} • ${category==='all'?'Tout':catLabel(category)}`;
 
-  function render(){
-    const list0 = getProductsForCategory(currentCategory);
-    const list = applySearch(list0, currentSearch);
-
-    resultInfoEl.textContent = `${list.length} article${list.length>1?"s":""} • ${currentCategory==="all"?"Tout":catLabel(currentCategory)}`;
-
-    gridEl.innerHTML = "";
-    list.forEach(p => {
+    sorted.forEach(product => {
       const card = document.createElement("div");
-      card.className = "card";
+      card.className = "bg-white shadow-sm !rounded-button overflow-hidden flex flex-col border border-gray-100";
+      card.innerHTML = `
+        
+<div class="p-3 flex-1">
+          <div class="flex flex-col items-center text-center">
+            <div class="w-32 h-40 rounded-2xl bg-gray-50 border border-gray-100 overflow-hidden flex items-center justify-center">
+              <img src="${product.imageUrl}" alt="${product.name}" class="w-full h-full object-contain" loading="lazy"
+                onerror="this.style.display='none'; this.parentElement.classList.add('items-center');" />
+            </div>
 
-      const top = document.createElement("div");
-      top.className = "topLine";
+            <div class="mt-3 w-full">
+              <div class="text-[10px] inline-flex items-center px-2 py-[2px] rounded-full bg-gray-100 text-gray-600 mb-2 mx-auto">
+                ${catLabel(product.category)}
+              </div>
 
-      const cat = document.createElement("div");
-      cat.textContent = catLabel(p.category);
+              <h3 class="font-extrabold text-[15px] leading-snug text-gray-900 px-2">
+                ${product.name}
+              </h3>
 
-      const badge = document.createElement("div");
-      badge.className = "badge";
+              <p class="text-primary font-extrabold text-[18px] mt-2">
+                ${product.price.toFixed(2)} <span class="text-[14px] font-black">€</span>
+              </p>
 
-      if(p.isAlcohol){
-        const dot = document.createElement("span");
-        dot.className = "dot " + (p.available ? "ok" : "ko");
-        const txt = document.createElement("span");
-        txt.textContent = p.available ? "Disponible" : "Rupture";
-        badge.classList.add(p.available ? "ok" : "ko");
-        badge.appendChild(dot);
-        badge.appendChild(txt);
-      } else {
-        // pas de dispo pour snacks/softs/accessoires
-        badge.classList.add("hidden");
-      }
+              ${product.isAlcohol ? `
+                <div class="mt-2 inline-flex items-center justify-center px-3 py-1 rounded-full text-[12px] font-extrabold ${product.available ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}">
+                  ${product.available ? 'Disponible' : 'Rupture'}
+                </div>
+              ` : ``}
+            </div>
+          </div>
+        </div>
 
-      top.appendChild(cat);
-      top.appendChild(badge);
-
-      const imgWrap = document.createElement("div");
-      imgWrap.className = "imgWrap";
-      const img = document.createElement("img");
-      img.loading = "lazy";
-      img.alt = p.name || "";
-      img.src = p.imageUrl || "";
-      img.onerror = () => { img.style.opacity = "0.25"; };
-      imgWrap.appendChild(img);
-
-      const name = document.createElement("div");
-      name.className = "name";
-      name.textContent = p.name || "";
-
-      const price = document.createElement("div");
-      price.className = "price";
-      const val = document.createElement("span");
-      val.textContent = (typeof p.price === "number") ? p.price.toFixed(2) : "";
-      const eur = document.createElement("span");
-      eur.className = "eur";
-      eur.textContent = "€";
-      price.appendChild(val);
-      price.appendChild(eur);
-
-      const btn = document.createElement("button");
-      btn.className = "btn";
-      btn.innerHTML = `
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.62 10.79a15.053 15.053 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.85 21 3 13.15 3 3a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.58a1 1 0 0 1-.24 1.01l-2.2 2.2z"/></svg>
-        Commander
+        </div>
+        <div class="px-3 pb-3">
+          <a href="tel:0652336461" class="w-full inline-flex items-center justify-center gap-2 py-2 bg-primary text-white text-xs font-semibold !rounded-button hover:opacity-95 transition">
+            <i class="ri-phone-fill"></i> Commander
+          </a>
+        </div>
       `;
-      btn.onclick = () => {
-        // Ici tu peux mettre ton tel en dur si tu veux:
-        // window.location.href = "tel:+33652336461";
-        alert("Appelle pour commander.");
-      };
-
-      card.appendChild(top);
-      card.appendChild(imgWrap);
-      card.appendChild(name);
-      card.appendChild(price);
-      card.appendChild(btn);
-
-      gridEl.appendChild(card);
+      productGrid.appendChild(card);
     });
   }
 
-  // ====== EVENTS ======
-  tabsEl.addEventListener("click", (e) => {
-    const b = e.target.closest("button[data-category]");
-    if(!b) return;
-    [...tabsEl.querySelectorAll("button")].forEach(x => x.classList.remove("active"));
-    b.classList.add("active");
-    currentCategory = b.getAttribute("data-category") || "all";
-    render();
-  });
-
-  searchEl.addEventListener("input", () => {
-    currentSearch = searchEl.value || "";
-    render();
-  });
-
-  // Modal open/close
-  const overlay = document.getElementById("overlay");
-  document.getElementById("openModal").addEventListener("click", async () => {
-    overlay.classList.add("show");
-    overlay.setAttribute("aria-hidden","false");
-    await loadStockAvail();
-    render();
-  });
-  document.getElementById("closeModal").addEventListener("click", () => {
-    overlay.classList.remove("show");
-    overlay.setAttribute("aria-hidden","true");
-  });
-  overlay.addEventListener("click", (e) => {
-    if(e.target === overlay){
-      overlay.classList.remove("show");
-      overlay.setAttribute("aria-hidden","true");
+  categoryTabs.addEventListener('click', (e) => {
+    if (e.target.tagName === 'BUTTON') {
+      categoryTabs.querySelectorAll('button').forEach(btn => { btn.classList.remove('tab-active'); btn.classList.add('tab-idle'); });
+      e.target.classList.remove('tab-idle');
+      e.target.classList.add('tab-active');
+      displayProducts(e.target.dataset.category, searchInput.value, sortSelect.value);
     }
   });
 
-  // Si tu veux précharger direct sans bouton (optionnel), dé-commente :
-  // (async()=>{ overlay.classList.add("show"); await loadStockAvail(); render(); })();
+  searchInput.addEventListener('input', () => displayProducts(getActiveCategory(), searchInput.value, sortSelect.value));
+  sortSelect.addEventListener('change', () => displayProducts(getActiveCategory(), searchInput.value, sortSelect.value));
+
+  displayProducts('all', '', 'popular');
+
+  // =========================
+  // ✅ Déclenche l'age gate sur les 4 boutons principaux
+  // =========================
+  const callBtn = document.getElementById('callBtn');
+  const installBtnEl = document.getElementById('installBtn');
+  const zoneBtnEl = document.getElementById('zoneBtn');
+  const articlesBtnEl = document.getElementById('articlesBtn');
+
+  callBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    requireMajorThen(() => {
+      window.location.href = callBtn.getAttribute('href') || 'tel:0652336461';
+    });
+  });
+
+  // Zone + Articles : on empêche l'ouverture directe, et on ouvre après validation
+  zoneBtnEl?.addEventListener('click', (e) => {
+    e.preventDefault();
+    requireMajorThen(() => openModal('zoneModal'));
+  });
+
+  articlesBtnEl?.addEventListener('click', (e) => {
+    e.preventDefault();
+    requireMajorThen(() => openModal('articlesModal'));
+  });
+
+  // Install : on laisse ensuite le code PWA gérer (on simule un clic après validation)
+  installBtnEl?.addEventListener('click', (e) => {
+    // IMPORTANT : on ne veut pas doubler le handler PWA plus bas.
+    // Donc: on intercepte seulement si pas majeur.
+    if (!ageIsMajorValid()) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      requireMajorThen(() => {
+        // relance le clic une fois validé
+        setTimeout(() => installBtnEl.click(), 0);
+      });
+    }
+  }, true);
+});
+</script>
+
+<!-- ✅ Installation PWA (sans worker pour l’instant) -->
+<script>
+let deferredPrompt = null;
+const installBtn = document.getElementById('installBtn');
+const installHint = document.getElementById('installHint');
+
+function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent); }
+function isInStandalone() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (!isInStandalone()) installBtn.classList.remove('hidden');
+});
+
+installBtn?.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  installBtn.classList.add('hidden');
+  deferredPrompt.prompt();
+  try { await deferredPrompt.userChoice; } catch(e) {}
+  deferredPrompt = null;
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
+  installBtn?.classList.add('hidden');
+});
+
+window.addEventListener('load', () => {
+  if (isIOS() && !isInStandalone()) {
+    setTimeout(() => {
+      installBtn.classList.remove('hidden');
+      installBtn.addEventListener('click', () => {
+        installHint.classList.remove('hidden');
+      }, { once: true });
+    }, 800);
+  }
+});
+</script>
+
+<!-- ===== GLOBAL STATUS POPUP (commun aux 2 sites) ===== -->
+<div id="globalStatusOverlay" class="fixed inset-0 z-[999997] hidden items-center justify-center p-4 bg-black/70 backdrop-blur-md">
+  <div class="w-[min(560px,94vw)] overflow-hidden rounded-3xl border border-white/10 shadow-2xl"
+       style="background: radial-gradient(900px 650px at 50% 18%, rgba(255,211,107,.18), transparent 58%),
+              radial-gradient(900px 650px at 20% 70%, rgba(198,25,16,.22), transparent 62%),
+              radial-gradient(900px 650px at 80% 70%, rgba(255,184,28,.14), transparent 62%),
+              linear-gradient(180deg, #5a1217, #2a0a0c 55%, #120406);">
+    <div class="p-3 flex items-center justify-between gap-3 border-b border-white/10 bg-white/5">
+      <div class="flex items-center gap-2 min-w-0">
+        <div class="w-9 h-9 rounded-2xl grid place-items-center font-black tracking-wider text-white border border-white/10"
+             style="background: rgba(198,25,16,.20);">!</div>
+        <div class="min-w-0">
+          <div class="text-[12px] tracking-[.18em] font-black text-white/90 whitespace-nowrap overflow-hidden text-ellipsis">INFORMATION SERVICE</div>
+          <div class="text-[12px] text-white/70 -mt-[2px]">Mise à jour officielle</div>
+        </div>
+      </div>
+      <button id="globalStatusCloseX" class="w-10 h-10 rounded-2xl grid place-items-center text-white/80 hover:text-white hover:bg-white/10 border border-white/10">
+        <i class="ri-close-line text-xl"></i>
+      </button>
+    </div>
+
+    <img id="globalStatusImg" alt="" class="w-full h-auto block bg-black/20">
+
+    <div class="p-5">
+      <h2 id="globalStatusTitle" class="text-white text-2xl font-black leading-tight mb-2">Service temporairement suspendu</h2>
+      <p id="globalStatusMsg" class="text-white/80 text-[15px] leading-relaxed">
+        Une information importante est en cours.
+      </p>
+
+      <div class="mt-4 grid gap-2">
+        <button id="globalStatusOk"
+                class="w-full py-4 !rounded-button font-black tracking-wide text-white bg-primary hover:opacity-95 transition">
+          OK, j'ai compris
+        </button>
+      </div>
+
+      <div class="mt-3 text-[12px] text-white/60 text-center">
+        L’abus d’alcool est dangereux pour la santé, à consommer avec modération.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== Lecture du statut commun (status.json) ===== */
+(function() {
+  const STATUS_URL = 'https://bullyto.github.io/status/status.json';
+
+  const overlay = document.getElementById('globalStatusOverlay');
+  const imgEl   = document.getElementById('globalStatusImg');
+  const titleEl = document.getElementById('globalStatusTitle');
+  const msgEl   = document.getElementById('globalStatusMsg');
+  const btnOk   = document.getElementById('globalStatusOk');
+  const btnX    = document.getElementById('globalStatusCloseX');
+
+  // (optionnel) zone message secondaire si warning
+  let secondary = document.getElementById('globalStatusSecondary');
+  if(!secondary){
+    const div = document.createElement('div');
+    div.id = 'globalStatusSecondary';
+    div.className = "mt-3 text-[13px] text-white/85 text-center font-semibold";
+    div.style.display = "none";
+    btnOk?.parentElement?.appendChild(div);
+    secondary = div;
+  }
+
+  if(!overlay || !imgEl || !titleEl || !msgEl || !btnOk) return;
+
+  let canClose = true;
+  let currentMode = "none";
+  let warningClickMsg = "Ce n'est actuellement pas possible de commander.";
+
+  function setCloseEnabled(on){
+    canClose = !!on;
+
+    if(btnX){
+      btnX.disabled = !canClose;
+      btnX.style.opacity = canClose ? "" : "0.5";
+      btnX.style.cursor = canClose ? "" : "not-allowed";
+      btnX.classList.toggle("pointer-events-none", !canClose);
+    }
+
+    if(currentMode === "info"){
+      btnOk.disabled = !canClose;
+      btnOk.style.opacity = canClose ? "" : "0.7";
+      btnOk.style.cursor = canClose ? "" : "not-allowed";
+      btnOk.classList.toggle("pointer-events-none", !canClose);
+    } else {
+      btnOk.disabled = false;
+      btnOk.style.opacity = "";
+      btnOk.style.cursor = "pointer";
+      btnOk.classList.remove("pointer-events-none");
+    }
+  }
+
+  function close() {
+    if(!canClose) return;
+    overlay.classList.add('hidden');
+    overlay.classList.remove('flex');
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+  }
+
+  function open() {
+    overlay.classList.remove('hidden');
+    overlay.classList.add('flex');
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+  }
+
+  overlay.addEventListener('click', (e) => {
+    if(e.target === overlay) {
+      if(canClose) close();
+      else if(currentMode === "warning" && secondary){
+        secondary.style.display = "block";
+        secondary.textContent = warningClickMsg;
+      }
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if(overlay.classList.contains("flex") && e.key === "Escape"){
+      if(!canClose){
+        e.preventDefault();
+        e.stopPropagation();
+      } else {
+        close();
+      }
+    }
+  }, true);
+
+  btnOk.addEventListener('click', () => {
+    if(currentMode === "warning"){
+      if(secondary){
+        secondary.style.display = "block";
+        secondary.textContent = warningClickMsg;
+        secondary.style.opacity = "1";
+        setTimeout(()=> secondary.style.opacity = "0.85", 250);
+      }
+      return;
+    }
+    close();
+  });
+
+  if(btnX) btnX.addEventListener('click', close);
+
+  function withinSchedule(schedule, now = new Date()){
+    if(!schedule || !schedule.enabled) return true;
+
+    const days = Array.isArray(schedule.days) ? schedule.days : [];
+    const day = now.getDay();
+    if(days.length && !days.includes(day)) return false;
+
+    const [sh, sm] = String(schedule.start||"00:00").split(":").map(n=>parseInt(n,10));
+    const [eh, em] = String(schedule.end||"00:00").split(":").map(n=>parseInt(n,10));
+    if(!Number.isFinite(sh)||!Number.isFinite(sm)||!Number.isFinite(eh)||!Number.isFinite(em)) return true;
+
+    const startMin = sh*60+sm;
+    const endMin = eh*60+em;
+    const nowMin = now.getHours()*60+now.getMinutes();
+
+    if(startMin === endMin) return true;
+    if(startMin < endMin){
+      return nowMin >= startMin && nowMin < endMin;
+    } else {
+      return (nowMin >= startMin) || (nowMin < endMin);
+    }
+  }
+
+  function setOrderEnabled(enabled){
+    const callBtn = document.getElementById("callBtn");
+    const orderLinks = Array.from(document.querySelectorAll('a[href^="tel:"]'));
+    const all = new Set([callBtn, ...orderLinks].filter(Boolean));
+    all.forEach(el => {
+      if(enabled){
+        el.classList.remove("pointer-events-none","opacity-50");
+        el.removeAttribute("aria-disabled");
+        el.dataset.statusBlocked = "0";
+      } else {
+        el.classList.add("pointer-events-none","opacity-50");
+        el.setAttribute("aria-disabled","true");
+        el.dataset.statusBlocked = "1";
+      }
+    });
+  }
+
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest('a[href^="tel:"]');
+    if(!a) return;
+    if(a.dataset.statusBlocked === "1"){
+      e.preventDefault();
+      if(currentMode === "warning" && secondary){
+        secondary.style.display = "block";
+        secondary.textContent = warningClickMsg;
+      }
+    }
+  }, true);
+
+  fetch(STATUS_URL, { cache: "no-store" })
+    .then(r => r.json())
+    .then(data => {
+      if(!data || !data.active) { setOrderEnabled(true); return; }
+
+      const mode = data.mode || "none";
+      const cfg = data.modes && data.modes[mode];
+      if(!cfg) { setOrderEnabled(true); return; }
+
+      currentMode = mode;
+
+      const base = STATUS_URL.replace(/\/status\.json$/,'/');
+      const imgUrl = (cfg.image || "").startsWith("http") ? cfg.image : (base + (cfg.image || ""));
+
+      imgEl.src = imgUrl;
+      titleEl.textContent = cfg.title || "Information";
+      msgEl.textContent = cfg.message || "";
+
+      if(mode === "info"){
+        const delay = Number.isFinite(cfg.ok_delay_seconds) ? cfg.ok_delay_seconds : 5;
+        if(btnOk) btnOk.textContent = `OK, j'ai compris (dans ${delay}s)`;
+        if(secondary) secondary.style.display = "none";
+
+        setCloseEnabled(false);
+        setOrderEnabled(true);
+        open();
+
+        let left = delay;
+        const t = setInterval(() => {
+          left -= 1;
+          if(left <= 0){
+            clearInterval(t);
+            if(btnOk) btnOk.textContent = "OK, j'ai compris";
+            setCloseEnabled(true);
+          } else {
+            if(btnOk) btnOk.textContent = `OK, j'ai compris (dans ${left}s)`;
+          }
+        }, 1000);
+        return;
+      }
+
+      if(mode === "warning"){
+        warningClickMsg = cfg.warning_click_message || warningClickMsg;
+        if(secondary){
+          secondary.style.display = "none";
+          secondary.textContent = warningClickMsg;
+        }
+
+        const schedule = cfg.block_schedule || { enabled:false };
+        const blockedNow = withinSchedule(schedule, new Date());
+
+        // ✅ WARNING ne bloque QUE pendant la plage horaire
+        if(!blockedNow){
+          setOrderEnabled(true);
+          close(); // ferme si jamais affichée
+          return;
+        }
+
+        // ✅ dans la plage => warning bloquant + commande bloquée
+        setCloseEnabled(false);
+        setOrderEnabled(false);
+
+        open();
+        return;
+      }
+
+      setOrderEnabled(true);
+    })
+    .catch(() => { setOrderEnabled(true); });
+})();
 </script>
 
 </body>
