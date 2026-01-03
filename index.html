@@ -96,6 +96,7 @@
    (stock alcool uniquement)
 ========================= */
 .liveBanner{
+  width:100%;
   display:flex;justify-content:space-between;align-items:center;gap:12px;
   margin:12px 0 14px; padding:12px 14px;border-radius:16px;
   border:1px solid rgba(198,25,16,.18);
@@ -747,6 +748,10 @@
         <i class="ri-phone-line text-primary"></i>
         <span>Service rapide et professionnel</span>
       </li>
+      <li class="flex items-center gap-2">
+        <i class="ri-bank-card-line text-primary"></i>
+        <span>Paiement en espèces ou carte bancaire au véhicule</span>
+      </li>
     </ul>
   </div>
 </main>
@@ -773,7 +778,7 @@
 </div>
 
 <div id="articlesModal" class="modal fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
-  <div class="w-[340px] bg-white !rounded-button p-4 relative max-h-[90vh] overflow-y-auto">
+  <div class="w-[92vw] max-w-[430px] bg-white !rounded-button p-4 relative max-h-[90vh] overflow-y-auto">
     <button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary"
             onclick="closeModal('articlesModal')">
       <i class="ri-close-line text-xl"></i>
@@ -847,7 +852,7 @@
 </div>
 
 <div id="cgvModal" class="modal fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
-  <div class="w-[340px] bg-white !rounded-button p-4 relative max-h-[90vh] overflow-y-auto">
+  <div class="w-[92vw] max-w-[430px] bg-white !rounded-button p-4 relative max-h-[90vh] overflow-y-auto">
     <button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary"
             onclick="closeModal('cgvModal')">
       <i class="ri-close-line text-xl"></i>
@@ -873,7 +878,7 @@
 </div>
 
 <div id="mentionsModal" class="modal fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
-  <div class="w-[340px] bg-white !rounded-button p-4 relative max-h-[90vh] overflow-y-auto">
+  <div class="w-[92vw] max-w-[430px] bg-white !rounded-button p-4 relative max-h-[90vh] overflow-y-auto">
     <button class="absolute right-4 top-4 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-primary"
             onclick="closeModal('mentionsModal')">
       <i class="ri-close-line text-xl"></i>
@@ -1061,18 +1066,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if(state === "live"){
       t.textContent = "STOCK EN DIRECT";
-      sub.textContent = "Stock alcool synchronisé avec le véhicule • Pas d’estimation";
+      sub.textContent = "Stock alcool synchro véhicule";
       chip.textContent = "LIVE";
       // état par défaut (rouge)
     }else if(state === "prep"){
       el.classList.add("prep");
       t.textContent = "PRÉPARATION DE LA TOURNÉE";
-      sub.textContent = "Stock alcool en direct à partir de 19h";
+      sub.textContent = "En ligne vers 19h";
       chip.textContent = "Bientôt";
     }else{
       el.classList.add("offline");
       t.textContent = "HORS LIGNE";
-      sub.textContent = "Aperçu indicatif • Stock alcool mis à jour ce soir";
+      sub.textContent = "Hors service • reprise ce soir";
       chip.textContent = "OFF";
     }
   }
@@ -1125,7 +1130,6 @@ document.addEventListener('DOMContentLoaded', function() {
       {"id":"old_nick_darkwood","name":"Old Nick Dark Wood","price":29.0},
       {"id":"captain_morgan","name":"Captain Morgan","price":34.0},
       {"id":"havana_especial","name":"Havana Club Especial","price":38.0},
-      {"id":"old_nick_blanc","name":"Old Nick Rhum Blanc","price":27.0},
       {"id":"saint_james_blanc","name":"Saint James Rhum blanc","price":32.0},
       {"id":"trois_rivieres","name":"Trois Rivières","price":33.0},
       {"id":"havana_3ans","name":"Havana Club 3 ans","price":37.0}
@@ -1153,8 +1157,8 @@ document.addEventListener('DOMContentLoaded', function() {
     ],
     "softs": [
       {"id":"oasis_tropical","name":"Oasis (tropical)","price":3.5},
-      {"id":"fanta_citron","name":"Fanta citron","price":3.5},
       {"id":"schweppes_tonic","name":"Schweppes tonic","price":3.5},
+      {"id":"perrier","name":"Perrier","price":2.5},
       {"id":"perrier_citron","name":"Perrier citron","price":2.5},
       {"id":"crazy_tiger","name":"Crazy Tiger","price":5.0},
       {"id":"jus_pomme","name":"Jus de pommes","price":4.5},
