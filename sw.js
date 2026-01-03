@@ -1,14 +1,13 @@
 /* Apéro PWA Service Worker
-   Goals:
-   - Fast load (app shell precache)
-   - Offline-friendly navigation (index.html fallback)
-   - Reliable stock freshness: network-first for snapshot with timeout + cache fallback
-   - Fast product images: stale-while-revalidate for GitHub raw images
-   - Cache external CDNs (Tailwind, fonts) safely as runtime
+   - App shell precache
+   - Offline navigation fallback
+   - Stock snapshot: network-first with timeout + cache fallback
+   - GitHub raw images: stale-while-revalidate
+   - CDN assets: stale-while-revalidate (opaque allowed)
 */
 'use strict';
 
-const VERSION = 'v2026-01-03-sw1';
+const VERSION = 'v2026-01-03-sw2';
 
 const CACHE_APP_SHELL = `ac-app-${VERSION}`;
 const CACHE_PAGES     = `ac-pages-${VERSION}`;
@@ -27,29 +26,24 @@ const APP_SHELL_URLS = [
   './apple-touch-icon.png?v=20251223'
 ];
 
-// --- helpers ---
 async function trimCache(cacheName, maxEntries) {
   try {
     const cache = await caches.open(cacheName);
     const keys = await cache.keys();
     const extra = keys.length - maxEntries;
     if (extra > 0) {
-      // Delete oldest entries first
-      for (let i = 0; i < extra; i++) {
-        await cache.delete(keys[i]);
-      }
+      for (let i = 0; i < extra; i++) await cache.delete(keys[i]);
     }
   } catch (e) {}
 }
 
 function isNavigationRequest(request) {
   return request.mode === 'navigate' ||
-         (request.method === 'GET' && request.headers.get('accept') && request.headers.get('accept').includes('text/html'));
+    (request.method === 'GET' &&
+     (request.headers.get('accept') || '').includes('text/html'));
 }
 
-function sameOrigin(url) {
-  return url.origin === self.location.origin;
-}
+function sameOrigin(url) { return url.origin === self.location.origin; }
 
 function isGitHubRawImage(url) {
   return url.hostname === 'raw.githubusercontent.com'
@@ -73,7 +67,6 @@ function isCDN(url) {
 }
 
 function isBackgroundImageHost(url) {
-  // Your current background uses readdy.ai; cache it but keep bounded
   return url.hostname === 'readdy.ai' || url.hostname.endsWith('.readdy.ai');
 }
 
@@ -82,18 +75,18 @@ async function cacheFirst(request, cacheName, {maxEntries} = {}) {
   const cached = await cache.match(request, { ignoreSearch: false });
   if (cached) return cached;
 
-  const response = await fetch(request);
-  // Cache only successful or opaque (CDN cross-origin) GET responses
-  if (response && (response.ok || response.type === 'opaque')) {
-    cache.put(request, response.clone()).catch(()=>{});
+  const res = await fetch(request);
+  if (res && (res.ok || res.type === 'opaque')) {
+    cache.put(request, res.clone()).catch(()=>{});
     if (maxEntries) trimCache(cacheName, maxEntries);
   }
-  return response;
+  return res;
 }
 
 async function staleWhileRevalidate(request, cacheName, {maxEntries} = {}) {
   const cache = await caches.open(cacheName);
-  const cachedPromise = cache.match(request, { ignoreSearch: false });
+  const cached = await cache.match(request, { ignoreSearch: false });
+
   const networkPromise = fetch(request).then(res => {
     if (res && (res.ok || res.type === 'opaque')) {
       cache.put(request, res.clone()).catch(()=>{});
@@ -102,17 +95,17 @@ async function staleWhileRevalidate(request, cacheName, {maxEntries} = {}) {
     return res;
   }).catch(()=>null);
 
-  const cached = await cachedPromise;
   if (cached) {
-    // Update in background
     networkPromise.catch(()=>{});
     return cached;
   }
+
   const net = await networkPromise;
   if (net) return net;
-  // Last resort: try matching ignoring search
+
   const cachedLoose = await cache.match(request, { ignoreSearch: true });
   if (cachedLoose) return cachedLoose;
+
   throw new Error('No response');
 }
 
@@ -122,13 +115,13 @@ async function networkFirst(request, cacheName, {timeoutMs = 2500, maxEntries} =
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const response = await fetch(request, { signal: controller.signal });
+    const res = await fetch(request, { signal: controller.signal });
     clearTimeout(timer);
-    if (response && (response.ok || response.type === 'opaque')) {
-      cache.put(request, response.clone()).catch(()=>{});
+    if (res && (res.ok || res.type === 'opaque')) {
+      cache.put(request, res.clone()).catch(()=>{});
       if (maxEntries) trimCache(cacheName, maxEntries);
     }
-    return response;
+    return res;
   } catch (e) {
     clearTimeout(timer);
     const cached = await cache.match(request, { ignoreSearch: true });
@@ -137,7 +130,6 @@ async function networkFirst(request, cacheName, {timeoutMs = 2500, maxEntries} =
   }
 }
 
-// --- lifecycle ---
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_APP_SHELL);
@@ -150,33 +142,28 @@ self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
     await Promise.all(keys.map(k => {
-      if (!k.includes(VERSION) && (k.startsWith('ac-'))) return caches.delete(k);
+      if (k.startsWith('ac-') && !k.includes(VERSION)) return caches.delete(k);
     }));
     await self.clients.claim();
   })());
 });
 
-// Allow page to force activate new SW
 self.addEventListener('message', event => {
   const data = event.data || {};
-  if (data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
+  if (data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
-// --- fetch routing ---
 self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
 
-  // Navigations: try network, fallback to cached index.html for offline
+  // Navigation: network-first, offline fallback to cached index.html
   if (isNavigationRequest(req) && sameOrigin(url)) {
     event.respondWith((async () => {
       try {
-        const res = await networkFirst(req, CACHE_PAGES, { timeoutMs: 3500, maxEntries: 20 });
-        return res;
+        return await networkFirst(req, CACHE_PAGES, { timeoutMs: 3500, maxEntries: 20 });
       } catch (e) {
         const cache = await caches.open(CACHE_APP_SHELL);
         const fallback = await cache.match('./index.html') || await cache.match('./');
@@ -186,41 +173,40 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // App shell assets (same origin): stale-while-revalidate keeps it snappy
+  // Same-origin assets: stale-while-revalidate for speed
   if (sameOrigin(url)) {
-    // Cache-busted assets still cache fine (we don't ignoreSearch)
     event.respondWith(staleWhileRevalidate(req, CACHE_APP_SHELL, { maxEntries: 80 }));
     return;
   }
 
-  // Stock snapshot: network-first (fresh) with quick timeout, fallback cache
+  // Stock snapshot: network-first with short timeout
   if (isStockSnapshot(url)) {
     event.respondWith(networkFirst(req, CACHE_API, { timeoutMs: 2000, maxEntries: 10 }));
     return;
   }
 
-  // Product images (GitHub raw): stale-while-revalidate for speed + freshness
+  // Product images: stale-while-revalidate
   if (isGitHubRawImage(url)) {
-    event.respondWith(staleWhileRevalidate(req, CACHE_IMG, { maxEntries: 120 }));
+    event.respondWith(staleWhileRevalidate(req, CACHE_IMG, { maxEntries: 150 }));
     return;
   }
 
-  // Background images (readdy.ai etc.): cache-first to reduce repeated downloads
+  // Background images (readdy): cache-first
   if (isBackgroundImageHost(url)) {
-    event.respondWith(cacheFirst(req, CACHE_IMG, { maxEntries: 30 }));
+    event.respondWith(cacheFirst(req, CACHE_IMG, { maxEntries: 40 }));
     return;
   }
 
-  // CDNs: stale-while-revalidate (opaque responses allowed)
+  // CDNs: stale-while-revalidate
   if (isCDN(url)) {
-    event.respondWith(staleWhileRevalidate(req, CACHE_CDN, { maxEntries: 60 }));
+    event.respondWith(staleWhileRevalidate(req, CACHE_CDN, { maxEntries: 80 }));
     return;
   }
 
-  // Default: try cache-first (safe), fallback network
+  // Default
   event.respondWith((async () => {
     try {
-      return await cacheFirst(req, CACHE_CDN, { maxEntries: 80 });
+      return await cacheFirst(req, CACHE_CDN, { maxEntries: 120 });
     } catch (e) {
       return fetch(req);
     }

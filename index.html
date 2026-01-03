@@ -753,7 +753,7 @@
     </div>
 
 <div class="stockNote">
-  <strong></span>
+  <strong></strong>
 </div>
 
 
@@ -763,7 +763,7 @@
         <div class="w-6 h-6 absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center text-gray-400">
           <i class="ri-search-line"></i>
         </div>
-        <input type="text" id="searchInput" placeholder="Rechercher un produitroduit..."
+        <input type="text" id="searchInput" placeholder="Rechercher un produit..."
                class="w-full pl-10 pr-4 py-2 !rounded-button border border-gray-200 text-sm focus:outline-none focus:border-primary">
       </div>
 
@@ -771,7 +771,6 @@
         <select id="sortSelect" style="display:none"
                 class="w-full py-2 px-3 !rounded-button border border-gray-200 text-sm focus:outline-none focus:border-primary">
           <option value="popular">Tri : Recommandés</option>
-          <option value="az">Tri : </option>
           <option value="priceAsc">Tri : Prix ↑</option>
           <option value="priceDesc">Tri : Prix ↓</option>
         </select>
@@ -992,9 +991,9 @@ document.addEventListener('DOMContentLoaded', function() {
       {"id":"pastis_51","name":"Pastis 51","price":35.0}
     ],
     "vin": [
-      {"id":"vin_rose","name":"XV catalan rosé","price":19.0},
-      {"id":"vin_blanc","name":"XV catalan blanc","price":19.0},
-      {"id":"vin_rouge","name":"XV catalan rouge","price":19.0},
+      {"id":"xv_catalan_rose","name":"XV catalan rosé","price":19.0},
+      {"id":"xv_catalan_blanc","name":"XV catalan blanc","price":19.0},
+      {"id":"xv_catalan_rouge","name":"XV catalan rouge","price":19.0},
       {"id":"muscat","name":"Muscat","price":25.0}
     ],
     "softs": [
@@ -1003,12 +1002,12 @@ document.addEventListener('DOMContentLoaded', function() {
       {"id":"schweppes_tonic","name":"Schweppes tonic","price":3.5},
       {"id":"perrier_citron","name":"Perrier citron","price":2.5},
       {"id":"crazy_tiger","name":"Crazy Tiger","price":5.0},
-      {"id":"jus_pommes","name":"Jus de pommes","price":4.5},
-      {"id":"jus_oranges","name":"Jus d'oranges","price":4.5},
+      {"id":"jus_pomme","name":"Jus de pommes","price":4.5},
+      {"id":"jus_orange","name":"Jus d'oranges","price":4.5},
       {"id":"jus_ananas","name":"Jus d'ananas","price":4.5}
     ],
     "accessoires": [
-      {"id":"verre_whisky_soda_35cl","name":"Verre à whisky-soda incassable 35 cl","price":0.5}
+      {"id":"verre_whisky","name":"Verre à whisky-soda incassable 35 cl","price":0.5}
     ]
   };
 
@@ -1768,6 +1767,19 @@ window.addEventListener('load', () => {
       })
       .catch(()=>{});
   });
+})();
+</script>
+
+
+<script>
+// PWA loader: exactly 2.7s, only when installed (standalone)
+(function(){
+  const overlay = document.getElementById('pwaLoading');
+  if (!overlay) return;
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if (!isPWA) { overlay.remove(); return; }
+  // Let the app load in the background while we show the loader
+  window.setTimeout(() => overlay.remove(), 2700);
 })();
 </script>
 
