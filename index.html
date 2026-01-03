@@ -89,6 +89,47 @@
 .stockNote .txt strong{display:block;font-size:14px}
 .stockNote .txt span{font-size:12px;opacity:.85}
 
+
+/* =========================
+   BANNIÈRE STOCK (3 états)
+   LIVE / PRÉPARATION / HORS LIGNE
+   (stock alcool uniquement)
+========================= */
+.liveBanner{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  margin:12px 0 14px; padding:12px 14px;border-radius:16px;
+  border:1px solid rgba(198,25,16,.18);
+  background:linear-gradient(135deg, rgba(198,25,16,.10), rgba(255,184,28,.10));
+  box-shadow:0 10px 30px rgba(0,0,0,.06);
+}
+.liveLeft{display:flex;align-items:center;gap:10px;min-width:0}
+.liveDot{
+  width:10px;height:10px;border-radius:999px;background:#C61910;
+  box-shadow:0 0 0 0 rgba(198,25,16,.55);
+  animation:livePulse 1.2s infinite;
+}
+@keyframes livePulse{
+  0%{box-shadow:0 0 0 0 rgba(198,25,16,.55)}
+  70%{box-shadow:0 0 0 10px rgba(198,25,16,0)}
+  100%{box-shadow:0 0 0 0 rgba(198,25,16,0)}
+}
+.liveTitle{font-weight:950;letter-spacing:.12em;font-size:12px;color:#7a0b0b}
+.liveSub{font-size:12px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.liveChip{
+  font-weight:950;font-size:12px;letter-spacing:.08em;
+  padding:6px 10px;border-radius:999px;color:#fff;background:#C61910;
+}
+/* Variantes */
+.liveBanner.offline{
+  background:linear-gradient(135deg, rgba(0,0,0,.06), rgba(0,0,0,.03));
+  border-color:rgba(0,0,0,.10);
+}
+.liveBanner.offline .liveDot{background:#111;animation:none;box-shadow:none}
+.liveBanner.offline .liveChip{background:#111}
+.liveBanner.prep .liveDot{background:#FFB81C;animation:none;box-shadow:none}
+.liveBanner.prep .liveChip{background:#FFB81C;color:#1b0b0b}
+
+
 /* Grid locked mobile-first */
 .grid, .productsGrid{
   display:grid !important;
@@ -741,23 +782,21 @@
     <div class="pr-8">
       <h2 class="text-xl font-semibold mb-1">Nos Articles</h2>
 
-<div class="stockNote premium">
-  <div class="icon">●</div>
-  <div class="txt">
-    <strong>Disponibilités en temps réel</strong>
-    <span>Stock des produits alcoolisés synchronisé avec le véhicule</span>
+
+<div class="liveBanner" id="stockBanner">
+  <div class="liveLeft">
+    <span class="liveDot" id="stockDot"></span>
+    <div>
+      <div class="liveTitle" id="stockTitle">STOCK</div>
+      <div class="liveSub" id="stockSub">—</div>
+    </div>
   </div>
+  <span class="liveChip" id="stockChip">INFO</span>
 </div>
+
 
       <p class="text-xs text-gray-500 mb-3">Appelez pour commander.</p>
     </div>
-
-<div class="stockNote">
-  <strong></strong>
-</div>
-
-
-
     <div class="grid grid-cols-1 gap-2 mb-4">
       <div class="relative">
         <div class="w-6 h-6 absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center text-gray-400">
@@ -925,6 +964,119 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+
+  // =========================
+  // 🟥🟨⬛ BANNIÈRE STOCK (alcool)
+  // - 3 états : LIVE / PRÉPARATION / HORS LIGNE
+  // - Horaires aléatoires (par jour) :
+  //   PRÉPA démarre entre 18:28–18:35 (jusqu'au LIVE)
+  //   LIVE démarre entre 18:50–19:30
+  //   LIVE finit entre 05:10–05:55
+  // =========================
+  const BANNER = {
+    LS_PREFIX: "ac_banner_sched_",
+    PREP_START: { h1:18, m1:28, h2:18, m2:35 },
+    LIVE_START: { h1:18, m1:50, h2:19, m2:30 },
+    LIVE_END:   { h1:5,  m1:10, h2:5,  m2:55 }
+  };
+
+  function pad2(n){ return String(n).padStart(2,"0"); }
+  function ymd(d){ return d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate()); }
+
+  // La "journée service" : si on est le matin (avant midi), on se rattache à la veille (fin de service)
+  function serviceDayKey(now){
+    const d = new Date(now);
+    if(d.getHours() < 12){
+      d.setDate(d.getDate()-1);
+    }
+    return ymd(d);
+  }
+
+  function minutesBetween(aH,aM,bH,bM){
+    return (bH*60+bM) - (aH*60+aM);
+  }
+  function randInt(min, max){
+    // inclusif
+    return Math.floor(Math.random()*(max-min+1))+min;
+  }
+  function timeInRange(baseDate, r){
+    const minM = r.h1*60 + r.m1;
+    const maxM = r.h2*60 + r.m2;
+    const pick = randInt(minM, maxM);
+    const d = new Date(baseDate);
+    d.setHours(Math.floor(pick/60), pick%60, 0, 0);
+    return d.getTime();
+  }
+
+  function getOrCreateBannerSchedule(){
+    const key = BANNER.LS_PREFIX + serviceDayKey(Date.now());
+    try{
+      const raw = localStorage.getItem(key);
+      if(raw){
+        const s = JSON.parse(raw);
+        if(s && s.prepStart && s.liveStart && s.liveEnd) return s;
+      }
+    }catch{}
+
+    // Base date = jour "service" à 00:00 locale
+    const now = new Date();
+    const d = new Date();
+    if(now.getHours() < 12) d.setDate(d.getDate()-1); // service = veille
+    d.setHours(0,0,0,0);
+
+    const prepStart = timeInRange(d, BANNER.PREP_START);
+    const liveStart = timeInRange(d, BANNER.LIVE_START);
+
+    // liveEnd = le lendemain matin
+    const d2 = new Date(d);
+    d2.setDate(d2.getDate()+1);
+    const liveEnd = timeInRange(d2, BANNER.LIVE_END);
+
+    // Sécurité : si par hasard liveStart < prepStart, on force l'ordre
+    const safeLiveStart = Math.max(liveStart, prepStart + 60*1000);
+    const sched = { prepStart, liveStart: safeLiveStart, liveEnd, key };
+
+    try{ localStorage.setItem(key, JSON.stringify(sched)); }catch{}
+    return sched;
+  }
+
+  function computeBannerState(){
+    const now = Date.now();
+    const s = getOrCreateBannerSchedule();
+    if(now >= s.liveStart && now < s.liveEnd) return "live";
+    if(now >= s.prepStart && now < s.liveStart) return "prep";
+    return "offline";
+  }
+
+  function setStockBanner(){
+    const el = document.getElementById("stockBanner");
+    const t  = document.getElementById("stockTitle");
+    const sub= document.getElementById("stockSub");
+    const chip=document.getElementById("stockChip");
+    if(!el||!t||!sub||!chip) return;
+
+    const state = computeBannerState();
+
+    el.classList.remove("prep","offline");
+
+    if(state === "live"){
+      t.textContent = "STOCK EN DIRECT";
+      sub.textContent = "Stock alcool synchronisé avec le véhicule • Pas d’estimation";
+      chip.textContent = "LIVE";
+      // état par défaut (rouge)
+    }else if(state === "prep"){
+      el.classList.add("prep");
+      t.textContent = "PRÉPARATION DE LA TOURNÉE";
+      sub.textContent = "Stock alcool en direct à partir de 19h";
+      chip.textContent = "Bientôt";
+    }else{
+      el.classList.add("offline");
+      t.textContent = "HORS LIGNE";
+      sub.textContent = "Aperçu indicatif • Stock alcool mis à jour ce soir";
+      chip.textContent = "OFF";
+    }
+  }
+
   const modals = {
     zoneModal: document.getElementById('zoneModal'),
     articlesModal: document.getElementById('articlesModal'),
@@ -939,6 +1091,9 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
     loadStockCache();
+    setStockBanner();
+    setInterval(setStockBanner, 30000);
+
 
   // ✅ BIÈRES RETIRÉES
   // ✅ VIN : DOMAINE DU VIEUX GENEVRIER remplacé par XV Catalan
@@ -1191,6 +1346,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const sortSelect = document.getElementById('sortSelect');
   const resultInfo = document.getElementById('resultInfo');
 
+  const CATEGORY_ORDER = ['snacks','vodka','whisky','rhum','liqueurs','gin','tequila','pastis','vin','softs','accessoires'];
+
   const featuredOrder = [
   "Cacahuète","Bretzel","Curly","Chips","Monster Munch","Dragibus","Fraise Tagada",
     "Jack Daniel's","Ballantine's","Captain Morgan","Havana Club 3 ans","Absolut Vodka",
@@ -1287,9 +1444,17 @@ function catLabel(cat){
     else if (mode === "priceDesc") arr.sort((a,b) => b.price - a.price);
     else {
       arr.sort((a,b) => {
+        const ca = CATEGORY_ORDER.indexOf(a.category);
+        const cb = CATEGORY_ORDER.indexOf(b.category);
+        const rca = ca === -1 ? 9999 : ca;
+        const rcb = cb === -1 ? 9999 : cb;
+        if (rca !== rcb) return rca - rcb;
+
+        // même catégorie : ordre "mise en avant" si présent, sinon A→Z
         const ia = featuredOrder.indexOf(a.name), ib = featuredOrder.indexOf(b.name);
         const ra = ia === -1 ? 9999 : ia, rb = ib === -1 ? 9999 : ib;
         if (ra !== rb) return ra - rb;
+
         return a.name.localeCompare(b.name, 'fr');
       });
     }
