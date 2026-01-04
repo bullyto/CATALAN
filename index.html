@@ -1295,8 +1295,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
   window.closeModal = function(modalId) { modals[modalId].classList.remove('active'); };
   window.openModal = function(modalId) {
-    modals[modalId].classList.add('active');
-    if(modalId === 'articlesModal') displayProducts(getActiveCategory(), searchInput.value, sortSelect.value);
+    modals[modalId]?.classList.add('active');
+    if(modalId === 'articlesModal'){
+      try{
+        displayProducts(getActiveCategory(), (searchInput?.value||''), (sortSelect?.value||'popular'));
+      }catch(e){
+        try{ displayProducts('all', (searchInput?.value||''), (sortSelect?.value||'popular')); }catch(_e){}
+      }
+    }
   };
 
   Object.values(modals).forEach(modal => {
@@ -1318,6 +1324,7 @@ document.addEventListener('DOMContentLoaded', function() {
   ];
 
   function getActiveCategory() {
+    if(!categoryTabs) return 'all';
     const active = categoryTabs.querySelector('.tab-active');
     return active ? active.dataset.category : 'all';
   }
