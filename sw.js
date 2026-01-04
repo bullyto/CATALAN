@@ -7,7 +7,7 @@
 */
 'use strict';
 
-const VERSION = 'v2026-01-04-sw2';
+const VERSION = 'v2026-01-04-sw';
 
 const CACHE_APP_SHELL = `ac-app-${VERSION}`;
 const CACHE_PAGES     = `ac-pages-${VERSION}`;
