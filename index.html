@@ -1563,6 +1563,31 @@ const base = getProductsForCategory(category);
   // ✅ Déclenche l'age gate sur les 4 boutons principaux
   // =========================
   const callBtn = document.getElementById('callBtn');
+
+  // =========================
+  // 📈 TRACKING : bouton "APPELER"
+  // - Envoie un hit (best-effort) AVANT l'ouverture du tel:
+  // - URL: https://stats.aperos.net/e/apero_catalan.call?to=tel%3A0652336461&src=app
+  // =========================
+  const TRACK_CALL_URL = "https://stats.aperos.net/e/apero_catalan.call?to=tel%3A0652336461&src=app";
+
+  function trackCallClick(){
+    try{
+      // sendBeacon = idéal car non bloquant et fiable lors d'une navigation
+      if (navigator.sendBeacon){
+        const blob = new Blob([], { type: "text/plain" });
+        navigator.sendBeacon(TRACK_CALL_URL, blob);
+        return;
+      }
+    }catch(e){}
+
+    // Fallback fetch (best-effort)
+    try{
+      fetch(TRACK_CALL_URL, { method: "GET", mode: "no-cors", cache: "no-store", keepalive: true })
+        .catch(()=>{});
+    }catch(e){}
+  }
+
   const installBtnEl = document.getElementById('installBtn');
   const zoneBtnEl = document.getElementById('zoneBtn');
   const articlesBtnEl = document.getElementById('articlesBtn');
@@ -1570,11 +1595,11 @@ const base = getProductsForCategory(category);
   callBtn?.addEventListener('click', (e) => {
     e.preventDefault();
     requireMajorThen(() => {
+      // 🔎 tracking (best-effort) avant l'ouverture du téléphone
+      trackCallClick();
       window.location.href = callBtn.getAttribute('href') || 'tel:0652336461';
     });
-  });
-
-  // Zone + Articles : on empêche l'ouverture directe, et on ouvre après validation
+  });// Zone + Articles : on empêche l'ouverture directe, et on ouvre après validation
   zoneBtnEl?.addEventListener('click', (e) => {
     e.preventDefault();
     requireMajorThen(() => openModal('zoneModal'));
