@@ -1335,6 +1335,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   ageYes?.addEventListener("click", ()=>{
+    trackHit(TRACK_AGE_ACCEPT_URL);
     ageSetMajorWeek();
     ageHide(ageQuestion);
     if(typeof agePendingAction === "function"){
@@ -1345,6 +1346,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   ageNo?.addEventListener("click", ()=>{
+    trackHit(TRACK_AGE_REFUSE_URL);
     ageSetMinorBlock();
     ageShowBlocked();
   });
@@ -1571,7 +1573,24 @@ const base = getProductsForCategory(category);
   // =========================
   const TRACK_CALL_URL = "https://stats.aperos.net/e/apero_catalan.call?to=tel%3A0652336461&src=app";
 
-  function trackCallClick(){
+  
+  const TRACK_APP_URL = "https://stats.aperos.net/e/apero_catalan.app.click?to=https%3A%2F%2Fcatalan.aperos.net&src=app";
+  const TRACK_AGE_ACCEPT_URL = "https://stats.aperos.net/e/apero_catalan.age.accept?to=https%3A%2F%2Fcatalan.aperos.net&src=agegate";
+  const TRACK_AGE_REFUSE_URL = "https://stats.aperos.net/e/apero_catalan.age.refuse?to=https%3A%2F%2Fcatalan.aperos.net&src=agegate";
+
+  function trackHit(url){
+    try{
+      // Ne doit jamais casser l'UX : tracking discret, sans navigation.
+      if(navigator.sendBeacon){
+        const blob = new Blob([], { type: "application/octet-stream" });
+        navigator.sendBeacon(url, blob);
+      } else {
+        fetch(url, { method: "GET", mode: "no-cors", keepalive: true, cache: "no-store" }).catch(()=>{});
+      }
+    }catch(e){}
+  }
+
+function trackCallClick(){
     try{
       // sendBeacon = idéal car non bloquant et fiable lors d'une navigation
       if (navigator.sendBeacon){
@@ -1645,7 +1664,11 @@ window.addEventListener('beforeinstallprompt', (e) => {
 
 installBtn?.addEventListener('click', async () => {
   if (!deferredPrompt) return;
-  installBtn.classList.add('hidden');
+  
+  trackHit(TRACK_APP_URL);
+installBtn.classList.add('hidden');
+  
+  trackHit(TRACK_APP_URL);
   deferredPrompt.prompt();
   try { await deferredPrompt.userChoice; } catch(e) {}
   deferredPrompt = null;
