@@ -5,14 +5,22 @@
   "start_url": "./?src=pwa",
   "scope": "./",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui", "browser"],
+  "display_override": [
+    "standalone",
+    "minimal-ui",
+    "browser"
+  ],
   "orientation": "portrait",
   "lang": "fr-FR",
   "dir": "ltr",
   "theme_color": "#8a0b0b",
   "background_color": "#2a0a0c",
   "description": "Épicerie de nuit catalane • Livraison 7j/7 de 19h à 6h • Appel direct",
-  "categories": ["shopping", "food", "delivery"],
+  "categories": [
+    "shopping",
+    "food",
+    "delivery"
+  ],
   "launch_handler": {
     "client_mode": "focus-existing"
   },
@@ -51,8 +59,8 @@
       "url": "./?src=shortcut&action=call",
       "icons": [
         {
-          "src": "icons/icon-192.png",
-          "sizes": "192x192",
+          "src": "icons/shortcut-call-96.png",
+          "sizes": "96x96",
           "type": "image/png"
         }
       ]
@@ -83,5 +91,22 @@
         }
       ]
     }
-  ]
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/narrow-1080x1920.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Accueil (mobile)"
+    },
+    {
+      "src": "screenshots/wide-1920x1080.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Accueil (desktop)"
+    }
+  ],
+  "prefer_related_applications": false
 }
