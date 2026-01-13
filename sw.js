@@ -18,12 +18,16 @@ const CACHE_CDN       = `ac-cdn-${VERSION}`;
 const APP_SHELL_URLS = [
   './',
   './index.html',
-  './manifest.webmanifest?v=20251223',
+  './manifest.webmanifest',
   './favicon.ico?v=20251223',
   './icon-32.png?v=20251223',
-  './icon-192.png?v=20251223',
-  './icon-512.png?v=20251223',
-  './apple-touch-icon.png?v=20251223'
+  './icon-192.png',
+  './icon-512.png',
+  './apple-touch-icon.png',
+  './icon-192-maskable.png',
+  './icon-512-maskable.png',
+  './screenshots/screen-1.png',
+  './screenshots/screen-2.png'
 ];
 
 async function trimCache(cacheName, maxEntries) {

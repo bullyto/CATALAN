@@ -2,7 +2,7 @@
   "name": "L'apéro catalan®",
   "short_name": "Apéro Catalan®",
   "description": "Épicerie de nuit catalan • Livraison 7j/7 de 19h à 6h • Appel direct",
-  "lang": "fr",
+  "lang": "fr-FR",
   "start_url": "./?src=pwa",
   "scope": "./",
   "display": "standalone",
@@ -11,28 +11,59 @@
   "theme_color": "#8a0b0b",
   "icons": [
     {
-      "src": "./icon-192.png?v=20251223",
+      "src": "./icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./icon-512.png?v=20251223",
+      "src": "./icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./icon-192.png?v=20251223",
+      "src": "./icon-192-maskable.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "./icon-512.png?v=20251223",
+      "src": "./icon-512-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "./apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
     }
-  ]
+  ],
+  "id": "./",
+  "dir": "ltr",
+  "categories": [
+    "food",
+    "shopping",
+    "business"
+  ],
+  "screenshots": [
+    {
+      "src": "./screenshots/screen-1.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "./screenshots/screen-2.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "prefer_related_applications": false
 }
