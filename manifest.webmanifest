@@ -1,69 +1,87 @@
 {
   "name": "L'apéro catalan®",
-  "short_name": "Apéro Catalan®",
-  "description": "Épicerie de nuit catalan • Livraison 7j/7 de 19h à 6h • Appel direct",
-  "lang": "fr-FR",
+  "short_name": "Apéro Catalan",
+  "id": "/?src=pwa",
   "start_url": "./?src=pwa",
   "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
   "orientation": "portrait",
-  "background_color": "#2a0a0c",
-  "theme_color": "#8a0b0b",
-  "icons": [
-    {
-      "src": "./icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "./icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "./icon-192-maskable.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "./icon-512-maskable.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "./apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any"
-    }
-  ],
-  "id": "./",
+  "lang": "fr-FR",
   "dir": "ltr",
-  "categories": [
-    "food",
-    "shopping",
-    "business"
-  ],
-  "screenshots": [
-    {
-      "src": "./screenshots/screen-1.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow"
-    },
-    {
-      "src": "./screenshots/screen-2.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow"
-    }
-  ],
+  "theme_color": "#8a0b0b",
+  "background_color": "#2a0a0c",
+  "description": "Épicerie de nuit catalane • Livraison 7j/7 de 19h à 6h • Appel direct",
+  "categories": ["shopping", "food", "delivery"],
   "launch_handler": {
     "client_mode": "focus-existing"
   },
-  "prefer_related_applications": false
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Commander",
+      "short_name": "Commander",
+      "description": "Ouvrir l'app pour commander",
+      "url": "./?src=shortcut&action=order",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Appeler",
+      "short_name": "Appeler",
+      "description": "Accès rapide à l'appel",
+      "url": "./?src=shortcut&action=call",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Promos / Jeu",
+      "short_name": "Promo",
+      "description": "Accéder aux promos/jeux",
+      "url": "./?src=shortcut&action=promo",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Infos",
+      "short_name": "Infos",
+      "description": "Horaires et informations",
+      "url": "./?src=shortcut&action=info",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
 }
