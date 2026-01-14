@@ -163,6 +163,12 @@ self.addEventListener('fetch', event => {
 
   const url = new URL(req.url);
 
+  // ✅ EXCLUSION CRITIQUE : page de confidentialité (Google Play)
+  // On laisse le navigateur faire la requête réseau sans interception SW.
+  if (url.pathname === '/privacy.html' || url.pathname.endsWith('/privacy.html')) {
+    return;
+  }
+
   // Navigation: network-first, offline fallback to cached index.html
   if (isNavigationRequest(req) && sameOrigin(url)) {
     event.respondWith((async () => {
