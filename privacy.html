@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#8a0b0b" />
+  <meta name="description" content="Règles de confidentialité – L'apéro catalan®" />
+
+  <title>Confidentialité – L'apéro catalan®</title>
+
+  <!-- Fonts (même esprit que ta page) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* 🎨 Style inspiré de ta PWA Apéro Catalan (simple, premium, mobile-first) */
+    :root{
+      --bg:#0f0a0b;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --text:#111827;
+      --primary:#8a0b0b;
+      --primary2:#b10f0f;
+      --ring: rgba(138,11,11,.18);
+      --shadow: 0 10px 25px rgba(0,0,0,.12);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 700px at 30% -10%, rgba(177,15,15,.35), transparent 55%),
+        radial-gradient(1000px 650px at 110% 0%, rgba(138,11,11,.25), transparent 60%),
+        linear-gradient(180deg, #140c0d 0%, #0f0a0b 100%);
+      color:#fff;
+    }
+
+    /* Header */
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:50;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(180,0,0,.12);
+      box-shadow: 0 4px 18px rgba(0,0,0,.06);
+    }
+    .topbar-inner{
+      max-width:430px;
+      margin:0 auto;
+      padding:14px 14px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      justify-content:space-between;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+    .logo{
+      width:44px;height:44px;
+      border-radius:999px;
+      overflow:hidden;
+      border:2px solid rgba(138,11,11,.25);
+      box-shadow: 0 8px 18px rgba(0,0,0,.12);
+      background:#fff;
+      flex:0 0 auto;
+    }
+    .logo img{width:100%;height:100%;object-fit:cover}
+    .brand-title{
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      line-height:1.05;
+    }
+    .brand-title strong{
+      font-family: Pacifico, cursive;
+      color: var(--primary);
+      font-size:20px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .brand-title span{
+      color:#374151;
+      font-size:12px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .btn{
+      appearance:none;
+      border:0;
+      cursor:pointer;
+      padding:10px 12px;
+      border-radius:12px;
+      font-weight:700;
+      color:#fff;
+      background: linear-gradient(180deg, var(--primary2), var(--primary));
+      box-shadow: 0 10px 18px rgba(138,11,11,.22);
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      flex:0 0 auto;
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn-outline{
+      background: rgba(255,255,255,.85);
+      color: var(--primary);
+      border:1px solid rgba(138,11,11,.22);
+      box-shadow:none;
+    }
+
+    /* Layout */
+    .wrap{
+      max-width:430px;
+      margin:0 auto;
+      padding:16px 14px 28px;
+    }
+    .hero{
+      margin-top:14px;
+      padding:16px 16px 14px;
+      border-radius:18px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: 0 14px 30px rgba(0,0,0,.18);
+    }
+    .hero h1{
+      margin:0 0 8px;
+      font-size:20px;
+      letter-spacing:.2px;
+    }
+    .hero p{
+      margin:0;
+      color: rgba(255,255,255,.82);
+      font-size:13.5px;
+      line-height:1.5;
+    }
+
+    .card{
+      margin-top:14px;
+      background: var(--card);
+      color: var(--text);
+      border-radius:18px;
+      box-shadow: var(--shadow);
+      border:1px solid rgba(180,0,0,.12);
+      overflow:hidden;
+    }
+    .card-hd{
+      padding:14px 14px 10px;
+      border-bottom:1px solid rgba(17,24,39,.06);
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .pill{
+      width:34px;height:34px;
+      border-radius:12px;
+      display:grid;
+      place-items:center;
+      background: rgba(138,11,11,.10);
+      border:1px solid rgba(138,11,11,.18);
+      color: var(--primary);
+      font-weight:900;
+      flex:0 0 auto;
+    }
+    .card-hd h2{
+      margin:0;
+      font-size:15px;
+    }
+    .card-hd p{
+      margin:4px 0 0;
+      color: var(--muted);
+      font-size:13px;
+      line-height:1.45;
+    }
+    .card-bd{
+      padding:12px 14px 14px;
+      font-size:13.5px;
+      line-height:1.55;
+    }
+    .card-bd ul{
+      margin:8px 0 0 18px;
+      padding:0;
+    }
+    .card-bd li{margin:6px 0}
+
+    .notice{
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:16px;
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.14);
+      color: rgba(255,255,255,.86);
+      font-size:12.8px;
+      line-height:1.5;
+    }
+    .mutedlink{color: var(--primary); text-decoration: underline}
+    .footer{
+      margin-top:18px;
+      padding-top:12px;
+      color: rgba(255,255,255,.72);
+      font-size:12px;
+      text-align:center;
+    }
+    .mono{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:12px;
+      color:#111827;
+      background: rgba(17,24,39,.06);
+      border:1px solid rgba(17,24,39,.08);
+      padding:8px 10px;
+      border-radius:12px;
+      overflow:auto;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="logo">
+          <img
+            src="https://i.postimg.cc/MHrNcvMr/file-000000002c906243b1fb58ce1bd6d82d-1.png"
+            alt="Logo Apéro Catalan"
+          />
+        </div>
+        <div class="brand-title">
+          <strong>L'apéro catalan®</strong>
+          <span>Règles de confidentialité</span>
+        </div>
+      </div>
+
+      <a class="btn btn-outline" href="./">← Retour</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>Confidentialité & données</h1>
+      <p>
+        Cette page explique simplement quelles informations peuvent être traitées quand vous utilisez
+        <strong>L’apéro catalan®</strong>, pourquoi, et comment exercer vos droits (RGPD).
+      </p>
+    </section>
+
+    <section class="card">
+      <div class="card-hd">
+        <div class="pill">1</div>
+        <div>
+          <h2>Ce que fait l’application</h2>
+          <p>Une PWA (application web) d’accès rapide : catalogue, infos, appel direct.</p>
+        </div>
+      </div>
+      <div class="card-bd">
+        <ul>
+          <li>Pas de création de compte.</li>
+          <li>Pas de paiement intégré dans l’application.</li>
+          <li>Une partie des réglages peut être enregistrée sur votre appareil (ex : confirmation d’âge, préférences d’affichage).</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-hd">
+        <div class="pill">2</div>
+        <div>
+          <h2>Données stockées sur votre appareil</h2>
+          <p>Pour que l’expérience soit fluide, certaines infos peuvent être sauvegardées localement.</p>
+        </div>
+      </div>
+      <div class="card-bd">
+        <ul>
+          <li><strong>Vérification d’âge</strong> : mémorise votre choix pendant une durée limitée.</li>
+          <li><strong>Cache / mode hors-ligne</strong> : le navigateur peut conserver des fichiers (images, pages) pour accélérer le chargement.</li>
+        </ul>
+        <div class="notice">
+          Ces données restent principalement sur votre appareil. Vous pouvez les effacer en vidant les données du navigateur
+          (paramètres de Chrome/Safari) ou en désinstallant la PWA.
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-hd">
+        <div class="pill">3</div>
+        <div>
+          <h2>Mesure d’audience / statistiques (anonymisées)</h2>
+          <p>Pour comprendre ce qui fonctionne (ex : clic “Appeler”, “Installer”), des événements peuvent être comptabilisés.</p>
+        </div>
+      </div>
+      <div class="card-bd">
+        <p>
+          Quand vous cliquez sur certains boutons, l’application peut envoyer un événement de statistique vers une URL de suivi.
+          Ces événements servent uniquement à améliorer l’expérience et piloter l’activité.
+        </p>
+        <ul>
+          <li>Exemples : clic sur <strong>Appeler</strong>, clic <strong>Installer</strong>, navigation de base.</li>
+          <li>Données techniques possibles : type d’appareil, navigateur, source (ex : “facebook”).</li>
+        </ul>
+
+        <p style="margin-top:10px;margin-bottom:6px;"><strong>Exemple d’URL de suivi (format) :</strong></p>
+        <div class="mono">https://stats.aperos.net/…</div>
+
+        <div class="notice">
+          Objectif : statistiques globales. Pas de profilage publicitaire et pas de revente de données.
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-hd">
+        <div class="pill">4</div>
+        <div>
+          <h2>Partage des données</h2>
+          <p>Seulement avec les services nécessaires au fonctionnement.</p>
+        </div>
+      </div>
+      <div class="card-bd">
+        <ul>
+          <li><strong>Hébergement</strong> : site hébergé en statique et servi via HTTPS.</li>
+          <li><strong>Statistiques</strong> : service technique de collecte (ex : via infrastructure Cloudflare / endpoint stats).</li>
+        </ul>
+        <p style="margin-top:10px;color:#6b7280">
+          Remarque : selon votre appareil, le navigateur / système peut aussi appliquer ses propres politiques (cache, journaux, etc.).
+        </p>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-hd">
+        <div class="pill">5</div>
+        <div>
+          <h2>Vos droits (RGPD)</h2>
+          <p>Accès, rectification, suppression, opposition, limitation…</p>
+        </div>
+      </div>
+      <div class="card-bd">
+        <p>
+          Si tu veux exercer tes droits ou poser une question, contacte-nous en précisant
+          l’application et, si possible, la date/heure approximative du problème.
+        </p>
+        <ul>
+          <li><strong>Email :</strong> <a class="mutedlink" href="mailto:contact@aperos.net">contact@aperos.net</a></li>
+          <li><strong>Téléphone :</strong> <a class="mutedlink" href="tel:0652336461">06 52 33 64 61</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="notice">
+      <strong>Dernière mise à jour :</strong> 14/01/2026.<br/>
+      Cette page peut évoluer (ex : ajout d’une fonctionnalité). La version publiée ici fait foi.
+    </section>
+
+    <div class="footer">
+      © L’apéro catalan® — Confidentialité
+    </div>
+  </main>
+</body>
+</html>
