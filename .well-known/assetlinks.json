@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "net.aperos.catalan",
+      "sha256_cert_fingerprints": [
+        "26:B7:CE:71:56:6D:FF:42:FC:4E:65:2D:EE:62:50:F0:CD:08:38:5C:B8:19:B5:2A:85:EF:5C:61:EE:63:43:04"
+      ]
+    }
+  }
+]
