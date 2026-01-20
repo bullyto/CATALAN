@@ -707,7 +707,7 @@
 
   <!-- ✅ 2/4 bouton principal (INSTALL) => déclenche l'age gate -->
   <button id="installBtn"
-          class="w-full bg-[#FFC107] text-white py-4 !rounded-button font-semibold flex items-center justify-center gap-2 shadow-lg hover:opacity-95 transition hidden cursor-pointer">
+          class="w-full bg-[#FFC107] text-white py-4 !rounded-button font-semibold flex items-center justify-center gap-2 shadow-lg hover:opacity-95 transition hidden">
     <i class="ri-download-cloud-2-line text-xl"></i>
     AJOUTER À L'ÉCRAN D'ACCUEIL
   </button>
@@ -1645,132 +1645,52 @@ function trackCallClick(){
 });
 </script>
 
-<!-- ✅ Installation PWA (Android / iOS) + masquage si app Play Store déjà installée -->
+<!-- ✅ Installation PWA (sans worker pour l’instant) -->
 <script>
-(() => {
-  let deferredPrompt = null;
-  const installBtn = document.getElementById('installBtn');
-  const installHint = document.getElementById('installHint');
+let deferredPrompt = null;
+const installBtn = document.getElementById('installBtn');
+const installHint = document.getElementById('installHint');
 
-  if (!installBtn) return;
+function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent); }
+function isInStandalone() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
 
-  function isIOS() {
-    return /iphone|ipad|ipod/i.test(navigator.userAgent);
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (!isInStandalone()) installBtn.classList.remove('hidden');
+});
+
+installBtn?.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  
+  trackHit(TRACK_APP_URL);
+installBtn.classList.add('hidden');
+  
+  trackHit(TRACK_APP_URL);
+  deferredPrompt.prompt();
+  try { await deferredPrompt.userChoice; } catch(e) {}
+  deferredPrompt = null;
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
+  installBtn?.classList.add('hidden');
+});
+
+window.addEventListener('load', () => {
+  if (isIOS() && !isInStandalone()) {
+    setTimeout(() => {
+      installBtn.classList.remove('hidden');
+      installBtn.addEventListener('click', () => {
+        installHint.classList.remove('hidden');
+      }, { once: true });
+    }, 800);
   }
-
-  function isInStandalone() {
-    return (
-      window.matchMedia('(display-mode: standalone)').matches ||
-      window.matchMedia('(display-mode: fullscreen)').matches ||
-      window.matchMedia('(display-mode: minimal-ui)').matches ||
-      window.navigator.standalone === true
-    );
-  }
-
-  function cameFromAndroidApp() {
-    return (document.referrer || '').startsWith('android-app://');
-  }
-
-  async function hasInstalledRelatedApp() {
-    // API Chromium : permet de savoir si l'app Play Store (TWA) liée est installée
-    try {
-      if (!('getInstalledRelatedApps' in navigator)) return false;
-      const related = await navigator.getInstalledRelatedApps();
-      return Array.isArray(related) && related.length > 0;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  function showInstallBtn() {
-    installBtn.classList.remove('hidden');
-  }
-
-  function hideInstallBtn() {
-    installBtn.classList.add('hidden');
-  }
-
-  async function syncInstallVisibility() {
-    // Si on est déjà dans l'app installée (standalone/TWA), on cache.
-    if (isInStandalone() || cameFromAndroidApp()) {
-      hideInstallBtn();
-      return;
-    }
-
-    // Si l'app liée Play Store est installée, on cache aussi.
-    const related = await hasInstalledRelatedApp();
-    if (related) {
-      hideInstallBtn();
-      return;
-    }
-
-    // Sinon, on laisse la logique beforeinstallprompt décider.
-    // On ne force pas l'affichage ici.
-  }
-
-  // Au chargement : masque si déjà installé (app Play Store / standalone)
-  window.addEventListener('load', () => {
-    syncInstallVisibility();
-
-    // iOS : pas de beforeinstallprompt, on affiche le bouton + hint.
-    if (isIOS() && !isInStandalone()) {
-      setTimeout(() => {
-        showInstallBtn();
-        installBtn.addEventListener('click', () => {
-          if (installHint) installHint.classList.remove('hidden');
-        }, { once: true });
-      }, 800);
-    }
-  });
-
-  // Android/Chromium : prompt d'installation
-  window.addEventListener('beforeinstallprompt', async (e) => {
-    e.preventDefault();
-
-    // Si déjà installé (app Play Store), on ne montre pas.
-    await syncInstallVisibility();
-    if (installBtn.classList.contains('hidden')) return;
-
-    deferredPrompt = e;
-    if (!isInStandalone()) showInstallBtn();
-  });
-
-  installBtn.addEventListener('click', async () => {
-    // Si pas de prompt (ou déjà installé), on affiche un message utile.
-    if (!deferredPrompt) {
-      // Re-sync au cas où l'app a été installée via Play Store entre temps
-      await syncInstallVisibility();
-      if (installBtn.classList.contains('hidden')) {
-        alert("Application déjà installée sur cet appareil.");
-        return;
-      }
-
-      alert("Installation automatique indisponible ici.\n\n➡️ Ouvre le site dans Chrome, puis menu ⋮ > ‘Ajouter à l’écran d’accueil’.\nOu installe via le Play Store si disponible.");
-      return;
-    }
-
-    try {
-      // Tracking best-effort (si défini plus haut)
-      try { if (typeof trackHit === 'function' && typeof TRACK_APP_URL === 'string') trackHit(TRACK_APP_URL); } catch(e) {}
-
-      deferredPrompt.prompt();
-      try { await deferredPrompt.userChoice; } catch (e) {}
-      deferredPrompt = null;
-
-      // On masque le bouton après tentative (UX)
-      hideInstallBtn();
-    } catch (e) {
-      deferredPrompt = null;
-      alert("Impossible de lancer l’installation automatiquement.\n\n➡️ Dans Chrome : menu ⋮ > ‘Ajouter à l’écran d’accueil’.");
-    }
-  });
-
-  window.addEventListener('appinstalled', () => {
-    deferredPrompt = null;
-    hideInstallBtn();
-  });
-})();
+});
 </script>
+
 <!-- ===== GLOBAL STATUS POPUP (commun aux 2 sites) ===== -->
 <div id="globalStatusOverlay" class="fixed inset-0 z-[999997] hidden items-center justify-center p-4 bg-black/70 backdrop-blur-md">
   <div class="w-[min(560px,94vw)] overflow-hidden rounded-3xl border border-white/10 shadow-2xl"
