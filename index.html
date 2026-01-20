@@ -598,39 +598,27 @@
     }
     .ageFine a{ color:#ffd36b; text-decoration:none; font-weight: 900; }
     .ageFine a:hover{ text-decoration: underline; }
-
-
-    /* =========================
-       ✅ Play Store CTA (pulse jaune/rouge)
-       - alternance jaune puis rouge
-       - halo autour du bouton
-       ========================= */
-    .play-pulse{
-      position:relative;
-      display:inline-flex;
-      justify-content:center;
-      align-items:center;
-    }
-    .play-pulse::before{
-      content:"";
-      position:absolute;
-      inset:-6px;
-      border-radius:18px;
-      pointer-events:none;
-      box-shadow: 0 0 0 0 rgba(255,184,28,.55);
-      animation: playPulse 1.6s ease-in-out infinite;
-    }
-    @keyframes playPulse{
-      0%{ box-shadow: 0 0 0 0 rgba(255,184,28,.60); }
-      45%{ box-shadow: 0 0 0 14px rgba(255,184,28,0); }
-      50%{ box-shadow: 0 0 0 0 rgba(198,25,16,.60); }
-      95%{ box-shadow: 0 0 0 14px rgba(198,25,16,0); }
-      100%{ box-shadow: 0 0 0 0 rgba(255,184,28,.0); }
-    }
-    @media (prefers-reduced-motion: reduce){
-      .play-pulse::before{ animation:none !important; }
-    }
   </style>
+
+<style>
+@keyframes pulseRedYellow {
+  0% { box-shadow: 0 0 0 0 rgba(220,38,38,0.9); }
+  50% { box-shadow: 0 0 0 14px rgba(255,193,7,0.9); }
+  100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.9); }
+}
+.playstore-cta {
+  display:inline-block;
+  cursor:pointer;
+  border-radius:14px;
+  animation:pulseRedYellow 1.8s infinite;
+  transition:transform .15s ease;
+}
+.playstore-cta:active { transform:scale(.96); }
+
+/* suppression totale ancien bouton add to home */
+#installBtn, .add-to-home, .a2hs { display:none !important; }
+</style>
+
 </head>
 
 <body class="w-full max-w-[430px] min-h-[100svh] mx-auto relative"
@@ -737,6 +725,16 @@
     <span>APPELER</span>
   </a>
 
+  <!-- ✅ 2/4 bouton principal (INSTALL) => déclenche l'age gate -->
+  <button id="installBtn"
+          class="w-full bg-[#FFC107] text-white py-4 !rounded-button font-semibold flex items-center justify-center gap-2 shadow-lg hover:opacity-95 transition hidden">
+    <i class="ri-download-cloud-2-line text-xl"></i>
+    AJOUTER À L'ÉCRAN D'ACCUEIL
+  </button>
+  <p id="installHint" class="text-xs text-white/90 text-center hidden">
+    Sur iPhone : appuie sur <b>Partager</b> puis <b>Sur l’écran d’accueil</b>.
+  </p>
+
   <!-- ✅ 3/4 bouton principal (ZONE) => déclenche l'age gate -->
   <button id="zoneBtn"
           class="w-full py-4 bg-secondary text-white font-semibold !rounded-button flex items-center justify-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
@@ -775,25 +773,6 @@
         <span>Paiement en espèces ou carte bancaire au véhicule</span>
       </li>
     </ul>
-
-    <!-- ✅ Bouton officiel Play Store (site uniquement) -->
-    <div id="playStoreCta" class="mt-4" style="display:none;">
-      <p id="playStoreText" class="text-sm font-semibold text-primary mb-2">Télécharger l’application officielle</p>
-      <a id="playStoreBtn"
-         href="https://play.google.com/store/apps/details?id=net.aperos.catalan"
-         target="_blank"
-         rel="noopener"
-         class="play-pulse inline-flex items-center justify-center w-full !rounded-button overflow-hidden">
-        <span class="sr-only">Télécharger sur Google Play</span>
-        <img
-          src="https://play.google.com/intl/en_us/badges/static/images/badges/fr_badge_web_generic.png"
-          alt="Télécharger sur Google Play"
-          class="w-full h-[64px] object-contain bg-black rounded-xl"
-          loading="lazy"
-        >
-      </a>
-      <p id="playStoreFine" class="text-xs text-gray-600 mt-2">Bouton disponible uniquement sur le site • disparaît après installation.</p>
-    </div>
   </div>
 </main>
 
@@ -1686,68 +1665,50 @@ function trackCallClick(){
 });
 </script>
 
-<!-- ✅ Play Store CTA (remplace l'installation PWA) -->
+<!-- ✅ Installation PWA (sans worker pour l’instant) -->
 <script>
-(function(){
-  const cta = document.getElementById('playStoreCta');
-  const btn = document.getElementById('playStoreBtn');
-  const txt = document.getElementById('playStoreText');
-  const fine = document.getElementById('playStoreFine');
-  if(!cta || !btn) return;
+let deferredPrompt = null;
+const installBtn = document.getElementById('installBtn');
+const installHint = document.getElementById('installHint');
 
-  const PLAY_PKG = 'net.aperos.catalan';
+function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent); }
+function isInStandalone() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
 
-  function isStandalone(){
-    return (
-      window.matchMedia('(display-mode: standalone)').matches ||
-      window.matchMedia('(display-mode: fullscreen)').matches ||
-      window.matchMedia('(display-mode: minimal-ui)').matches ||
-      window.navigator.standalone === true
-    );
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (!isInStandalone()) installBtn.classList.remove('hidden');
+});
+
+installBtn?.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  
+  trackHit(TRACK_APP_URL);
+installBtn.classList.add('hidden');
+  
+  trackHit(TRACK_APP_URL);
+  deferredPrompt.prompt();
+  try { await deferredPrompt.userChoice; } catch(e) {}
+  deferredPrompt = null;
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
+  installBtn?.classList.add('hidden');
+});
+
+window.addEventListener('load', () => {
+  if (isIOS() && !isInStandalone()) {
+    setTimeout(() => {
+      installBtn.classList.remove('hidden');
+      installBtn.addEventListener('click', () => {
+        installHint.classList.remove('hidden');
+      }, { once: true });
+    }, 800);
   }
-
-  function isFromAndroidApp(){
-    return (document.referrer || '').startsWith('android-app://');
-  }
-
-  function hideCta(){
-    cta.style.display = 'none';
-  }
-
-  // 1) Si on est dans l'app (TWA/standalone) => jamais afficher
-  if(isStandalone() || isFromAndroidApp()){
-    hideCta();
-    return;
-  }
-
-  // 2) Si le navigateur sait détecter l'app Play installée => masquer
-  (async () => {
-    try{
-      if(navigator.getInstalledRelatedApps){
-        const related = await navigator.getInstalledRelatedApps();
-        if(Array.isArray(related) && related.some(a => (a && (a.id === PLAY_PKG || a.platform === 'play')))){
-          hideCta();
-          return;
-        }
-      }
-    }catch(e){}
-
-    // 3) Sinon => visible sur le site web classique
-    cta.style.display = '';
-  })();
-
-  // Tracking best-effort (ne casse jamais)
-  btn.addEventListener('click', () => {
-    try{
-      const url = 'https://stats.aperos.net/e/apero_catalan.playstore.click?to=' + encodeURIComponent(btn.href) + '&src=site';
-      if(navigator.sendBeacon){
-        navigator.sendBeacon(url, new Blob([], {type:'application/octet-stream'}));
-      }else{
-        fetch(url, {method:'GET', mode:'no-cors', keepalive:true, cache:'no-store'}).catch(()=>{});
-      }
-    }catch(e){}
-  }, {passive:true});
-})();
+});
 </script>
 
 <!-- ===== GLOBAL STATUS POPUP (commun aux 2 sites) ===== -->
@@ -2079,6 +2040,37 @@ function trackCallClick(){
   if (!isPWA) { overlay.remove(); return; }
   // Let the app load in the background while we show the loader
   window.setTimeout(() => overlay.remove(), 2700);
+})();
+</script>
+
+
+<script>
+(function(){
+  const PLAY_URL="https://play.google.com/store/apps/details?id=net.aperos.catalan";
+  const isInApp =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.matchMedia('(display-mode: fullscreen)').matches ||
+    window.matchMedia('(display-mode: minimal-ui)').matches ||
+    window.navigator.standalone===true ||
+    (document.referrer && document.referrer.startsWith('android-app://'));
+
+  if(isInApp) return;
+
+  const container = document.querySelector('.horaires, .horaires-zone, .delivery-hours') || document.body;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `
+    <p style="font-weight:700;color:#b91c1c;margin-top:16px;text-align:center;">
+      Télécharger l’application officielle
+    </p>
+    <a href="${PLAY_URL}" class="playstore-cta" id="playStoreBtn" aria-label="Télécharger sur Google Play">
+      <img src="https://play.google.com/intl/en_us/badges/static/images/badges/fr_badge_web_generic.png"
+           alt="Disponible sur Google Play" style="height:64px;display:block;margin:0 auto;">
+    </a>
+    <p style="font-size:12px;color:#6b7280;text-align:center;margin-top:8px;">
+      Bouton disponible uniquement sur le site • disparaît après installation.
+    </p>
+  `;
+  container.appendChild(wrap);
 })();
 </script>
 
