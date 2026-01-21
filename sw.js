@@ -40,9 +40,7 @@ const APP_SHELL_URLS = [
   './icon-512-maskable.png',
   './livraisons_alcool_66.html',
   './privacy.html',
-  // Optionnel (si tu as un vrai offline.html)
   './offline.html',
-  // Optionnel (si tu les utilises vraiment)
   './screenshots/screen-1.png',
   './screenshots/screen-2.png'
 ];
@@ -86,7 +84,7 @@ function isCdnAsset(url) {
           url.hostname.includes('cdn.jsdelivr.net'));
 }
 
-// SEO/Crawl helpers (ne pas “casser” robots/sitemap)
+// Livraison d'alcool la nuit à perpignan
 function isRobotsOrSitemap(url) {
   if (!sameOrigin(url)) return false;
   return (
