@@ -1,13 +1,15 @@
-/* Apéro PWA Service Worker
+/* Apéro PWA Service Worker (SEO-safe + perf)
    - App shell precache
-   - Offline navigation fallback
+   - Offline navigation fallback (offline.html si présent, sinon index)
    - Stock snapshot: network-first with timeout + cache fallback
-   - GitHub raw images: stale-while-revalidate
+   - GitHub raw images: stale-while-revalidate (opaque allowed)
    - CDN assets: stale-while-revalidate (opaque allowed)
+   - Cache trim to avoid bloat
+   - Navigation Preload enabled (when supported)
 */
 'use strict';
 
-const VERSION = 'v2026-01-06-sw';
+const VERSION = 'v2026-01-21-sw';
 
 const CACHE_APP_SHELL = `ac-app-${VERSION}`;
 const CACHE_PAGES     = `ac-pages-${VERSION}`;
@@ -15,6 +17,16 @@ const CACHE_IMG       = `ac-img-${VERSION}`;
 const CACHE_API       = `ac-api-${VERSION}`;
 const CACHE_CDN       = `ac-cdn-${VERSION}`;
 
+const MAX_PAGES = 40;
+const MAX_IMG   = 180;
+const MAX_API   = 40;
+const MAX_CDN   = 60;
+
+// IMPORTANT:
+// - Ne surcharge pas l'app-shell (évite de precacher trop lourd inutilement).
+// - Les pages essentielles ok.
+// - Les screenshots: garde si tu en as besoin pour install prompt / PWA builder,
+//   sinon tu peux les retirer pour réduire le precache.
 const APP_SHELL_URLS = [
   './',
   './index.html',
@@ -26,6 +38,11 @@ const APP_SHELL_URLS = [
   './apple-touch-icon.png',
   './icon-192-maskable.png',
   './icon-512-maskable.png',
+  './livraisons_alcool_66.html',
+  './privacy.html',
+  // Optionnel (si tu as un vrai offline.html)
+  './offline.html',
+  // Optionnel (si tu les utilises vraiment)
   './screenshots/screen-1.png',
   './screenshots/screen-2.png'
 ];
@@ -60,81 +77,99 @@ function isStockSnapshot(url) {
     && url.pathname.includes('/bullyto/stock/main/stock/_snapshot.json');
 }
 
-function isCDN(url) {
-  return [
-    'cdn.tailwindcss.com',
-    'fonts.googleapis.com',
-    'fonts.gstatic.com',
-    'cdn.jsdelivr.net',
-    'unpkg.com'
-  ].includes(url.hostname);
+function isCdnAsset(url) {
+  return (url.hostname.includes('cdnjs') ||
+          url.hostname.includes('jsdelivr') ||
+          url.hostname.includes('unpkg') ||
+          url.hostname.includes('fonts.googleapis.com') ||
+          url.hostname.includes('fonts.gstatic.com') ||
+          url.hostname.includes('cdn.jsdelivr.net'));
 }
 
-function isBackgroundImageHost(url) {
-  return url.hostname === 'readdy.ai' || url.hostname.endsWith('.readdy.ai');
+// SEO/Crawl helpers (ne pas “casser” robots/sitemap)
+function isRobotsOrSitemap(url) {
+  if (!sameOrigin(url)) return false;
+  return (
+    url.pathname === '/robots.txt' ||
+    url.pathname === '/sitemap.xml' ||
+    url.pathname.endsWith('.xml')
+  );
 }
 
-async function cacheFirst(request, cacheName, {maxEntries} = {}) {
+async function cacheFirst(request, cacheName, allowOpaque = false) {
   const cache = await caches.open(cacheName);
-  const cached = await cache.match(request, { ignoreSearch: false });
+  const cached = await cache.match(request);
   if (cached) return cached;
 
   const res = await fetch(request);
-  if (res && (res.ok || res.type === 'opaque')) {
-    cache.put(request, res.clone()).catch(()=>{});
-    if (maxEntries) trimCache(cacheName, maxEntries);
+  if (res && (res.ok || (allowOpaque && res.type === 'opaque'))) {
+    cache.put(request, res.clone());
   }
   return res;
 }
 
-async function staleWhileRevalidate(request, cacheName, {maxEntries} = {}) {
+async function staleWhileRevalidate(request, cacheName, allowOpaque = false) {
   const cache = await caches.open(cacheName);
-  const cached = await cache.match(request, { ignoreSearch: false });
+  const cached = await cache.match(request);
 
-  const networkPromise = fetch(request).then(res => {
-    if (res && (res.ok || res.type === 'opaque')) {
-      cache.put(request, res.clone()).catch(()=>{});
-      if (maxEntries) trimCache(cacheName, maxEntries);
+  const fetchPromise = fetch(request).then(res => {
+    if (res && (res.ok || (allowOpaque && res.type === 'opaque'))) {
+      cache.put(request, res.clone());
     }
     return res;
-  }).catch(()=>null);
+  }).catch(() => null);
 
-  if (cached) {
-    networkPromise.catch(()=>{});
-    return cached;
-  }
-
-  const net = await networkPromise;
-  if (net) return net;
-
-  const cachedLoose = await cache.match(request, { ignoreSearch: true });
-  if (cachedLoose) return cachedLoose;
-
-  throw new Error('No response');
+  return cached || (await fetchPromise) || cached;
 }
 
-async function networkFirst(request, cacheName, {timeoutMs = 2500, maxEntries} = {}) {
+async function networkFirst(request, cacheName, timeoutMs = 4500) {
   const cache = await caches.open(cacheName);
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  let timer;
 
   try {
+    const controller = new AbortController();
+    timer = setTimeout(() => controller.abort(), timeoutMs);
+
+    // Navigation Preload: si dispo, on l’utilise
+    // (ne s’applique réellement que sur navigations, mais safe partout)
+    const preloadResponse = request.mode === 'navigate' && self.registration.navigationPreload
+      ? await eventPreloadMaybe()
+      : null;
+
+    if (preloadResponse) {
+      clearTimeout(timer);
+      if (preloadResponse.ok) cache.put(request, preloadResponse.clone());
+      return preloadResponse;
+    }
+
     const res = await fetch(request, { signal: controller.signal });
     clearTimeout(timer);
-    if (res && (res.ok || res.type === 'opaque')) {
-      cache.put(request, res.clone()).catch(()=>{});
-      if (maxEntries) trimCache(cacheName, maxEntries);
-    }
+
+    // On ne cache que les 200 OK (évite de “mémoriser” des 404)
+    if (res && res.ok) cache.put(request, res.clone());
     return res;
   } catch (e) {
     clearTimeout(timer);
-    const cached = await cache.match(request, { ignoreSearch: true });
+    const cached = await cache.match(request);
     if (cached) return cached;
     throw e;
   }
 }
 
-self.addEventListener('install', event => {
+// Petite astuce: navigationPreload response récupérable via event.preloadResponse,
+// mais on ne l’a pas hors scope. On utilise une variable temporaire.
+let __currentEvent = null;
+async function eventPreloadMaybe() {
+  try {
+    if (!__currentEvent) return null;
+    const pr = await __currentEvent.preloadResponse;
+    return pr || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_APP_SHELL);
     await cache.addAll(APP_SHELL_URLS);
@@ -142,83 +177,126 @@ self.addEventListener('install', event => {
   })());
 });
 
-self.addEventListener('activate', event => {
+self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
+    // Enable navigation preload (perf)
+    try {
+      if (self.registration.navigationPreload) {
+        await self.registration.navigationPreload.enable();
+      }
+    } catch (e) {}
+
+    // Cleanup old caches
     const keys = await caches.keys();
     await Promise.all(keys.map(k => {
       if (k.startsWith('ac-') && !k.includes(VERSION)) return caches.delete(k);
+      return null;
     }));
+
+    // Trim current caches
+    await trimCache(CACHE_PAGES, MAX_PAGES);
+    await trimCache(CACHE_IMG, MAX_IMG);
+    await trimCache(CACHE_API, MAX_API);
+    await trimCache(CACHE_CDN, MAX_CDN);
+
     await self.clients.claim();
   })());
 });
 
-self.addEventListener('message', event => {
-  const data = event.data || {};
-  if (data.type === 'SKIP_WAITING') self.skipWaiting();
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
 
-self.addEventListener('fetch', event => {
-  const req = event.request;
-  if (req.method !== 'GET') return;
+self.addEventListener('fetch', (event) => {
+  __currentEvent = event;
 
-  const url = new URL(req.url);
+  const request = event.request;
+  const url = new URL(request.url);
 
-  // ✅ EXCLUSION CRITIQUE : page de confidentialité (Google Play)
-  // On laisse le navigateur faire la requête réseau sans interception SW.
-  if (url.pathname === '/privacy.html' || url.pathname.endsWith('/privacy.html')) {
-    return;
-  }
+  // ignore non-GET
+  if (request.method !== 'GET') return;
 
-  // Navigation: network-first, offline fallback to cached index.html
-  if (isNavigationRequest(req) && sameOrigin(url)) {
+  // robots / sitemap : network-first court (SEO-safe) + fallback cache
+  if (isRobotsOrSitemap(url)) {
     event.respondWith((async () => {
       try {
-        return await networkFirst(req, CACHE_PAGES, { timeoutMs: 3500, maxEntries: 20 });
+        const res = await networkFirst(request, CACHE_PAGES, 2500);
+        return res;
       } catch (e) {
-        const cache = await caches.open(CACHE_APP_SHELL);
-        const fallback = await cache.match('./index.html') || await cache.match('./');
-        return fallback || new Response('Offline', { status: 503, headers: {'Content-Type':'text/plain'} });
+        const cache = await caches.open(CACHE_PAGES);
+        const cached = await cache.match(request);
+        return cached || fetch(request);
       }
     })());
     return;
   }
 
-  // Same-origin assets: stale-while-revalidate for speed
-  if (sameOrigin(url)) {
-    event.respondWith(staleWhileRevalidate(req, CACHE_APP_SHELL, { maxEntries: 80 }));
-    return;
-  }
-
-  // Stock snapshot: network-first with short timeout
+  // stock snapshot (json) : network-first + fallback cache
   if (isStockSnapshot(url)) {
-    event.respondWith(networkFirst(req, CACHE_API, { timeoutMs: 2000, maxEntries: 10 }));
+    event.respondWith((async () => {
+      try {
+        const res = await networkFirst(request, CACHE_API, 4500);
+        // trim après usage
+        trimCache(CACHE_API, MAX_API);
+        return res;
+      } catch (e) {
+        const cache = await caches.open(CACHE_API);
+        const cached = await cache.match(request);
+        return cached || new Response('{"ok":false,"error":"offline"}', {
+          status: 503,
+          headers: { 'content-type': 'application/json; charset=utf-8' }
+        });
+      }
+    })());
     return;
   }
 
-  // Product images: stale-while-revalidate
+  // GitHub raw images: SWR
   if (isGitHubRawImage(url)) {
-    event.respondWith(staleWhileRevalidate(req, CACHE_IMG, { maxEntries: 150 }));
+    event.respondWith((async () => {
+      const res = await staleWhileRevalidate(request, CACHE_IMG, true);
+      trimCache(CACHE_IMG, MAX_IMG);
+      return res;
+    })());
     return;
   }
 
-  // Background images (readdy): cache-first
-  if (isBackgroundImageHost(url)) {
-    event.respondWith(cacheFirst(req, CACHE_IMG, { maxEntries: 40 }));
+  // CDN assets: SWR (opaque allowed)
+  if (isCdnAsset(url)) {
+    event.respondWith((async () => {
+      const res = await staleWhileRevalidate(request, CACHE_CDN, true);
+      trimCache(CACHE_CDN, MAX_CDN);
+      return res;
+    })());
     return;
   }
 
-  // CDNs: stale-while-revalidate
-  if (isCDN(url)) {
-    event.respondWith(staleWhileRevalidate(req, CACHE_CDN, { maxEntries: 80 }));
+  // Same-origin navigations: network-first with offline fallback
+  if (sameOrigin(url) && isNavigationRequest(request)) {
+    event.respondWith((async () => {
+      try {
+        const res = await networkFirst(request, CACHE_PAGES, 4500);
+        trimCache(CACHE_PAGES, MAX_PAGES);
+        return res;
+      } catch (e) {
+        // Offline fallback: préfère offline.html si présent
+        const cache = await caches.open(CACHE_APP_SHELL);
+        const offlinePage = (await cache.match('./offline.html')) || (await cache.match('./index.html'));
+        return offlinePage || new Response('Offline', {
+          status: 503,
+          headers: { 'content-type': 'text/plain; charset=utf-8' }
+        });
+      }
+    })());
     return;
   }
 
-  // Default
-  event.respondWith((async () => {
-    try {
-      return await cacheFirst(req, CACHE_CDN, { maxEntries: 120 });
-    } catch (e) {
-      return fetch(req);
-    }
-  })());
+  // Same-origin static files: cache-first (app-shell)
+  if (sameOrigin(url)) {
+    event.respondWith(cacheFirst(request, CACHE_APP_SHELL));
+    return;
+  }
+
+  // default: try network then cache
+  event.respondWith(fetch(request).catch(() => caches.match(request)));
 });
