@@ -1,8 +1,8 @@
 {
   "name": "L'apéro catalan®",
   "short_name": "Apéro Catalan",
-  "id": "/?src=pwa",
-  "start_url": "./?src=pwa",
+  "id": "/",
+  "start_url": "/?src=pwa",
   "scope": "./",
   "display": "standalone",
   "display_override": [
@@ -15,11 +15,13 @@
   "dir": "ltr",
   "theme_color": "#8a0b0b",
   "background_color": "#2a0a0c",
-  "description": "Épicerie de nuit catalane • Livraison 7j/7 de 19h à 6h • Appel direct",
+  "description": "Épicerie de nuit catalane dans le 66 • Livraison d’alcool 7j/7 de 19h à 6h • Commande rapide et appel direct",
   "categories": [
     "shopping",
     "food",
-    "delivery"
+    "delivery",
+    "business",
+    "lifestyle"
   ],
   "launch_handler": {
     "client_mode": "focus-existing"
@@ -29,13 +31,25 @@
       "src": "icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "shortcuts": [
@@ -43,7 +57,7 @@
       "name": "Commander",
       "short_name": "Commander",
       "description": "Ouvrir l'app pour commander",
-      "url": "./?src=shortcut&action=order",
+      "url": "/?src=shortcut&action=order",
       "icons": [
         {
           "src": "icons/icon-192.png",
@@ -56,7 +70,7 @@
       "name": "Appeler",
       "short_name": "Appeler",
       "description": "Accès rapide à l'appel",
-      "url": "./?src=shortcut&action=call",
+      "url": "/?src=shortcut&action=call",
       "icons": [
         {
           "src": "icons/shortcut-call-96.png",
@@ -66,10 +80,10 @@
       ]
     },
     {
-      "name": "Promos / Jeu",
-      "short_name": "Promo",
-      "description": "Accéder aux promos/jeux",
-      "url": "./?src=shortcut&action=promo",
+      "name": "Livraison alcool 66",
+      "short_name": "Livraison",
+      "description": "Informations sur la livraison d’alcool dans le 66",
+      "url": "/livraisons_alcool_66.html?src=shortcut",
       "icons": [
         {
           "src": "icons/icon-192.png",
@@ -79,10 +93,10 @@
       ]
     },
     {
-      "name": "Infos",
-      "short_name": "Infos",
-      "description": "Horaires et informations",
-      "url": "./?src=shortcut&action=info",
+      "name": "Confidentialité",
+      "short_name": "Privacy",
+      "description": "Politique de confidentialité",
+      "url": "/privacy.html?src=shortcut",
       "icons": [
         {
           "src": "icons/icon-192.png",
@@ -98,14 +112,14 @@
       "sizes": "1080x1920",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Accueil (mobile)"
+      "label": "Accueil mobile"
     },
     {
       "src": "screenshots/wide-1920x1080.png",
       "sizes": "1920x1080",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Accueil (desktop)"
+      "label": "Accueil desktop"
     }
   ],
   "prefer_related_applications": false
