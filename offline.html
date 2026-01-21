@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+
+  <title>Hors connexion • Apéro Catalan® • Livraison de nuit Perpignan (66)</title>
+
+  <!-- SEO (offline page: évite l’indexation, mais garde le “follow” pour le maillage) -->
+  <meta name="robots" content="noindex,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
+  <meta name="description" content="Apéro Catalan® — Livraison d’alcool de nuit à Perpignan (66) et Pyrénées-Orientales. Ouvert 7j/7 de 19h à 6h. Minimum 25€. Page hors connexion." />
+  <link rel="canonical" href="https://catalan.aperos.net/" />
+  <meta name="theme-color" content="#8a0b0b" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="format-detection" content="telephone=yes" />
+
+  <link rel="icon" href="./favicon.ico?v=20251223" />
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet" />
+
+  <style>
+    :root{
+      --primary:#C61910;
+      --secondary:#FFB81C;
+      --night:#2a0a0c;
+      --wine:#8a0b0b;
+    }
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial;
+      background:
+        radial-gradient(1000px 700px at 50% 10%, rgba(255,211,107,.22), transparent 60%),
+        radial-gradient(900px 650px at 18% 75%, rgba(198,25,16,.22), transparent 62%),
+        radial-gradient(900px 650px at 82% 72%, rgba(255,184,28,.14), transparent 62%),
+        linear-gradient(180deg, #5a1217, var(--night) 55%, #120406);
+      color:#fff;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      padding-bottom: calc(18px + env(safe-area-inset-bottom));
+      padding-top: calc(18px + env(safe-area-inset-top));
+    }
+    .glass{
+      width:100%;
+      max-width: 520px;
+      border-radius: 26px;
+      padding: 18px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 18px 70px rgba(0,0,0,.45);
+    }
+    .top{
+      display:flex;
+      gap:14px;
+      align-items:center;
+    }
+    .logo{
+      width:58px;height:58px;
+      border-radius: 18px;
+      overflow:hidden;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 18px 55px rgba(0,0,0,.50);
+      flex:0 0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .logo img{width:100%;height:100%;object-fit:cover}
+    .brand{
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .brand .name{
+      font-family:"Pacifico", cursive;
+      font-size: 22px;
+      line-height: 1;
+      color: var(--secondary);
+      text-shadow: 0 10px 30px rgba(0,0,0,.55);
+    }
+    .brand .meta{
+      font-size: 12px;
+      font-weight: 800;
+      color: rgba(255,255,255,.82);
+      line-height: 1.25;
+    }
+    .hero{
+      margin-top: 14px;
+      border-radius: 22px;
+      padding: 14px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    h1{
+      margin:0;
+      font-size: 18px;
+      font-weight: 1000;
+      letter-spacing: -0.2px;
+      line-height:1.2;
+    }
+    p{
+      margin: 10px 0 0;
+      color: rgba(255,255,255,.82);
+      font-size: 13px;
+      line-height: 1.35;
+      font-weight: 650;
+    }
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top: 12px;
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      font-weight: 900;
+      font-size: 12px;
+      color: rgba(255,255,255,.90);
+    }
+    .actions{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+    }
+    @media (min-width: 520px){
+      .actions{ grid-template-columns: 1fr 1fr; }
+    }
+    .btn{
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      appearance:none;
+      border:none;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding: 14px 14px;
+      border-radius: 16px;
+      font-weight: 1000;
+      letter-spacing: .02em;
+      text-decoration:none;
+      transition: transform .08s ease, filter .18s ease, opacity .18s ease;
+    }
+    .btn:active{ transform: scale(.99); }
+    .btnPrimary{
+      background: linear-gradient(180deg, rgba(198,25,16,1), rgba(138,11,11,1));
+      color:#fff;
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 16px 55px rgba(198,25,16,.28);
+    }
+    .btnSecondary{
+      background: linear-gradient(180deg, rgba(255,184,28,1), rgba(217,137,18,1));
+      color:#1b0b0b;
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 16px 55px rgba(255,184,28,.22);
+    }
+    .btnGhost{
+      background: rgba(255,255,255,.06);
+      color:#fff;
+      border: 1px solid rgba(255,255,255,.12);
+    }
+    .fine{
+      margin-top: 12px;
+      font-size: 11.5px;
+      line-height: 1.35;
+      color: rgba(255,255,255,.68);
+    }
+    .links{
+      margin-top: 10px;
+      display:flex;
+      gap:14px;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+    .links a{
+      font-size: 11px;
+      color: rgba(255,255,255,.65);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  </style>
+
+  <!-- JSON-LD (safe, même si noindex) -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"LocalBusiness",
+    "name":"Apéro Catalan®",
+    "url":"https://catalan.aperos.net/",
+    "telephone":"+33652336461",
+    "areaServed":["Perpignan","Pyrénées-Orientales","66"],
+    "openingHoursSpecification":[
+      {
+        "@type":"OpeningHoursSpecification",
+        "dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+        "opens":"19:00",
+        "closes":"06:00"
+      }
+    ],
+    "description":"Livraison d’alcool de nuit à Perpignan (66) et Pyrénées-Orientales. 7j/7 de 19h à 6h. Minimum 25€. Vente interdite aux mineurs."
+  }
+  </script>
+</head>
+
+<body>
+  <main class="glass" role="main" aria-labelledby="t">
+    <div class="top">
+      <div class="logo">
+        <img src="./apple-touch-icon.png" alt="Logo Apéro Catalan®" onerror="this.onerror=null; this.src='./icons/icon-192.png';" />
+      </div>
+      <div class="brand">
+        <div class="name">L'apéro catalan<sup>®</sup></div>
+        <div class="meta">Livraison d’alcool de nuit • Perpignan (66) • 19h–6h • Min. 25€</div>
+      </div>
+    </div>
+
+    <section class="hero">
+      <h1 id="t"><i class="ri-wifi-off-line"></i> Hors connexion</h1>
+      <p>
+        Tu es actuellement <strong>sans réseau</strong>. Pas de panique :
+        tu peux <strong>réessayer</strong>, revenir à l’accueil, ou <strong>appeler directement</strong>.
+      </p>
+
+      <div class="chips" aria-label="Informations">
+        <span class="chip"><i class="ri-time-fill"></i> 7j/7 • 19h–6h</span>
+        <span class="chip"><i class="ri-shopping-bag-3-fill"></i> Min. 25€</span>
+        <span class="chip"><i class="ri-shield-check-fill"></i> Réservé majeurs</span>
+      </div>
+
+      <div class="actions" aria-label="Actions rapides">
+        <a class="btn btnPrimary" href="./index.html" aria-label="Retour à l’accueil">
+          <i class="ri-home-5-fill"></i> Retour accueil
+        </a>
+        <a class="btn btnSecondary" href="tel:0652336461" aria-label="Appeler Apéro Catalan au 06 52 33 64 61">
+          <i class="ri-phone-fill"></i> Appeler
+        </a>
+        <button class="btn btnGhost" type="button" id="retryBtn" aria-label="Réessayer">
+          <i class="ri-refresh-line"></i> Réessayer
+        </button>
+        <a class="btn btnGhost" href="./livraisons_alcool_66.html" aria-label="Informations livraison alcool 66">
+          <i class="ri-information-2-line"></i> Infos livraison
+        </a>
+      </div>
+
+      <div class="fine">
+        🔞 Vente d’alcool interdite aux mineurs • L’abus d’alcool est dangereux pour la santé • À consommer avec modération.
+      </div>
+
+      <nav class="links" aria-label="Liens utiles">
+        <a href="./livraisons_alcool_66.html">Livraison alcool 66</a>
+        <a href="./privacy.html">Confidentialité</a>
+      </nav>
+    </section>
+  </main>
+
+  <script>
+    (function(){
+      const btn = document.getElementById('retryBtn');
+      if(btn){
+        btn.addEventListener('click', function(){
+          try { window.location.reload(); } catch(e) { window.location.href = './index.html'; }
+        });
+      }
+      // auto-retry si réseau revient
+      window.addEventListener('online', () => {
+        setTimeout(() => {
+          try { window.location.reload(); } catch(e) {}
+        }, 250);
+      });
+    })();
+  </script>
+</body>
+</html>
