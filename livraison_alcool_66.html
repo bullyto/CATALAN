@@ -1,0 +1,553 @@
+<!--
+   Apéro Catalan® 
+  ✅ Horaires: 19h → 6h
+  ✅ Minimum commande: 25 €
+  ✅ Téléphone: 06 52 33 64 61
+-->
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+
+  <title>Livraison d’alcool de nuit à Perpignan (66) • Apéro Catalan® • 19h–6h</title>
+  <meta name="description" content="Apéro Catalan® : livraison d’alcool de nuit à Perpignan et Pyrénées-Orientales (66). 7j/7 de 19h à 6h. Commande par téléphone au 06 52 33 64 61. Minimum 25€." />
+  <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
+  <meta name="theme-color" content="#8a0b0b" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="format-detection" content="telephone=yes" />
+
+  <!-- Canonical (mets ton URL finale si besoin) -->
+  <link rel="canonical" href="https://catalan.aperos.net/" />
+
+  <!-- PWA (optionnel mais propre) -->
+  <link rel="manifest" href="manifest.webmanifest" />
+
+  <!-- Icons (si présents dans ton repo) -->
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png" />
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+
+  <!-- OpenGraph / Social -->
+  <meta property="og:locale" content="fr_FR" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Apéro Catalan® • Livraison d’alcool de nuit à Perpignan (66)" />
+  <meta property="og:description" content="Livraison 7j/7 de 19h à 6h • Perpignan & alentours (66) • Commande par téléphone • Minimum 25€" />
+  <meta property="og:url" content="https://catalan.aperos.net/" />
+  <meta property="og:image" content="./icon-512.png?v=20251223" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Apéro Catalan® • Livraison d’alcool de nuit à Perpignan (66)" />
+  <meta name="twitter:description" content="19h–6h • 7j/7 • Minimum 25€ • Appel direct" />
+  <meta name="twitter:image" content="./icon-512.png?v=20251223" />
+
+  <!-- Tailwind (comme ton index) -->
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#C61910",
+            secondary: "#FFB81C",
+            night: "#2a0a0c",
+            wine: "#8a0b0b"
+          },
+          borderRadius: {
+            button: "16px"
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    :root{
+      --primary:#C61910;
+      --secondary:#FFB81C;
+      --night:#2a0a0c;
+      --wine:#8a0b0b;
+    }
+    html, body { height: 100%; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background:
+        radial-gradient(1000px 700px at 50% 10%, rgba(255,211,107,.22), transparent 60%),
+        radial-gradient(900px 650px at 18% 75%, rgba(198,25,16,.22), transparent 62%),
+        radial-gradient(900px 650px at 82% 72%, rgba(255,184,28,.14), transparent 62%),
+        linear-gradient(180deg, #5a1217, var(--night) 55%, #120406);
+      color:#fff;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .glass{
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 18px 70px rgba(0,0,0,.45);
+    }
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.12);
+      color: rgba(255,255,255,.90);
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: .02em;
+    }
+    .cta{
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .cta:active{ transform: scale(.99); }
+    .ctaPrimary{
+      background: linear-gradient(180deg, rgba(198,25,16,1), rgba(138,11,11,1));
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 16px 55px rgba(198,25,16,.28);
+    }
+    .ctaSecondary{
+      background: linear-gradient(180deg, rgba(255,184,28,1), rgba(217,137,18,1));
+      color: #1b0b0b;
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 16px 55px rgba(255,184,28,.22);
+    }
+    .ctaGhost{
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+    .softPulse{
+      position: relative;
+    }
+    .softPulse::before{
+      content:"";
+      position:absolute;
+      inset:-10px;
+      border-radius: 999px;
+      pointer-events:none;
+      opacity:.20;
+      animation: softPulse 7.5s ease-in-out infinite;
+    }
+    @keyframes softPulse{
+      0%{ box-shadow: 0 0 0 0 rgba(255,184,28,.10), 0 0 18px rgba(255,184,28,.06); }
+      45%{ box-shadow: 0 0 0 12px rgba(255,184,28,0), 0 0 26px rgba(255,184,28,.05); }
+      50%{ box-shadow: 0 0 0 0 rgba(198,25,16,.10), 0 0 18px rgba(198,25,16,.06); }
+      100%{ box-shadow: 0 0 0 12px rgba(198,25,16,0), 0 0 26px rgba(198,25,16,.05); }
+    }
+    .sr-only-focusable:active, .sr-only-focusable:focus {
+      position: static !important;
+      width: auto !important;
+      height: auto !important;
+      margin: 0 !important;
+      overflow: visible !important;
+      clip: auto !important;
+      white-space: normal !important;
+    }
+    /* Prevent layout shift for images */
+    img { max-width:100%; height:auto; }
+    /* Reduce motion */
+    @media (prefers-reduced-motion: reduce){
+      .softPulse::before { animation: none !important; }
+      .cta:active{ transform:none; }
+    }
+  </style>
+
+  <!-- JSON-LD: WebSite + LocalBusiness -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@graph":[
+      {
+        "@type":"WebSite",
+        "name":"Apéro Catalan®",
+        "url":"https://catalan.aperos.net/",
+        "inLanguage":"fr-FR",
+        "potentialAction":{
+          "@type":"SearchAction",
+          "target":"https://catalan.aperos.net/?q={search_term_string}",
+          "query-input":"required name=search_term_string"
+        }
+      },
+      {
+        "@type":"LocalBusiness",
+        "name":"Apéro Catalan®",
+        "url":"https://catalan.aperos.net/",
+        "telephone":"+33652336461",
+        "areaServed":[
+          "Perpignan",
+          "Pyrénées-Orientales",
+          "66",
+          "Canet-en-Roussillon",
+          "Saint-Estève",
+          "Rivesaltes",
+          "Pia",
+          "Bompas",
+          "Cabestany",
+          "Saleilles",
+          "Pollestres",
+          "Canohès",
+          "Toulouges",
+          "Thuir",
+          "Elne",
+          "Saint-Cyprien",
+          "Argelès-sur-Mer",
+          "Le Barcarès",
+          "Torreilles",
+          "Claira",
+          "Sainte-Marie-la-Mer"
+        ],
+        "openingHoursSpecification":[
+          {
+            "@type":"OpeningHoursSpecification",
+            "dayOfWeek":[
+              "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"
+            ],
+            "opens":"19:00",
+            "closes":"06:00"
+          }
+        ],
+        "priceRange":"€€",
+        "image":[
+          "https://i.postimg.cc/MHrNcvMr/file-000000002c906243b1fb58ce1bd6d82d-1.png",
+          "https://catalan.aperos.net/icon-512.png"
+        ],
+        "description":"Livraison d’alcool de nuit à Perpignan (66) et alentours. Service 7j/7 de 19h à 6h. Commande par téléphone. Minimum de commande 25€. Vente d’alcool interdite aux mineurs."
+      }
+    ]
+  }
+  </script>
+</head>
+
+<body>
+  <a class="sr-only sr-only-focusable" href="#contenu">Aller au contenu</a>
+
+  <header class="sticky top-0 z-50">
+    <div class="mx-auto w-full max-w-[980px] px-4 pt-4">
+      <div class="glass rounded-[22px] px-4 py-3 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-[44px] h-[44px] rounded-[14px] overflow-hidden bg-white/10 border border-white/10 flex-shrink-0">
+            <img
+              src="https://i.postimg.cc/MHrNcvMr/file-000000002c906243b1fb58ce1bd6d82d-1.png"
+              alt="Logo Apéro Catalan®"
+              loading="eager"
+              width="44"
+              height="44"
+              onerror="this.onerror=null; this.src='./icon-192.png';"
+            />
+          </div>
+          <div class="min-w-0">
+            <div class="font-['Pacifico'] text-[20px] leading-none text-secondary drop-shadow">
+              L'apéro catalan<sup>®</sup>
+            </div>
+            <div class="text-[12px] text-white/80 truncate">
+              Livraison d’alcool de nuit • Perpignan & 66 • 19h–6h • Min. 25€
+            </div>
+          </div>
+        </div>
+
+        <nav class="hidden md:flex items-center gap-2">
+          <a class="chip hover:bg-white/10 transition" href="#livraison"><i class="ri-map-pin-2-fill"></i> Zone</a>
+          <a class="chip hover:bg-white/10 transition" href="#catalogue"><i class="ri-shopping-bag-3-fill"></i> Catalogue</a>
+          <a class="chip hover:bg-white/10 transition" href="#commande"><i class="ri-phone-fill"></i> Commander</a>
+          <a class="chip hover:bg-white/10 transition" href="#faq"><i class="ri-question-fill"></i> FAQ</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main id="contenu" class="mx-auto w-full max-w-[980px] px-4 pb-10 pt-6">
+    <!-- HERO -->
+    <section class="glass rounded-[26px] p-5 md:p-7">
+      <div class="flex flex-col md:flex-row md:items-center gap-6">
+        <div class="flex-1 min-w-0">
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span class="chip"><i class="ri-time-fill"></i> 7j/7 • 19h–6h</span>
+            <span class="chip"><i class="ri-shield-check-fill"></i> Réservé aux majeurs</span>
+            <span class="chip"><i class="ri-map-pin-range-fill"></i> Jusqu’à ~30 km de Perpignan</span>
+          </div>
+
+          <h1 class="text-[30px] md:text-[40px] font-black leading-[1.05] tracking-tight">
+            Livraison d’alcool de nuit à <span class="text-secondary">Perpignan</span> (66)
+          </h1>
+          <p class="mt-3 text-white/80 text-[15px] md:text-[16px] leading-relaxed">
+            <strong class="text-white">Apéro Catalan®</strong> vous livre boissons et produits d’apéritif
+            à domicile le soir et la nuit : vodka, whisky, rhum, vins, rosés, softs, snacks.
+            Commande simple et rapide par téléphone.
+          </p>
+
+          <div class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <a class="cta ctaPrimary rounded-button py-4 px-4 text-center font-extrabold tracking-wide flex items-center justify-center gap-2"
+               href="tel:0652336461"
+               aria-label="Appeler Apéro Catalan au 06 52 33 64 61">
+              <i class="ri-phone-fill text-xl"></i>
+              APPELER
+            </a>
+
+            <a class="cta ctaSecondary rounded-button py-4 px-4 text-center font-extrabold tracking-wide flex items-center justify-center gap-2"
+               href="#catalogue"
+               aria-label="Voir le catalogue Apéro Catalan">
+              <i class="ri-shopping-bag-3-fill text-xl"></i>
+              CATALOGUE
+            </a>
+
+            <a class="cta ctaGhost softPulse rounded-button py-4 px-4 text-center font-extrabold tracking-wide flex items-center justify-center gap-2"
+               href="https://play.google.com/store/apps/details?id=net.aperos.catalan"
+               target="_blank" rel="noopener"
+               aria-label="Ouvrir Apéro Catalan sur Google Play">
+              <i class="ri-google-play-fill text-xl"></i>
+              GOOGLE PLAY
+            </a>
+          </div>
+
+          <div class="mt-4 text-[12px] text-white/65 leading-relaxed">
+            Minimum de commande : <strong class="text-white">25€</strong> • Paiement : <strong class="text-white">CB ou espèces</strong> au véhicule • Service discret & professionnel.
+          </div>
+        </div>
+
+        <!-- Visuel -->
+        <div class="md:w-[340px] w-full">
+          <div class="rounded-[26px] overflow-hidden border border-white/10 bg-white/5">
+            <div class="p-4">
+              <div class="flex items-center gap-3">
+                <div class="w-[64px] h-[64px] rounded-[20px] overflow-hidden bg-white/10 border border-white/10 flex-shrink-0">
+                  <img
+                    src="./icon-512.png?v=20251223"
+                    alt="Icône Apéro Catalan®"
+                    loading="lazy"
+                    width="64"
+                    height="64"
+                    onerror="this.onerror=null; this.src='https://image.noelshack.com/fichiers/2025/52/2/1766528997-icon-512-1.png';"
+                  />
+                </div>
+                <div class="min-w-0">
+                  <div class="font-black tracking-wide">APÉRO CATALAN®</div>
+                  <div class="text-[12px] text-white/75 truncate">Épicerie de nuit catalane • Perpignan & 66</div>
+                </div>
+              </div>
+              <div class="mt-4 grid grid-cols-2 gap-3">
+                <div class="rounded-[18px] border border-white/10 bg-white/5 p-3">
+                  <div class="text-[11px] text-white/70">Horaires</div>
+                  <div class="text-[15px] font-extrabold">19h → 6h</div>
+                </div>
+                <div class="rounded-[18px] border border-white/10 bg-white/5 p-3">
+                  <div class="text-[11px] text-white/70">Commande min.</div>
+                  <div class="text-[15px] font-extrabold">25€</div>
+                </div>
+                <div class="rounded-[18px] border border-white/10 bg-white/5 p-3">
+                  <div class="text-[11px] text-white/70">Zone</div>
+                  <div class="text-[15px] font-extrabold">~30 km</div>
+                </div>
+                <div class="rounded-[18px] border border-white/10 bg-white/5 p-3">
+                  <div class="text-[11px] text-white/70">Paiement</div>
+                  <div class="text-[15px] font-extrabold">CB / Espèces</div>
+                </div>
+              </div>
+              <div class="mt-4 text-[12px] text-white/70 leading-relaxed">
+                🔞 Vente d’alcool interdite aux mineurs. Une pièce d’identité peut être demandée.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIVRAISON / ZONE -->
+    <section id="livraison" class="mt-6 glass rounded-[26px] p-5 md:p-7">
+      <h2 class="text-[22px] md:text-[26px] font-black tracking-tight">
+        Votre épicerie de nuit à Perpignan et dans les Pyrénées-Orientales (66)
+      </h2>
+      <p class="mt-3 text-white/80 leading-relaxed">
+        Apéro Catalan® assure la <strong class="text-white">livraison de boissons de nuit</strong> à Perpignan et alentours :
+        Canet-en-Roussillon, Saint-Estève, Rivesaltes, Pia, Bompas, Cabestany, Saleilles, Pollestres,
+        Canohès, Toulouges, Thuir, Elne, Saint-Cyprien, Argelès-sur-Mer, Le Barcarès, Torreilles, Claira,
+        Sainte-Marie-la-Mer… (et communes proches dans le 66).
+      </p>
+
+      <div class="mt-5 grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="rounded-[22px] border border-white/10 bg-white/5 p-4">
+          <div class="flex items-center gap-2 font-extrabold"><i class="ri-flashlight-fill text-secondary"></i> Livraison rapide</div>
+          <div class="mt-1 text-[13px] text-white/75">Commande simple par téléphone, livraison discrète.</div>
+        </div>
+        <div class="rounded-[22px] border border-white/10 bg-white/5 p-4">
+          <div class="flex items-center gap-2 font-extrabold"><i class="ri-user-star-fill text-secondary"></i> Service pro</div>
+          <div class="mt-1 text-[13px] text-white/75">Paiement CB ou espèces au véhicule. Sécurité & efficacité.</div>
+        </div>
+        <div class="rounded-[22px] border border-white/10 bg-white/5 p-4">
+          <div class="flex items-center gap-2 font-extrabold"><i class="ri-shield-check-fill text-secondary"></i> Encadré</div>
+          <div class="mt-1 text-[13px] text-white/75">Réservé aux majeurs, vérification possible à la livraison.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CATALOGUE (SEO + UX) -->
+    <section id="catalogue" class="mt-6 glass rounded-[26px] p-5 md:p-7">
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+        <div>
+          <h2 class="text-[22px] md:text-[26px] font-black tracking-tight">Catalogue : alcools, softs & apéro</h2>
+          <p class="mt-2 text-white/80 leading-relaxed">
+            Quelques catégories populaires : vodka, whisky, rhum, liqueurs, gin, tequila, vins & rosés, softs, snacks.
+            <span class="text-white/75">(Le stock peut varier selon la nuit — confirme au téléphone.)</span>
+          </p>
+        </div>
+        <a class="cta ctaSecondary rounded-button py-3 px-4 font-extrabold flex items-center justify-center gap-2"
+           href="tel:0652336461">
+          <i class="ri-phone-fill"></i> Commander maintenant
+        </a>
+      </div>
+
+      <div class="mt-5 grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="rounded-[22px] border border-white/10 bg-white/5 p-4">
+          <div class="font-extrabold flex items-center gap-2"><i class="ri-goblet-fill text-secondary"></i> Spiritueux</div>
+          <ul class="mt-2 text-[13px] text-white/75 space-y-1">
+            <li>Vodka • Whisky • Rhum</li>
+            <li>Gin • Tequila • Liqueurs</li>
+            <li>Idéal soirées & apéritifs</li>
+          </ul>
+        </div>
+        <div class="rounded-[22px] border border-white/10 bg-white/5 p-4">
+          <div class="font-extrabold flex items-center gap-2"><i class="ri-wine-fill text-secondary"></i> Vins & rosés</div>
+          <ul class="mt-2 text-[13px] text-white/75 space-y-1">
+            <li>Rouge • Blanc • Rosé</li>
+            <li>Muscat (selon disponibilité)</li>
+            <li>Parfait pour l’apéro</li>
+          </ul>
+        </div>
+        <div class="rounded-[22px] border border-white/10 bg-white/5 p-4">
+          <div class="font-extrabold flex items-center gap-2"><i class="ri-cake-3-fill text-secondary"></i> Softs & snacks</div>
+          <ul class="mt-2 text-[13px] text-white/75 space-y-1">
+            <li>Softs • Jus • Énergisants</li>
+            <li>Chips • Bonbons • Apéro</li>
+            <li>Complète ta commande</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-5 rounded-[22px] border border-white/10 bg-white/5 p-4">
+        <div class="text-[13px] text-white/75 leading-relaxed">
+          <strong class="text-white">Commande minimum : 25€.</strong>
+          Les prix et disponibilités peuvent évoluer selon la tournée.
+          Confirme au téléphone pour une prise de commande rapide.
+        </div>
+      </div>
+    </section>
+
+    <!-- COMMANDE -->
+    <section id="commande" class="mt-6 glass rounded-[26px] p-5 md:p-7">
+      <h2 class="text-[22px] md:text-[26px] font-black tracking-tight">Comment commander ?</h2>
+      <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="rounded-[22px] border border-white/10 bg-white/5 p-4">
+          <div class="font-extrabold flex items-center gap-2"><i class="ri-phone-fill text-secondary"></i> 1) Appelle</div>
+          <p class="mt-2 text-[13px] text-white/75 leading-relaxed">
+            Dis-nous ce que tu veux (boissons, softs, snacks) + ton adresse à Perpignan/alentours.
+          </p>
+        </div>
+        <div class="rounded-[22px] border border-white/10 bg-white/5 p-4">
+          <div class="font-extrabold flex items-center gap-2"><i class="ri-car-fill text-secondary"></i> 2) Livraison</div>
+          <p class="mt-2 text-[13px] text-white/75 leading-relaxed">
+            Livraison discrète. Paiement <strong class="text-white">CB ou espèces</strong> au véhicule.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <a class="cta ctaPrimary rounded-button py-4 px-4 text-center font-extrabold tracking-wide flex items-center justify-center gap-2"
+           href="tel:0652336461">
+          <i class="ri-phone-fill text-xl"></i> 06 52 33 64 61
+        </a>
+        <a class="cta ctaGhost rounded-button py-4 px-4 text-center font-extrabold tracking-wide flex items-center justify-center gap-2"
+           href="https://play.google.com/store/apps/details?id=net.aperos.catalan"
+           target="_blank" rel="noopener">
+          <i class="ri-google-play-fill text-xl"></i> Installer l’app (Android)
+        </a>
+      </div>
+
+      <div class="mt-4 text-[12px] text-white/65 leading-relaxed">
+        🔞 Vente d’alcool interdite aux mineurs • L’abus d’alcool est dangereux pour la santé, à consommer avec modération.
+      </div>
+    </section>
+
+    <!-- FAQ (SEO) -->
+    <section id="faq" class="mt-6 glass rounded-[26px] p-5 md:p-7">
+      <h2 class="text-[22px] md:text-[26px] font-black tracking-tight">FAQ — Livraison d’alcool de nuit à Perpignan</h2>
+
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+        <details class="rounded-[22px] border border-white/10 bg-white/5 p-4">
+          <summary class="font-extrabold cursor-pointer">Quels sont les horaires d’Apéro Catalan® ?</summary>
+          <div class="mt-2 text-[13px] text-white/75 leading-relaxed">
+            Nous livrons <strong class="text-white">7j/7 de 19h00 à 6h00</strong> à Perpignan et dans le 66.
+          </div>
+        </details>
+
+        <details class="rounded-[22px] border border-white/10 bg-white/5 p-4">
+          <summary class="font-extrabold cursor-pointer">Quel est le minimum de commande ?</summary>
+          <div class="mt-2 text-[13px] text-white/75 leading-relaxed">
+            Le minimum de commande est de <strong class="text-white">25€</strong>.
+          </div>
+        </details>
+
+        <details class="rounded-[22px] border border-white/10 bg-white/5 p-4">
+          <summary class="font-extrabold cursor-pointer">Dans quelles villes livrez-vous ?</summary>
+          <div class="mt-2 text-[13px] text-white/75 leading-relaxed">
+            Perpignan + communes proches (environ <strong class="text-white">30 km</strong>) : Canet, Saint-Estève, Rivesaltes, Pia,
+            Bompas, Cabestany, Thuir, Elne, Saint-Cyprien, Argelès, Barcarès, etc.
+          </div>
+        </details>
+
+        <details class="rounded-[22px] border border-white/10 bg-white/5 p-4">
+          <summary class="font-extrabold cursor-pointer">Vendez-vous aux mineurs ?</summary>
+          <div class="mt-2 text-[13px] text-white/75 leading-relaxed">
+            Non. La vente d’alcool est <strong class="text-white">interdite aux mineurs</strong>. Une pièce d’identité peut être demandée.
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- LEGAL -->
+    <section id="mentions" class="mt-6 glass rounded-[26px] p-5 md:p-7">
+      <h2 class="text-[18px] md:text-[20px] font-black tracking-tight">Mentions & prévention</h2>
+      <div class="mt-3 text-[12.5px] text-white/75 leading-relaxed space-y-2">
+        <p><strong class="text-white">L’abus d’alcool est dangereux pour la santé.</strong> À consommer avec modération.</p>
+        <p><strong class="text-white">Vente d’alcool interdite aux mineurs.</strong> Une vérification d’identité peut être effectuée.</p>
+        <p>Les informations de catalogue sont indicatives : disponibilité et tarifs peuvent varier selon la tournée et la nuit.</p>
+      </div>
+    </section>
+
+    <!-- Sticky bottom CTA (mobile) -->
+    <div class="fixed bottom-0 left-0 right-0 z-50 md:hidden">
+      <div class="mx-auto w-full max-w-[980px] px-4 pb-4">
+        <div class="glass rounded-[22px] p-3 flex gap-3">
+          <a class="cta ctaPrimary rounded-button py-3 px-4 flex-1 text-center font-extrabold flex items-center justify-center gap-2"
+             href="tel:0652336461">
+            <i class="ri-phone-fill text-xl"></i> Appeler
+          </a>
+          <a class="cta ctaSecondary rounded-button py-3 px-4 flex-1 text-center font-extrabold flex items-center justify-center gap-2"
+             href="#catalogue">
+            <i class="ri-shopping-bag-3-fill text-xl"></i> Catalogue
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="h-24 md:h-0"></div>
+  </main>
+
+  <footer class="mx-auto w-full max-w-[980px] px-4 pb-10 pt-2 text-center text-[12px] text-white/55">
+    © <span id="y"></span> Apéro Catalan® • Perpignan (66) • 19h–6h • Min. 25€
+  </footer>
+
+  <script>
+    document.getElementById("y").textContent = String(new Date().getFullYear());
+  </script>
+</body>
+</html>
