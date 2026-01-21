@@ -1,0 +1,15 @@
+# Apéro Catalan® — Robots.txt
+# Objectif :
+# - Laisser Google comprendre que le site est une vraie PWA
+# - Ne bloquer aucun asset utile (manifest, sw, icons, screenshots)
+# - Bloquer uniquement la page hors connexion
+# - Déclarer le sitemap
+
+User-agent: *
+Allow: /
+
+# Page technique hors connexion (aucun intérêt SEO)
+Disallow: /offline.html
+
+# Sitemap officiel
+Sitemap: https://catalan.aperos.net/sitemap.xml
