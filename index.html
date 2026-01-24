@@ -2146,7 +2146,45 @@ document.addEventListener('DOMContentLoaded', function() {
     }catch{}
   }
 
-  function imgUrlForId(id){
+  
+  async function hydrateMissingStock(ids){
+    // Si le snapshot est incomplet, on complète via les fichiers /<id>.json (qty)
+    const missing = (ids || []).filter(id => id && stockAvail[id] === undefined);
+    if(!missing.length) return;
+
+    // petite limite pour éviter de spammer le réseau
+    const toFetch = missing.slice(0, 60);
+
+    // Concurrency simple
+    const CONC = 6;
+    let i = 0;
+    async function worker(){
+      while(i < toFetch.length){
+        const id = toFetch[i++];
+        try{
+          const url = `${STOCK_BASE}${encodeURIComponent(id)}.json?t=${Date.now()}`;
+          const res = await fetch(url, { cache:"no-store" });
+          if(!res.ok) continue;
+          const data = await res.json();
+          const q = Number(data && data.qty);
+          if(Number.isFinite(q)) stockAvail[id] = (q > 0);
+        }catch(e){}
+      }
+    }
+    await Promise.all(Array.from({length: Math.min(CONC, toFetch.length)}, worker));
+
+    // met à jour le cache local
+    try{
+      localStorage.setItem("ac_stock_snapshot_cache_v1", JSON.stringify({ savedAt: Date.now(), avail: stockAvail }));
+    }catch{}
+  }
+
+  function idsForList(list){
+    const out = [];
+    (list || []).forEach(p => { if(p && p.id) out.push(String(p.id)); });
+    return out;
+  }
+function imgUrlForId(id){
     // Anticipe : images softs ajoutées plus tard dans le dépôt stock/img/
     // Les images doivent s'appeler : <id>.png
     return `${STOCK_IMG_BASE}${encodeURIComponent(id)}.png`;
@@ -2160,7 +2198,7 @@ function catLabel(cat){
     Object.entries(products).forEach(([cat, list]) => list.forEach(p => {
       const id = p.id || "";
       const isAlcohol = ALCOHOL_CATS.has(cat);
-      const available = isAlcohol ? !!stockAvail[id] : null;
+      const available = isAlcohol ? (stockAvail[id] === undefined ? null : !!stockAvail[id]) : null;
       out.push({ ...p, id, category: cat, isAlcohol, available, imageUrl: id ? imgUrlForId(id) : "" });
     }));
     return out;
@@ -2170,7 +2208,7 @@ function catLabel(cat){
     return (products[category] || []).map(p => {
       const id = p.id || "";
       const isAlcohol = ALCOHOL_CATS.has(category);
-      const available = isAlcohol ? !!stockAvail[id] : null;
+      const available = isAlcohol ? (stockAvail[id] === undefined ? null : !!stockAvail[id]) : null;
       return ({ ...p, id, category, isAlcohol, available, imageUrl: id ? imgUrlForId(id) : "" });
     });
   }
@@ -2209,6 +2247,8 @@ function catLabel(cat){
       try { await fetchStockSnapshot(); } catch(e) { /* garde cache */ }
     }
 const base = getProductsForCategory(category);
+    // Complète le stock manquant via /<id>.json (si snapshot incomplet)
+    if (navigator.onLine) { try { await hydrateMissingStock(idsForList(base)); } catch(e) {} }
     const searched = applySearch(base, searchTerm);
     const sorted = applySort(searched, sortMode);
 
