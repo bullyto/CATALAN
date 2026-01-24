@@ -2107,7 +2107,10 @@ document.addEventListener('DOMContentLoaded', function() {
   // - On affiche seulement Disponible / Rupture (jamais la quantité)
   // - Alcool = catégories : vodka/whisky/rhum/liqueurs/gin/tequila/pastis/vin
   // =========================
-  const STOCK_BASE = 'https://bullyto.github.io/outil/apps/stock/stock/';
+  const STOCK_BASE_GHP = 'https://bullyto.github.io/outil/apps/stock/stock/';
+  const STOCK_BASE_RAW = 'https://raw.githubusercontent.com/bullyto/outil/main/apps/stock/stock/';
+  const STOCK_BASE = STOCK_BASE_GHP; // primary
+
   const STOCK_SNAPSHOT_URL = `${STOCK_BASE}_snapshot.json`;
   const STOCK_IMG_BASE = STOCK_BASE; // images: <id>.png dans le même dossier
   const ALCOHOL_CATS = new Set(["vodka","whisky","rhum","liqueurs","gin","tequila","pastis","vin"]);
@@ -2541,7 +2544,22 @@ window.addEventListener('load', () => {
 <script>
 /* ===== Lecture du statut commun (status.json) ===== */
 (function() {
-  const STATUS_URL = 'https://bullyto.github.io/outil/apps/status/status.json';
+  const STATUS_URL_GHP = 'https://bullyto.github.io/outil/apps/status/status.json';
+  const STATUS_URL_RAW = 'https://raw.githubusercontent.com/bullyto/outil/main/apps/status/status.json';
+  const STATUS_URL = STATUS_URL_GHP; // primary
+
+  async function fetchJsonWithFallback(urlPrimary, urlFallback, opts){
+    try{
+      const r = await fetch(urlPrimary, opts);
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      return await r.json();
+    }catch(e){
+      const r2 = await fetch(urlFallback, opts);
+      if(!r2.ok) throw new Error('HTTP '+r2.status);
+      return await r2.json();
+    }
+  }
+
 
   const overlay = document.getElementById('globalStatusOverlay');
   const imgEl   = document.getElementById('globalStatusImg');
@@ -2693,7 +2711,7 @@ window.addEventListener('load', () => {
     }
   }, true);
 
-  fetch(STATUS_URL, { cache: "no-store" })
+  fetchJsonWithFallback(STATUS_URL_GHP, STATUS_URL_RAW, { cache: "no-store" })
     .then(r => r.json())
     .then(data => {
       if(!data || !data.active) { setOrderEnabled(true); return; }
