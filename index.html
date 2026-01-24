@@ -2107,17 +2107,16 @@ document.addEventListener('DOMContentLoaded', function() {
   // - On affiche seulement Disponible / Rupture (jamais la quantité)
   // - Alcool = catégories : vodka/whisky/rhum/liqueurs/gin/tequila/pastis/vin
   // =========================
-  const STOCK_REPO = { owner:"bullyto", repo:"stock", branch:"main" };
-  const STOCK_SNAPSHOT_PATH = "stock/_snapshot.json";
-  const STOCK_IMG_BASE = `https://raw.githubusercontent.com/${STOCK_REPO.owner}/${STOCK_REPO.repo}/${STOCK_REPO.branch}/img/`;
-
+  const STOCK_BASE = 'https://bullyto.github.io/outil/apps/stock/stock/';
+  const STOCK_SNAPSHOT_URL = `${STOCK_BASE}_snapshot.json`;
+  const STOCK_IMG_BASE = STOCK_BASE; // images: <id>.png dans le même dossier
   const ALCOHOL_CATS = new Set(["vodka","whisky","rhum","liqueurs","gin","tequila","pastis","vin"]);
   let stockAvail = {}; // {id: true/false}
   let stockUpdatedAt = 0;
 
   async function fetchStockSnapshot(){
     // cache-bust + no-store pour coller au "temps réel"
-    const url = `https://raw.githubusercontent.com/${STOCK_REPO.owner}/${STOCK_REPO.repo}/${STOCK_REPO.branch}/${STOCK_SNAPSHOT_PATH}?t=${Date.now()}`;
+    const url = `${STOCK_SNAPSHOT_URL}?t=${Date.now()}`;
     const res = await fetch(url, { cache:"no-store" });
     if(!res.ok) throw new Error("snapshot_fetch_failed");
     const snap = await res.json();
@@ -2502,7 +2501,7 @@ window.addEventListener('load', () => {
 <script>
 /* ===== Lecture du statut commun (status.json) ===== */
 (function() {
-  const STATUS_URL = 'https://bullyto.github.io/status/status.json';
+  const STATUS_URL = 'https://bullyto.github.io/outil/apps/status/status.json';
 
   const overlay = document.getElementById('globalStatusOverlay');
   const imgEl   = document.getElementById('globalStatusImg');
