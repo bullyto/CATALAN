@@ -1,45 +1,77 @@
 <!DOCTYPE html>
 <html lang="fr" data-status-url="https://bullyto.github.io/outil/apps/status/status.json">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Apéro Catalan® – Livraison alcool de nuit 66 | Apéro After Night</title>
-
 <script>
-  // ✅ PATCH STATUS: force Apéro Catalan à lire /outil/apps/status/status.json (et plus l'ancien repo /status)
+  // ✅ PATCH STATUS (hard): force Apéro Catalan à lire /outil/apps/status/status.json
   (function(){
     var NEW_STATUS_URL = "https://bullyto.github.io/outil/apps/status/status.json";
+    // Expose/compat variables (au cas où le client les lit)
     window.AD_STATUS_URL = NEW_STATUS_URL;
     window.AD_STATUS_JSON_URL = NEW_STATUS_URL;
     window.STATUS_URL = NEW_STATUS_URL;
     window.STATUS_JSON_URL = NEW_STATUS_URL;
     window.statusJsonUrl = NEW_STATUS_URL;
+    window.__STATUS_JSON_OVERRIDE__ = NEW_STATUS_URL;
+
     try { document.documentElement.setAttribute('data-status-url', NEW_STATUS_URL); } catch(e) {}
+
+    // ---- intercept fetch ----
+    function rewrite(u){
+      try {
+        if (!u) return u;
+        var s = String(u);
+        if (s.indexOf('bullyto.github.io/status/status.json') !== -1) return NEW_STATUS_URL;
+        if (s.indexOf('raw.githubusercontent.com/bullyto/status') !== -1) return NEW_STATUS_URL;
+        if (/\/status\.json(\?|$)/i.test(s) && s.indexOf('/outil/apps/status/status.json') === -1) return NEW_STATUS_URL;
+        return s;
+      } catch(e) { return u; }
+    }
 
     var _fetch = window.fetch ? window.fetch.bind(window) : null;
     if (_fetch) {
       window.fetch = function(input, init){
         try {
-          var url = (typeof input === 'string') ? input : (input && input.url ? input.url : '');
-          if (url) {
-            var u = url;
-            if (u.indexOf('bullyto.github.io/status/status.json') !== -1) u = NEW_STATUS_URL;
-            if (u.indexOf('raw.githubusercontent.com/bullyto/status') !== -1) u = NEW_STATUS_URL;
-            if (/\/status\.json(\?|$)/i.test(u) && u.indexOf('/outil/apps/status/status.json') === -1) u = NEW_STATUS_URL;
-            if (u !== url) {
-              if (typeof input === 'string') input = u;
-              else if (input && input.url) input = new Request(u, input);
-            }
+          if (typeof input === 'string') {
+            input = rewrite(input);
+          } else if (input && input.url) {
+            var nu = rewrite(input.url);
+            if (nu !== input.url) input = new Request(nu, input);
           }
         } catch(e) {}
         return _fetch(input, init);
       };
     }
+
+    // ---- intercept XHR ----
+    var X = window.XMLHttpRequest;
+    if (X && X.prototype && X.prototype.open) {
+      var _open = X.prototype.open;
+      X.prototype.open = function(method, url){
+        try { url = rewrite(url); } catch(e) {}
+        return _open.apply(this, arguments);
+      };
+    }
+
+    // ---- intercept Request() constructor when used elsewhere ----
+    if (window.Request) {
+      var _Req = window.Request;
+      window.Request = function(input, init){
+        try {
+          if (typeof input === 'string') input = rewrite(input);
+          else if (input && input.url) input = rewrite(input.url);
+        } catch(e) {}
+        return new _Req(input, init);
+      };
+      window.Request.prototype = _Req.prototype;
+    }
   })();
 </script>
 
 
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Apéro Catalan® – Livraison alcool de nuit 66 | Apéro After Night</title>
 
   
 
