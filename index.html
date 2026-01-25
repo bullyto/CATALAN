@@ -1,10 +1,45 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-status-url="https://bullyto.github.io/outil/apps/status/status.json">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Apéro Catalan® – Livraison alcool de nuit 66 | Apéro After Night</title>
+
+<script>
+  // ✅ PATCH STATUS: force Apéro Catalan à lire /outil/apps/status/status.json (et plus l'ancien repo /status)
+  (function(){
+    var NEW_STATUS_URL = "https://bullyto.github.io/outil/apps/status/status.json";
+    window.AD_STATUS_URL = NEW_STATUS_URL;
+    window.AD_STATUS_JSON_URL = NEW_STATUS_URL;
+    window.STATUS_URL = NEW_STATUS_URL;
+    window.STATUS_JSON_URL = NEW_STATUS_URL;
+    window.statusJsonUrl = NEW_STATUS_URL;
+    try { document.documentElement.setAttribute('data-status-url', NEW_STATUS_URL); } catch(e) {}
+
+    var _fetch = window.fetch ? window.fetch.bind(window) : null;
+    if (_fetch) {
+      window.fetch = function(input, init){
+        try {
+          var url = (typeof input === 'string') ? input : (input && input.url ? input.url : '');
+          if (url) {
+            var u = url;
+            if (u.indexOf('bullyto.github.io/status/status.json') !== -1) u = NEW_STATUS_URL;
+            if (u.indexOf('raw.githubusercontent.com/bullyto/status') !== -1) u = NEW_STATUS_URL;
+            if (/\/status\.json(\?|$)/i.test(u) && u.indexOf('/outil/apps/status/status.json') === -1) u = NEW_STATUS_URL;
+            if (u !== url) {
+              if (typeof input === 'string') input = u;
+              else if (input && input.url) input = new Request(u, input);
+            }
+          }
+        } catch(e) {}
+        return _fetch(input, init);
+      };
+    }
+  })();
+</script>
+
+
 
   
 
