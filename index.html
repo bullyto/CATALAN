@@ -2318,6 +2318,111 @@ const base = getProductsForCategory(category);
   displayProducts('all', '', 'popular');
 
   // =========================
+  // 🔔 PUSH CATALAN — activation directe sur Zone + Articles
+  // =========================
+  const ADN66_CATALAN_PUSH = {
+    workerBaseUrl: "https://adn66-push.apero-nuit-du-66.workers.dev",
+    vapidPublicKey: "BG7Vo1rUSIoCQSqEx-tS91696VwWDpxAl65__ilnZW-eKP7Bzu8HrHhsRT8J0gI5aZ0-wPmIXDhNdb-iQ5LsCS8",
+    target: "catalan",
+    serviceWorkerUrl: "./sw.js?v=catalan-push-20260521-1",
+    cooldownKey: "adn66_catalan_push_prompt_cooldown_until",
+    syncedKey: "adn66_catalan_push_synced_at",
+    cooldownMs: 12 * 60 * 60 * 1000
+  };
+
+  let adn66CatalanPushBusy = false;
+
+  function adn66CatalanPushBase64ToUint8Array(base64String){
+    const padding = "=".repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+    const rawData = atob(base64);
+    return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
+  }
+
+  function adn66CatalanPushSupported(){
+    return "Notification" in window && "serviceWorker" in navigator && "PushManager" in window;
+  }
+
+  function adn66CatalanPushCooldownRemaining(){
+    try{
+      const until = Number(localStorage.getItem(ADN66_CATALAN_PUSH.cooldownKey) || 0);
+      const remaining = until - Date.now();
+      if(remaining > 0) return remaining;
+      localStorage.removeItem(ADN66_CATALAN_PUSH.cooldownKey);
+    }catch(e){}
+    return 0;
+  }
+
+  function adn66CatalanPushSetCooldown(){
+    try{ localStorage.setItem(ADN66_CATALAN_PUSH.cooldownKey, String(Date.now() + ADN66_CATALAN_PUSH.cooldownMs)); }catch(e){}
+  }
+
+  function adn66CatalanPushMarkSynced(){
+    try{ localStorage.setItem(ADN66_CATALAN_PUSH.syncedKey, new Date().toISOString()); }catch(e){}
+  }
+
+  async function adn66CatalanPushRegistration(){
+    await navigator.serviceWorker.register(ADN66_CATALAN_PUSH.serviceWorkerUrl, { scope: "./" }).catch(() => null);
+    return navigator.serviceWorker.ready;
+  }
+
+  async function adn66CatalanPushSaveSubscription(subscription){
+    const response = await fetch(`${ADN66_CATALAN_PUSH.workerBaseUrl}/push/subscribe`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        target: ADN66_CATALAN_PUSH.target,
+        subscription,
+        userAgent: navigator.userAgent
+      })
+    });
+
+    if(!response.ok) throw new Error("push_subscribe_failed_" + response.status);
+    adn66CatalanPushMarkSynced();
+  }
+
+  async function adn66CatalanPushCreateOrRefreshSubscription(){
+    const registration = await adn66CatalanPushRegistration();
+    let subscription = await registration.pushManager.getSubscription();
+
+    if(!subscription){
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: adn66CatalanPushBase64ToUint8Array(ADN66_CATALAN_PUSH.vapidPublicKey)
+      });
+    }
+
+    await adn66CatalanPushSaveSubscription(subscription);
+  }
+
+  window.adn66CatalanPushRequestFromArticlesZone = async function(){
+    if(adn66CatalanPushBusy || !adn66CatalanPushSupported()) return;
+    if(Notification.permission === "denied") return;
+
+    adn66CatalanPushBusy = true;
+    try{
+      if(Notification.permission === "default"){
+        if(adn66CatalanPushCooldownRemaining() > 0) return;
+
+        // Demande navigateur directe, déclenchée par le clic utilisateur sur Zone ou Nos articles.
+        const permission = await Notification.requestPermission();
+        if(permission !== "granted"){
+          adn66CatalanPushSetCooldown();
+          return;
+        }
+      }
+
+      if(Notification.permission === "granted"){
+        await adn66CatalanPushCreateOrRefreshSubscription();
+      }
+    }catch(error){
+      console.warn("ADN66 Catalan push:", error);
+    }finally{
+      adn66CatalanPushBusy = false;
+    }
+  };
+
+  // =========================
   // ✅ Déclenche l'age gate sur les 4 boutons principaux
   // =========================
   const callBtn = document.getElementById('callBtn');
@@ -2377,11 +2482,17 @@ function trackCallClick(){
   });// Zone + Articles : on empêche l'ouverture directe, et on ouvre après validation
   zoneBtnEl?.addEventListener('click', (e) => {
     e.preventDefault();
+    if (typeof window.adn66CatalanPushRequestFromArticlesZone === "function") {
+      window.adn66CatalanPushRequestFromArticlesZone();
+    }
     requireMajorThen(() => openModal('zoneModal'));
   });
 
   articlesBtnEl?.addEventListener('click', (e) => {
     e.preventDefault();
+    if (typeof window.adn66CatalanPushRequestFromArticlesZone === "function") {
+      window.adn66CatalanPushRequestFromArticlesZone();
+    }
     requireMajorThen(() => openModal('articlesModal'));
   });
 
@@ -2801,7 +2912,7 @@ window.addEventListener('load', () => {
   if (!('serviceWorker' in navigator)) return;
   // Avoid double-registration
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js', { scope: './' })
+    navigator.serviceWorker.register('./sw.js?v=catalan-push-20260521-1', { scope: './' })
       .then(reg => {
         // If there's a waiting SW, activate it ASAP
         if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });

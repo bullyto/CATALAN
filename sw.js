@@ -303,3 +303,259 @@ self.addEventListener('fetch', (event) => {
   // default: try network then cache
   event.respondWith(fetch(request).catch(() => caches.match(request)));
 });
+
+
+/* ================================
+   🔔 WEB PUSH ADN66 — APÉRO CATALAN
+   Cible : target=catalan
+   ================================ */
+
+const ADN_PUSH_WORKER_URL = "https://adn66-push.apero-nuit-du-66.workers.dev";
+const ADN_PUSH_LATEST_URL = `${ADN_PUSH_WORKER_URL}/push/latest?target=catalan`;
+
+const DEFAULT_SITE_URL = "https://catalan.aperos.net/";
+const DEFAULT_ICON_URL = "https://bullyto.github.io/outil/apps/PUSH/icons/icon-catalan-192.png";
+const DEFAULT_BADGE_URL = "https://bullyto.github.io/outil/apps/PUSH/icons/badge-catalan-96.png";
+
+self.addEventListener("push", (event) => {
+  event.waitUntil(showCatalanPushNotification());
+});
+
+async function showCatalanPushNotification() {
+  const payload = await getLatestCatalanNotificationPayload();
+
+  const title = cleanPushText(payload.title) || "Apéro Catalan";
+  const body = cleanPushText(payload.body) || "Livraison disponible ce soir de 19h à 6h.";
+
+  const siteUrl = cleanPushSiteUrl(payload.site_url || payload.url) || DEFAULT_SITE_URL;
+  const iconUrl = cleanPushHttpsUrl(payload.icon_url) || DEFAULT_ICON_URL;
+  const badgeUrl = cleanPushHttpsUrl(payload.badge_url) || DEFAULT_BADGE_URL;
+  const imageUrl = cleanPushLargeImageUrl(payload.image_url || payload.image || payload.imageUrl || "");
+
+  const options = {
+    body,
+    icon: iconUrl,
+    badge: badgeUrl,
+    data: {
+      url: siteUrl,
+      site_url: siteUrl
+    },
+    tag: cleanPushTag(payload.tag) || "adn66-catalan-alerte",
+    renotify: toPushBoolean(payload.renotify, true),
+    requireInteraction: toPushBoolean(payload.require_interaction, true),
+    silent: toPushBoolean(payload.silent, false),
+    vibrate: cleanPushVibrate(payload.vibrate),
+    // Version volontairement sûre : tous les boutons ouvrent le site Catalan.
+    actions: [
+      { action: "open_site", title: "Voir le site" },
+      { action: "open_site_2", title: "Ouvrir" }
+    ]
+  };
+
+  if (imageUrl) {
+    options.image = imageUrl;
+  }
+
+  return self.registration.showNotification(title, options);
+}
+
+async function getLatestCatalanNotificationPayload() {
+  try {
+    const response = await fetch(ADN_PUSH_LATEST_URL, { cache: "no-store" });
+
+    if (!response.ok) {
+      return getFallbackCatalanNotificationPayload();
+    }
+
+    const data = await response.json();
+
+    if (data && data.notification) {
+      return {
+        ...getFallbackCatalanNotificationPayload(),
+        ...data.notification
+      };
+    }
+  } catch (error) {
+    // Fallback silencieux.
+  }
+
+  return getFallbackCatalanNotificationPayload();
+}
+
+function getFallbackCatalanNotificationPayload() {
+  return {
+    title: "Apéro Catalan",
+    body: "Livraison disponible ce soir de 19h à 6h.",
+    url: DEFAULT_SITE_URL,
+    site_url: DEFAULT_SITE_URL,
+    icon_url: DEFAULT_ICON_URL,
+    badge_url: DEFAULT_BADGE_URL,
+    image_url: "",
+    tag: "adn66-catalan-alerte",
+    renotify: true,
+    require_interaction: true,
+    silent: false,
+    vibrate: [500, 150, 500, 150, 800]
+  };
+}
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+
+  const data = event.notification.data || {};
+  const targetUrl = cleanPushSiteUrl(data.site_url || data.url) || DEFAULT_SITE_URL;
+
+  // Tous les clics de notification Apéro Catalan ouvrent le site Catalan.
+  event.waitUntil(openOrFocusCatalanSite(targetUrl));
+});
+
+async function openOrFocusCatalanSite(url) {
+  const finalUrl = cleanPushSiteUrl(url) || DEFAULT_SITE_URL;
+
+  const clientList = await clients.matchAll({
+    type: "window",
+    includeUncontrolled: true
+  });
+
+  for (const client of clientList) {
+    try {
+      const clientUrl = new URL(client.url);
+
+      if (clientUrl.hostname === "catalan.aperos.net") {
+        if ("navigate" in client) {
+          await client.navigate(finalUrl);
+        }
+        if ("focus" in client) {
+          return client.focus();
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  if (clients.openWindow) {
+    return clients.openWindow(finalUrl);
+  }
+
+  return undefined;
+}
+
+function cleanPushText(value) {
+  return String(value || "").replace(/\s+/g, " ").trim();
+}
+
+function cleanPushTag(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, "")
+    .slice(0, 80);
+}
+
+function cleanPushHttpsUrl(value) {
+  const raw = String(value || "").trim();
+
+  if (!raw) {
+    return "";
+  }
+
+  try {
+    const url = new URL(raw, self.location.href);
+
+    if (url.protocol !== "https:") {
+      return "";
+    }
+
+    return url.toString();
+  } catch {
+    return "";
+  }
+}
+
+function cleanPushSiteUrl(value) {
+  const url = cleanPushHttpsUrl(value);
+
+  if (!url) {
+    return "";
+  }
+
+  try {
+    const parsed = new URL(url);
+
+    // Sécurité : ce service worker Catalan ne doit jamais ouvrir Google Play.
+    if (parsed.hostname.includes("play.google.com")) {
+      return DEFAULT_SITE_URL;
+    }
+
+    return parsed.toString();
+  } catch {
+    return "";
+  }
+}
+
+function cleanPushLargeImageUrl(value) {
+  const imageUrl = cleanPushHttpsUrl(value);
+
+  if (!imageUrl) {
+    return "";
+  }
+
+  const normalized = imageUrl.toLowerCase();
+
+  // Ne pas afficher une icône ou un badge comme grande image.
+  if (
+    normalized.includes("/apps/push/icons/icon-") ||
+    normalized.includes("/apps/push/icons/badge-") ||
+    normalized.includes("apple-touch-icon") ||
+    normalized.includes("favicon")
+  ) {
+    return "";
+  }
+
+  return imageUrl;
+}
+
+function toPushBoolean(value, fallback) {
+  if (value === undefined || value === null || value === "") {
+    return Boolean(fallback);
+  }
+
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  if (typeof value === "number") {
+    return value !== 0;
+  }
+
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+
+    if (["true", "1", "yes", "oui"].includes(normalized)) {
+      return true;
+    }
+
+    if (["false", "0", "no", "non"].includes(normalized)) {
+      return false;
+    }
+  }
+
+  return Boolean(fallback);
+}
+
+function cleanPushVibrate(value) {
+  const fallback = [500, 150, 500, 150, 800];
+
+  if (!Array.isArray(value)) {
+    return fallback;
+  }
+
+  const cleaned = value
+    .map(v => Number(v))
+    .filter(v => Number.isFinite(v) && v >= 0 && v <= 2000)
+    .slice(0, 10);
+
+  return cleaned.length ? cleaned : fallback;
+}
+
