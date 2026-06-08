@@ -2076,7 +2076,10 @@ document.addEventListener('DOMContentLoaded', function() {
   window.closeModal = function(modalId) { modals[modalId].classList.remove('active'); };
   window.openModal = function(modalId) {
     modals[modalId].classList.add('active');
-    if(modalId === 'articlesModal') displayProducts(getActiveCategory(), searchInput.value, sortSelect.value);
+    if(modalId === 'articlesModal') {
+      displayProducts(getActiveCategory(), searchInput.value, sortSelect.value); // affichage immédiat cache
+      refreshStockOnce().then(() => displayProducts(getActiveCategory(), searchInput.value, sortSelect.value)); // puis vraie MAJ
+    }
   };
 
   Object.values(modals).forEach(modal => {
@@ -2109,24 +2112,22 @@ document.addEventListener('DOMContentLoaded', function() {
   // =========================
   const STOCK_BASE_GHP = 'https://bullyto.github.io/outil/apps/stock/stock/';
   const STOCK_BASE_RAW = 'https://raw.githubusercontent.com/bullyto/outil/main/apps/stock/stock/';
-  const STOCK_BASE = STOCK_BASE_GHP; // primary
+  const STOCK_WORKER_URL = 'https://adn66-stock-worker.apero-nuit-du-66.workers.dev';
+  const STOCK_BASE = STOCK_BASE_GHP; // images + fallback GitHub Pages
 
   const STOCK_SNAPSHOT_URL = `${STOCK_BASE}_snapshot.json`;
+  const STOCK_RAW_SNAPSHOT_URL = `${STOCK_BASE_RAW}_snapshot.json`;
   const STOCK_IMG_BASE = STOCK_BASE; // images: <id>.png dans le même dossier
   const ALCOHOL_CATS = new Set(["vodka","whisky","rhum","liqueurs","gin","tequila","pastis","vin"]);
   let stockAvail = {}; // {id: true/false}
   let stockUpdatedAt = 0;
+  let stockRefreshPromise = null;
 
-  async function fetchStockSnapshot(){
-    // cache-bust + no-store pour coller au "temps réel"
-    const url = `${STOCK_SNAPSHOT_URL}?t=${Date.now()}`;
-    const res = await fetch(url, { cache:"no-store" });
-    if(!res.ok) throw new Error("snapshot_fetch_failed");
-    const snap = await res.json();
+  function applyVehicleSnapshot(snap){
     if(!snap || !Array.isArray(snap.items)) throw new Error("snapshot_bad");
     const map = {};
     snap.items.forEach(it => {
-      if(!it || !it.id) return;
+      if(!it || it.id === undefined || it.id === null) return;
       const q = Number(it.qty);
       map[String(it.id)] = Number.isFinite(q) ? (q > 0) : false;
     });
@@ -2135,6 +2136,58 @@ document.addEventListener('DOMContentLoaded', function() {
     try{
       localStorage.setItem("ac_stock_snapshot_cache_v1", JSON.stringify({ savedAt: stockUpdatedAt, avail: stockAvail }));
     }catch{}
+  }
+
+  async function fetchJsonNoStore(url){
+    const sep = url.includes("?") ? "&" : "?";
+    const res = await fetch(`${url}${sep}t=${Date.now()}`, { cache:"no-store" });
+    if(!res.ok) throw new Error("fetch_failed_" + res.status);
+    return res.json();
+  }
+
+  async function fetchStockSnapshot(){
+    // Priorité Worker Cloudflare : c'est lui qui reçoit la publication du module Stock.
+    // Fallbacks conservés pour ne rien casser : GitHub Pages puis raw GitHub.
+    const errors = [];
+
+    try{
+      const data = await fetchJsonNoStore(`${STOCK_WORKER_URL}/api/stock/load`);
+      if(data && data.ok === true && data.vehicle && Array.isArray(data.vehicle.items)){
+        applyVehicleSnapshot(data.vehicle);
+        return;
+      }
+      errors.push("worker_bad");
+    }catch(e){
+      errors.push("worker_" + (e && e.message ? e.message : "error"));
+    }
+
+    try{
+      const snap = await fetchJsonNoStore(STOCK_SNAPSHOT_URL);
+      applyVehicleSnapshot(snap);
+      return;
+    }catch(e){
+      errors.push("ghp_" + (e && e.message ? e.message : "error"));
+    }
+
+    try{
+      const snap = await fetchJsonNoStore(STOCK_RAW_SNAPSHOT_URL);
+      applyVehicleSnapshot(snap);
+      return;
+    }catch(e){
+      errors.push("raw_" + (e && e.message ? e.message : "error"));
+    }
+
+    throw new Error("snapshot_fetch_failed: " + errors.join(" / "));
+  }
+
+  async function refreshStockOnce(){
+    if(stockRefreshPromise) return stockRefreshPromise;
+    stockRefreshPromise = fetchStockSnapshot().catch(err => {
+      console.warn("Stock refresh failed", err);
+    }).finally(() => {
+      stockRefreshPromise = null;
+    });
+    return stockRefreshPromise;
   }
 
   function loadStockCache(){
@@ -2165,13 +2218,16 @@ document.addEventListener('DOMContentLoaded', function() {
       while(i < toFetch.length){
         const id = toFetch[i++];
         try{
-          const url = `${STOCK_BASE}${encodeURIComponent(id)}.json?t=${Date.now()}`;
-          const res = await fetch(url, { cache:"no-store" });
-          if(!res.ok) continue;
-          const data = await res.json();
+          const data = await fetchJsonNoStore(`${STOCK_BASE}${encodeURIComponent(id)}.json`);
           const q = Number(data && data.qty);
           if(Number.isFinite(q)) stockAvail[id] = (q > 0);
-        }catch(e){}
+        }catch(e){
+          try{
+            const data = await fetchJsonNoStore(`${STOCK_BASE_RAW}${encodeURIComponent(id)}.json`);
+            const q = Number(data && data.qty);
+            if(Number.isFinite(q)) stockAvail[id] = (q > 0);
+          }catch(_e){}
+        }
       }
     }
     await Promise.all(Array.from({length: Math.min(CONC, toFetch.length)}, worker));
@@ -2315,7 +2371,16 @@ const base = getProductsForCategory(category);
   searchInput.addEventListener('input', () => displayProducts(getActiveCategory(), searchInput.value, sortSelect.value));
   sortSelect.addEventListener('change', () => displayProducts(getActiveCategory(), searchInput.value, sortSelect.value));
 
+  setInterval(() => {
+    refreshStockOnce().then(() => {
+      if(modals.articlesModal && modals.articlesModal.classList.contains('active')){
+        displayProducts(getActiveCategory(), searchInput.value, sortSelect.value);
+      }
+    });
+  }, 60000);
+
   displayProducts('all', '', 'popular');
+  refreshStockOnce().then(() => displayProducts(getActiveCategory(), searchInput.value, sortSelect.value));
 
   // =========================
   // 🔔 PUSH CATALAN — activation directe sur Zone + Articles
