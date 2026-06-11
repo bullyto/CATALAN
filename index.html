@@ -2898,9 +2898,16 @@ window.addEventListener('load', () => {
       currentMode = mode;
 
       const base = STATUS_URL.replace(/\/status\.json$/,'/');
-      const imgUrl = (cfg.image || "").startsWith("http") ? cfg.image : (base + (cfg.image || ""));
+      const rawImg = cfg.image_catalan_disabled ? "" : (cfg.image_catalan || cfg.image || "");
+      const imgUrl = rawImg ? (String(rawImg).startsWith("http") ? rawImg : (base + rawImg)) : "";
 
-      imgEl.src = imgUrl;
+      if(imgUrl){
+        imgEl.src = imgUrl;
+        imgEl.style.display = "block";
+      }else{
+        imgEl.removeAttribute("src");
+        imgEl.style.display = "none";
+      }
       titleEl.textContent = cfg.title || "Information";
       msgEl.textContent = cfg.message || "";
 
