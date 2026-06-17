@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+  <title>Page introuvable – L'apéro catalan®</title>
+  <meta name="description" content="Page introuvable. Retournez à l'accueil de L'apéro catalan® ou appelez directement pour commander." />
+  <meta name="robots" content="noindex,follow" />
+  <meta name="theme-color" content="#8a0b0b" />
+
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./favicon.png" sizes="48x48" type="image/png" />
+  <link rel="icon" href="./icons/icon-192.png" sizes="192x192" type="image/png" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet" />
+
+  <style>
+    :root{
+      --primary:#C61910;
+      --primary-dark:#8a0b0b;
+      --secondary:#FFB81C;
+      --cream:#fff8ee;
+      --text:#242424;
+      --muted:#666;
+      --card:rgba(255,255,255,.94);
+      --shadow:0 18px 55px rgba(0,0,0,.28);
+      --radius:24px;
+    }
+
+    *{ box-sizing:border-box; }
+
+    html,body{
+      margin:0;
+      min-height:100%;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:#2a0a0c;
+    }
+
+    body{
+      min-height:100svh;
+      display:flex;
+      justify-content:center;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.35)),
+        url("https://readdy.ai/api/search-image?query=blurred%20background%2C%20warm%20and%20festive%20atmosphere%2C%20people%20celebrating%2C%20soft%20lights%2C%20party%20mood%2C%20warm%20colors%2C%20subtle%20pattern%2C%20low%20opacity%20for%20text%20readability%2C%20no%20distinct%20objects&width=430&height=932&seq=404catalan&orientation=portrait");
+      background-size:cover;
+      background-position:center;
+      background-attachment:fixed;
+    }
+
+    .phone{
+      width:100%;
+      max-width:430px;
+      min-height:100svh;
+      position:relative;
+      overflow:hidden;
+      background:rgba(255,255,255,.03);
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:10;
+      background:rgba(255,255,255,.96);
+      box-shadow:0 8px 24px rgba(0,0,0,.12);
+      padding:12px 18px 18px;
+      text-align:center;
+    }
+
+    .top-icons{
+      position:absolute;
+      top:20px;
+      left:18px;
+      right:18px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      pointer-events:none;
+    }
+
+    .menu-lines{
+      width:28px;
+      height:22px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
+
+    .menu-lines span{
+      display:block;
+      height:4px;
+      border-radius:999px;
+      background:var(--primary);
+    }
+
+    .bag{
+      position:relative;
+      color:var(--primary);
+      font-size:32px;
+      line-height:1;
+    }
+
+    .bag::after{
+      content:"0";
+      position:absolute;
+      top:-9px;
+      right:-9px;
+      width:22px;
+      height:22px;
+      display:grid;
+      place-items:center;
+      border-radius:999px;
+      background:var(--primary);
+      color:#fff;
+      font-size:12px;
+      font-weight:900;
+      border:2px solid #fff;
+    }
+
+    .logo-wrap{
+      width:122px;
+      height:122px;
+      margin:0 auto 7px;
+      border-radius:999px;
+      padding:5px;
+      background:#fff;
+      border:3px solid rgba(255,184,28,.65);
+      box-shadow:0 12px 24px rgba(0,0,0,.12);
+      overflow:hidden;
+    }
+
+    .logo-wrap img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      border-radius:999px;
+      display:block;
+    }
+
+    .brand{
+      margin:0;
+      font-family:"Pacifico", cursive;
+      color:var(--primary);
+      font-size:29px;
+      line-height:1;
+      font-weight:400;
+      text-shadow:0 1px 0 rgba(255,255,255,.8);
+    }
+
+    main{
+      padding:26px 14px 34px;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      border:1px solid rgba(255,255,255,.75);
+      padding:26px 18px 20px;
+      text-align:center;
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+    }
+
+    .error-line{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:16px;
+      color:#d8a43c;
+      margin-bottom:2px;
+    }
+
+    .spark{
+      font-size:31px;
+      line-height:1;
+      filter:drop-shadow(0 4px 8px rgba(216,164,60,.22));
+    }
+
+    .divider{
+      width:42px;
+      height:2px;
+      background:linear-gradient(90deg, transparent, #d8a43c, transparent);
+      border-radius:999px;
+    }
+
+    .code{
+      margin:0;
+      color:var(--primary);
+      font-size:96px;
+      line-height:.86;
+      font-weight:950;
+      letter-spacing:1px;
+      font-family:Georgia,"Times New Roman",serif;
+      text-shadow:0 5px 0 rgba(138,11,11,.08);
+    }
+
+    .title{
+      margin:18px 0 8px;
+      font-size:29px;
+      line-height:1.08;
+      font-weight:950;
+      letter-spacing:-.8px;
+    }
+
+    .subtitle{
+      margin:0 auto 18px;
+      max-width:330px;
+      color:#444;
+      font-size:17px;
+      line-height:1.35;
+      font-weight:500;
+    }
+
+    .van-scene{
+      margin:15px auto 18px;
+      width:min(310px,100%);
+      height:120px;
+      position:relative;
+      border-radius:22px;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 14% 22%, rgba(255,184,28,.35) 0 2px, transparent 3px),
+        radial-gradient(circle at 29% 15%, rgba(255,184,28,.55) 0 2px, transparent 3px),
+        radial-gradient(circle at 43% 27%, rgba(255,184,28,.35) 0 2px, transparent 3px),
+        linear-gradient(180deg, rgba(255,248,238,.9), rgba(255,255,255,.2));
+    }
+
+    .moon{
+      position:absolute;
+      left:18px;
+      top:22px;
+      width:28px;
+      height:28px;
+      border-radius:50%;
+      background:#2a2524;
+      box-shadow:9px -4px 0 0 var(--cream);
+    }
+
+    .castle{
+      position:absolute;
+      right:36px;
+      bottom:29px;
+      width:58px;
+      height:58px;
+      background:#2f2b2b;
+      clip-path:polygon(0 100%,0 38%,13% 38%,13% 25%,27% 25%,27% 38%,44% 38%,44% 16%,59% 16%,59% 38%,74% 38%,74% 27%,89% 27%,89% 38%,100% 38%,100% 100%);
+      opacity:.9;
+    }
+
+    .road{
+      position:absolute;
+      left:34px;
+      right:34px;
+      bottom:20px;
+      height:4px;
+      background:linear-gradient(90deg, transparent, rgba(0,0,0,.5), transparent);
+      border-radius:999px;
+    }
+
+    .speed{
+      position:absolute;
+      left:40px;
+      bottom:45px;
+      width:66px;
+      height:36px;
+      border-top:5px solid #3a302e;
+      border-bottom:4px solid #3a302e;
+      opacity:.85;
+      transform:skewX(-17deg);
+    }
+
+    .van{
+      position:absolute;
+      left:92px;
+      bottom:28px;
+      width:128px;
+      height:60px;
+      border-radius:14px 24px 12px 12px;
+      background:linear-gradient(180deg, #e42118, #b80e08);
+      box-shadow:0 9px 16px rgba(0,0,0,.18);
+    }
+
+    .van::before{
+      content:"L’apéro\a catalan";
+      white-space:pre;
+      position:absolute;
+      left:15px;
+      top:13px;
+      color:#fff;
+      font-family:"Pacifico", cursive;
+      font-size:15px;
+      line-height:.9;
+      text-align:left;
+      transform:rotate(-2deg);
+    }
+
+    .van::after{
+      content:"";
+      position:absolute;
+      right:13px;
+      top:11px;
+      width:35px;
+      height:24px;
+      border-radius:8px 14px 5px 5px;
+      background:linear-gradient(135deg, #fff, #dbeafe);
+      clip-path:polygon(15% 0,100% 0,100% 100%,0 100%);
+      border:2px solid rgba(0,0,0,.25);
+    }
+
+    .wheel{
+      position:absolute;
+      bottom:-8px;
+      width:22px;
+      height:22px;
+      border-radius:50%;
+      background:#2b2523;
+      border:4px solid #6b5240;
+    }
+
+    .wheel.one{ left:20px; }
+    .wheel.two{ right:18px; }
+
+    .light{
+      position:absolute;
+      right:-4px;
+      bottom:18px;
+      width:13px;
+      height:13px;
+      border-radius:50%;
+      background:#ffd36b;
+      box-shadow:0 0 22px 6px rgba(255,211,107,.65);
+    }
+
+    .actions{
+      display:grid;
+      gap:11px;
+      margin-top:16px;
+    }
+
+    .btn{
+      min-height:58px;
+      border:0;
+      border-radius:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      text-decoration:none;
+      font-size:18px;
+      font-weight:950;
+      letter-spacing:.5px;
+      text-transform:uppercase;
+      cursor:pointer;
+      -webkit-tap-highlight-color:transparent;
+      transition:transform .15s ease, filter .15s ease;
+    }
+
+    .btn:active{ transform:scale(.985); }
+
+    .btn-primary{
+      color:#fff;
+      background:linear-gradient(180deg, #df1d14, #b60f09);
+      box-shadow:0 12px 25px rgba(198,25,16,.28);
+    }
+
+    .btn-secondary{
+      color:#fff;
+      background:linear-gradient(180deg, #ffc928, #f2a900);
+      box-shadow:0 12px 25px rgba(255,184,28,.25);
+    }
+
+    .btn-outline{
+      color:var(--primary);
+      background:#fff;
+      border:2px solid rgba(198,25,16,.75);
+      box-shadow:0 8px 20px rgba(0,0,0,.06);
+    }
+
+    .info-card{
+      margin-top:20px;
+      background:#fff;
+      border-radius:20px;
+      padding:11px 16px;
+      box-shadow:0 10px 26px rgba(0,0,0,.08);
+      border:1px solid rgba(0,0,0,.05);
+      text-align:left;
+    }
+
+    .info-row{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      padding:12px 0;
+      font-size:16px;
+      color:#333;
+      font-weight:550;
+    }
+
+    .info-row + .info-row{ border-top:1px solid rgba(0,0,0,.08); }
+
+    .info-row i{
+      width:34px;
+      height:34px;
+      flex:0 0 auto;
+      display:grid;
+      place-items:center;
+      border-radius:12px;
+      color:var(--primary);
+      font-size:23px;
+      background:rgba(198,25,16,.08);
+    }
+
+    .app-card{
+      margin-top:20px;
+      background:rgba(255,255,255,.96);
+      border-radius:20px;
+      padding:12px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-align:left;
+      box-shadow:0 10px 26px rgba(0,0,0,.10);
+    }
+
+    .app-icon{
+      width:62px;
+      height:62px;
+      border-radius:18px;
+      object-fit:cover;
+      flex:0 0 auto;
+      box-shadow:0 8px 18px rgba(198,25,16,.18);
+    }
+
+    .app-text{
+      min-width:0;
+      flex:1;
+    }
+
+    .app-text strong{
+      display:block;
+      font-size:16px;
+      line-height:1.1;
+      margin-bottom:4px;
+    }
+
+    .app-text span{
+      display:block;
+      color:#444;
+      font-size:12.5px;
+      line-height:1.25;
+    }
+
+    .play{
+      flex:0 0 auto;
+      text-decoration:none;
+      color:#fff;
+      background:#111;
+      border-radius:8px;
+      padding:7px 9px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      font-size:10px;
+      line-height:1.02;
+      font-weight:800;
+      box-shadow:0 6px 14px rgba(0,0,0,.18);
+    }
+
+    .play i{
+      font-size:23px;
+      color:#4ade80;
+    }
+
+    .footer-msg{
+      margin:18px 0 0;
+      text-align:center;
+      color:rgba(255,255,255,.92);
+      text-shadow:0 2px 10px rgba(0,0,0,.45);
+      font-size:15px;
+      line-height:1.35;
+    }
+
+    .footer-msg i{ color:#ffdddd; }
+
+    @media (max-width:370px){
+      .brand{ font-size:25px; }
+      .logo-wrap{ width:106px; height:106px; }
+      main{ padding-left:10px; padding-right:10px; }
+      .card{ padding:22px 13px 16px; }
+      .code{ font-size:82px; }
+      .title{ font-size:25px; }
+      .subtitle{ font-size:15.5px; }
+      .btn{ min-height:54px; font-size:16px; }
+      .app-card{ gap:9px; }
+      .play{ padding:7px; font-size:9px; }
+    }
+
+    @media (prefers-reduced-motion:no-preference){
+      .card{
+        animation:cardIn .45s ease both;
+      }
+      .van{
+        animation:vanFloat 2.8s ease-in-out infinite;
+      }
+      .btn-primary{
+        animation:softPulse 2.5s ease-in-out infinite;
+      }
+
+      @keyframes cardIn{
+        from{ opacity:0; transform:translateY(14px) scale(.985); }
+        to{ opacity:1; transform:translateY(0) scale(1); }
+      }
+
+      @keyframes vanFloat{
+        0%,100%{ transform:translateY(0); }
+        50%{ transform:translateY(-3px); }
+      }
+
+      @keyframes softPulse{
+        0%,100%{ box-shadow:0 12px 25px rgba(198,25,16,.28), 0 0 0 0 rgba(198,25,16,.25); }
+        50%{ box-shadow:0 12px 25px rgba(198,25,16,.28), 0 0 0 9px rgba(198,25,16,0); }
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="phone">
+    <header class="topbar">
+      <div class="top-icons" aria-hidden="true">
+        <div class="menu-lines"><span></span><span></span><span></span></div>
+        <div class="bag"><i class="ri-shopping-bag-line"></i></div>
+      </div>
+
+      <div class="logo-wrap">
+        <img
+          src="https://i.postimg.cc/MHrNcvMr/file-000000002c906243b1fb58ce1bd6d82d-1.png"
+          alt="Logo L'apéro catalan"
+          onerror="this.onerror=null;this.src='./icons/icon-192.png';"
+        />
+      </div>
+
+      <h1 class="brand">L'apéro catalan®</h1>
+    </header>
+
+    <main>
+      <section class="card" aria-labelledby="title404">
+        <div class="error-line" aria-hidden="true">
+          <span class="divider"></span>
+          <span class="spark">✦</span>
+          <span class="divider"></span>
+        </div>
+
+        <p class="code">404</p>
+
+        <h2 id="title404" class="title">Oups… cette page<br />est introuvable</h2>
+        <p class="subtitle">Le lien que vous cherchez n’existe plus ou a changé d’adresse.</p>
+
+        <div class="van-scene" aria-hidden="true">
+          <span class="moon"></span>
+          <span class="castle"></span>
+          <span class="speed"></span>
+          <span class="road"></span>
+          <div class="van">
+            <span class="wheel one"></span>
+            <span class="wheel two"></span>
+            <span class="light"></span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <a class="btn btn-primary" href="./">
+            <i class="ri-home-5-fill"></i>
+            Retour à l’accueil
+          </a>
+
+          <a class="btn btn-secondary" href="tel:0652336461">
+            <i class="ri-phone-fill"></i>
+            Appeler
+          </a>
+
+          <a class="btn btn-outline" href="./#articles">
+            <i class="ri-list-check-2"></i>
+            Nos articles
+          </a>
+        </div>
+
+        <div class="info-card">
+          <div class="info-row">
+            <i class="ri-time-line"></i>
+            <span>Livraison 7j/7 de 19h à 6h</span>
+          </div>
+          <div class="info-row">
+            <i class="ri-map-pin-2-fill"></i>
+            <span>Jusqu’à 30 km de Perpignan</span>
+          </div>
+          <div class="info-row">
+            <i class="ri-shield-check-fill"></i>
+            <span>Service rapide et professionnel</span>
+          </div>
+        </div>
+
+        <div class="app-card">
+          <img
+            class="app-icon"
+            src="./icons/icon-192.png"
+            alt="Icône application L'apéro catalan"
+            onerror="this.onerror=null;this.src='https://i.postimg.cc/MHrNcvMr/file-000000002c906243b1fb58ce1bd6d82d-1.png';"
+          />
+          <div class="app-text">
+            <strong>L’apéro catalan®</strong>
+            <span>Téléchargez l’application et commandez encore plus vite.</span>
+          </div>
+          <a class="play" href="https://play.google.com/store/apps/details?id=net.aperos.catalan" target="_blank" rel="noopener" aria-label="Ouvrir Google Play">
+            <i class="ri-google-play-fill"></i>
+            <span>DISPONIBLE<br />Google Play</span>
+          </a>
+        </div>
+      </section>
+
+      <p class="footer-msg">
+        <i class="ri-heart-fill"></i>
+        Merci de votre fidélité et à très vite !<br />
+        L’équipe L’apéro catalan®
+      </p>
+    </main>
+  </div>
+
+  <script>
+    // Sur la page 404, le bouton “Nos articles” renvoie proprement à l’accueil.
+    // Si votre page d’accueil utilise un autre ancrage, modifiez simplement href="./#articles".
+    (function(){
+      const isStandalone =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        window.navigator.standalone === true;
+
+      if (isStandalone) {
+        document.body.classList.add("is-pwa");
+      }
+    })();
+  </script>
+</body>
+</html>
